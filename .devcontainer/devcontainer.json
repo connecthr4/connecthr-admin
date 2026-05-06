@@ -23,7 +23,7 @@
     }
   },
 
-  "postStartCommand": "bash .devcontainer/checkout-main.sh",
+  "postStartCommand": "sh .devcontainer/checkout-main.sh",
 
   "forwardPorts": [3000],
   "portsAttributes": {
@@ -34,6 +34,7 @@
   },
 
   "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind",
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
     "source=pnpm-store,target=/home/node/.pnpm-store,type=volume"
   ],
