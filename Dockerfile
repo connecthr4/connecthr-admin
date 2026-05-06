@@ -1,8 +1,8 @@
 # Use official Node.js image
 FROM node:20-alpine
 
-# Install Git and Bash
-RUN apk add --no-cache git bash
+# Install Git and ssh
+RUN apk add --no-cache git openssh
 
 # Set working directory inside the container
 WORKDIR /app
