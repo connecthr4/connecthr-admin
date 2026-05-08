@@ -1,0 +1,29 @@
+/**
+ * {{ componentDescription }}
+ *
+ * @example
+ * ```tsx
+ * import {{pascalCase name}} from '@src/components/{{pascalCase name}}'
+ *
+ * export default function {{pascalCase name}}() {
+ *   return <{{pascalCase name}} label="Hello" />;
+ * }
+ * ```
+ */
+
+import styles from './{{pascalCase name}}.module.scss';
+
+/**
+ * Define the props available for the {{pascalCase name}} component.
+ */
+interface {{pascalCase name}}Props {
+  label?: string;
+}
+
+export default function {{pascalCase name}}({ label = 'label' }: {{pascalCase name}}Props) {
+  return (
+    <div className={styles.container}>
+      {{pascalCase name}} component - {label}
+    </div>
+  );
+}
