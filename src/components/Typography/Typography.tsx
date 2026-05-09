@@ -6,10 +6,7 @@
  * import Typography from '@src/components/Typography'
  *
  * export default function Typography() {
- *    return <Typography
- *            label="Hello"
- *            tag="span"
- *          />;
+ *    return <Typography tag="span">Hello</Typography>;
  * }
  * ```
  */
