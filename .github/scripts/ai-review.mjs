@@ -1,11 +1,11 @@
-import fs from "fs";
+import fs from 'fs';
 
 /* =======================
    Config
 ======================= */
 
-const PRIMARY_MODEL = "gemini-2.5-flash";
-const FALLBACK_MODEL = "gemini-1.5-flash";
+const PRIMARY_MODEL = 'gemini-2.5-flash';
+const FALLBACK_MODEL = 'gemini-1.5-flash';
 
 const MAX_CHARS = 40000;
 
@@ -15,9 +15,9 @@ const MAX_CHARS = 40000;
 
 function safeRead(file) {
   try {
-    return fs.readFileSync(file, "utf8");
+    return fs.readFileSync(file, 'utf8');
   } catch {
-    return "";
+    return '';
   }
 }
 
@@ -25,9 +25,9 @@ async function callGemini(model, prompt) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       contents: [
@@ -49,11 +49,11 @@ async function callGemini(model, prompt) {
 ======================= */
 
 async function run() {
-  const diffRaw = safeRead("diff.txt");
-  const eslintRaw = safeRead("eslint-report.json");
+  const diffRaw = safeRead('diff.txt');
+  const eslintRaw = safeRead('eslint-report.json');
 
   if (!diffRaw.trim()) {
-    console.log("No changes found.");
+    console.log('No changes found.');
     process.exit(0);
   }
 
@@ -65,39 +65,85 @@ async function run() {
   ======================= */
 
   const prompt = `
-You are a senior React Native engineer reviewing a pull request.
+You are a senior Next.js + React + TypeScript engineer reviewing a pull request.
+
+Your task is to review ONLY the changed code from the provided git diff.
 
 Focus ONLY on:
 - Bugs
-- Performance issues
+- Runtime issues
+- Next.js best practices
+- React performance issues
 - Security concerns
-- React Native best practices
 - TypeScript issues
+- Hydration problems
+- Server vs Client Component mistakes
+- Async/data fetching issues
 - Memory leaks
-- Async issues
+- Accessibility issues (only critical ones)
+- Incorrect React hooks usage
+- SEO issues in Next.js
+- App Router best practices
+- API route/security issues
+- Suspicious state management issues
 
 DO NOT:
 - Give formatting suggestions
-- Mention lint issues unless critical
+- Mention lint/prettier issues unless critical
 - Give generic praise
 - Suggest unnecessary refactors
+- Comment on unchanged code
+- Suggest micro optimizations
+- Repeat ESLint errors unless they are severe
+
+Next.js specific checks:
+- Detect unnecessary "use client"
+- Detect server component misuse
+- Detect client component misuse
+- Detect async client component issues
+- Detect improper data fetching
+- Detect missing loading/error handling
+- Detect improper caching/revalidation
+- Detect hydration mismatch risks
+- Detect large client bundle risks
+- Detect insecure API usage
+- Detect environment variable exposure
+- Detect improper metadata usage
+- Detect missing key props
+- Detect improper image/font optimization
+- Detect route handler mistakes
 
 Return ONLY valid JSON array.
 
 Example:
 [
   {
-    "file": "src/screens/Login.tsx",
+    "file": "src/app/login/page.tsx",
     "line": 42,
     "severity": "warning",
-    "comment": "Avoid storing sensitive tokens in AsyncStorage."
+    "comment": "This client component performs async data fetching directly during render which can cause hydration inconsistencies.",
+    "suggestion": "Move the data fetching to a Server Component or fetch the data inside useEffect.",
+    "code": "useEffect(() => { fetchData(); }, []);"
   }
 ]
 
-IMPORTANT:
+Rules:
 - Only review changed lines
 - Only use files from diff
 - Line numbers must exist in diff
+- Keep comments short and actionable
+- Use severity values: "info", "warning", or "critical"
+- Every review must include a short fix suggestion
+- Suggestions must be actionable
+- Keep suggestions concise
+- Do not generate full refactors
+- Do not suggest formatting fixes
+- Include a minimal code suggestion when possible
+- Keep code snippets under 10 lines
+- Do not hallucinate fixes
+- Only suggest fixes relevant to the changed code
+- If unsure, do not generate a suggestion
+- If no issues are found, return []
 
 DIFF:
 ${diff}
@@ -121,10 +167,7 @@ ${eslintReport}
   }
 
   if (aiData.error) {
-    console.error(
-      "All Gemini models failed:",
-      JSON.stringify(aiData.error, null, 2),
-    );
+    console.error('All Gemini models failed:', JSON.stringify(aiData.error, null, 2));
 
     process.exit(1);
   }
@@ -136,13 +179,13 @@ ${eslintReport}
   const raw = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!raw) {
-    console.log("No AI review generated.");
+    console.log('No AI review generated.');
     process.exit(0);
   }
 
   const cleaned = raw
-    .replace(/```json/g, "")
-    .replace(/```/g, "")
+    .replace(/```json/g, '')
+    .replace(/```/g, '')
     .trim();
 
   let reviews = [];
@@ -150,14 +193,14 @@ ${eslintReport}
   try {
     reviews = JSON.parse(cleaned);
   } catch (err) {
-    console.error("Invalid JSON returned by AI");
+    console.error('Invalid JSON returned by AI');
     console.error(cleaned);
 
     process.exit(1);
   }
 
   if (!reviews.length) {
-    console.log("No review comments generated.");
+    console.log('No review comments generated.');
     process.exit(0);
   }
 
@@ -165,22 +208,21 @@ ${eslintReport}
      GitHub Setup
   ======================= */
 
-  const [owner, repo] = process.env.REPO.split("/");
+  const [owner, repo] = process.env.REPO.split('/');
 
   const headers = {
-    Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-    Accept: "application/vnd.github+json",
-    "Content-Type": "application/json",
+    'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json',
   };
 
   /* =======================
      Get PR Details
   ======================= */
 
-  const prRes = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/pulls/${process.env.PR_NUMBER}`,
-    { headers },
-  );
+  const prRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/pulls/${process.env.PR_NUMBER}`, {
+    headers,
+  });
 
   const prData = await prRes.json();
 
@@ -192,44 +234,62 @@ ${eslintReport}
 
   for (const review of reviews) {
     try {
-      const response = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/pulls/${process.env.PR_NUMBER}/comments`,
-        {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            body: `## 🤖 AI Review
+      const reviewBody = `## 🤖 AI Review
 
 **Severity:** ${review.severity}
 
+### Issue
 ${review.comment}
-`,
+
+${
+  review.suggestion
+    ? `### Suggested Fix
+${review.suggestion}
+`
+    : ''
+}
+
+${
+  review.code
+    ? `### Example Code
+\`\`\`ts
+${review.code}
+\`\`\`
+`
+    : ''
+}
+`;
+
+      const response = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/pulls/${process.env.PR_NUMBER}/comments`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            body: reviewBody,
             commit_id: commitId,
             path: review.file,
             line: review.line,
-            side: "RIGHT",
+            side: 'RIGHT',
           }),
-        },
+        }
       );
 
       const data = await response.json();
 
       if (data.message) {
-        console.error(`Failed for ${review.file}:${review.line}`, data);
+        console.error(`Failed for ${review.file}:${review.line}`, JSON.stringify(data, null, 2));
 
         continue;
       }
 
       console.log(`Created review for ${review.file}:${review.line}`);
     } catch (err) {
-      console.error(
-        `Error creating review for ${review.file}:${review.line}`,
-        err,
-      );
+      console.error(`Error creating review for ${review.file}:${review.line}`, err);
     }
   }
 
-  console.log("AI review completed successfully.");
+  console.log('AI review completed successfully.');
 }
 
 run().catch((err) => {
