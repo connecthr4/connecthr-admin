@@ -12,4 +12,17 @@
   --color-lime-500: #a3d139;
   --color-purple-400: #8d75f5;
   --color-gray-900: #16151c;
+
+  /* Layout */
+  /* --sidebar-width: 280px;
+  --header-height: 72px; */
+
+  /* Spacing */
+  /* --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px; */
+
+  /* Radius */
+  /* --radius-md: 12px; */
 }

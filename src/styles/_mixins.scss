@@ -1,0 +1,30 @@
+/* -----------------------------
+  Breakpoints
+----------------------------- */
+$breakpoint-sm: 768px; // Tablet
+$breakpoint-md: 1024px; // Laptop
+$breakpoint-lg: 1280px; // Desktop
+$breakpoint-xl: 1440px; // Large Desktop
+
+/* -----------------------------
+  Responsive Mixin
+----------------------------- */
+@mixin respond($breakpoint) {
+  @if $breakpoint == sm {
+    @media (max-width: #{$breakpoint-sm}) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (max-width: #{$breakpoint-md}) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (max-width: #{$breakpoint-lg}) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (max-width: #{$breakpoint-xl}) {
+      @content;
+    }
+  }
+}
