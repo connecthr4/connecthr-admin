@@ -1,0 +1,67 @@
+/**
+------------------------------------------------------
+styles specific to the Typography component
+------------------------------------------------------
+**/
+
+.typography {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-inter);
+  color: var(--color-black);
+
+  // Alignment
+  &.align-left {
+    text-align: left;
+  }
+  &.align-center {
+    text-align: center;
+  }
+  &.align-right {
+    text-align: right;
+  }
+  &.align-justify {
+    text-align: justify;
+  }
+  &.align-start {
+    text-align: start;
+  }
+  &.align-end {
+    text-align: end;
+  }
+  &.align-match-parent {
+    text-align: match-parent;
+  }
+
+  // Text Transform
+  &.transform-uppercase {
+    text-transform: uppercase;
+  }
+  &.transform-lowercase {
+    text-transform: lowercase;
+  }
+  &.transform-capitalize {
+    text-transform: capitalize;
+  }
+
+  // Truncation
+  &.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.noWrap {
+    white-space: nowrap;
+  }
+
+  // Line Clamping
+  @for $i from 1 through 5 {
+    &.lineClamp-#{$i} {
+      display: -webkit-box;
+      -webkit-line-clamp: #{$i};
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+}
