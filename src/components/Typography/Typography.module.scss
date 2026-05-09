@@ -11,25 +11,25 @@ styles specific to the Typography component
   color: var(--color-black);
 
   // Alignment
-  .align-left {
+  &.align-left {
     text-align: left;
   }
-  .align-center {
+  &.align-center {
     text-align: center;
   }
-  .align-right {
+  &.align-right {
     text-align: right;
   }
-  .align-right {
+  &.align-justify {
     text-align: justify;
   }
-  .align-right {
+  &.align-start {
     text-align: start;
   }
-  .align-right {
+  &.align-end {
     text-align: end;
   }
-  .align-right {
+  &.align-match-parent {
     text-align: match-parent;
   }
 

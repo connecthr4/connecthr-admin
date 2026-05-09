@@ -73,13 +73,14 @@ type Truncation = 'ellipsis' | 'noWrap' | `lineClamp-${number}`;
 
 export type TextAlign = 'left' | 'right' | 'center' | 'justify' | 'start' | 'end' | 'match-parent';
 
-export type Tags = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'h6' | 'li' | 'span' | 'label';
+export type Tags = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'li' | 'span' | 'label';
 
 const TagsMapping: Record<Tags, keyof JSX.IntrinsicElements> = {
   h1: 'h1',
   h2: 'h2',
   h3: 'h3',
   h4: 'h4',
+  h5: 'h5',
   h6: 'h6',
   p: 'p',
   li: 'li',
