@@ -11,86 +11,69 @@
  * ```
  */
 
-import React, { JSX, ReactNode, ElementType } from 'react';
+import React, { ReactNode, ElementType } from 'react';
 import clsx from 'clsx';
 import styles from './Typography.module.scss';
 
 /**
  * Define the props available for the Typography component.
  */
-export type TypographyProps<T extends Tags = Tags> = {
-  /**
-   * The semantic HTML tag to render (e.g., heading, paragraph, span).
-   * @example 'h1'
-   */
-  tag: T;
+export type TypographyVariant = 'heading1' | 'heading2' | 'text1' | 'text2' | 'caption';
 
+export type TextAlign = 'left' | 'center' | 'right' | 'justify' | 'start' | 'end' | 'match-parent';
+
+export type TextTransform = 'uppercase' | 'lowercase' | 'capitalize' | 'none';
+
+export type Truncation = 'ellipsis' | 'noWrap' | `lineClamp-${number}`;
+
+export type TypographyProps = {
   /**
-   * Override the underlying rendered element.
-   * Useful when you want the styling of one tag but render another element.
-   * @example 'div'
+   * Render a different semantic element.
+   * @example 'h1'
    */
   as?: ElementType;
 
   /**
-   * The content to be displayed inside the Typography component.
+   * Typography visual variant.
+   */
+  variant: TypographyVariant;
+
+  /**
+   * Content inside typography.
    */
   children?: ReactNode;
 
   /**
-   * Additional custom class names for styling.
+   * Additional custom class names.
    */
   className?: string;
 
   /**
-   * Text alignment for the content.
+   * Text alignment.
    * @default 'left'
    */
   align?: TextAlign;
 
   /**
-   * Text transformation style.
+   * Text transform.
    * @default 'none'
    */
   transform?: TextTransform;
 
   /**
-   * Controls text truncation and line clamping behavior.
-   * @example 'ellipsis'
-   * @example 'lineClamp-2'
+   * Text truncation behavior.
    */
   truncation?: Truncation;
 
   /**
-   * to handle the color of the text.
+   * Custom text color.
    */
   color?: string;
-} & React.ComponentPropsWithoutRef<(typeof TagsMapping)[T]>;
+} & React.HTMLAttributes<HTMLElement>;
 
-type TextTransform = 'uppercase' | 'lowercase' | 'capitalize' | 'none';
-
-type Truncation = 'ellipsis' | 'noWrap' | `lineClamp-${number}`;
-
-export type TextAlign = 'left' | 'right' | 'center' | 'justify' | 'start' | 'end' | 'match-parent';
-
-export type Tags = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'li' | 'span' | 'label';
-
-const TagsMapping: Record<Tags, keyof JSX.IntrinsicElements> = {
-  h1: 'h1',
-  h2: 'h2',
-  h3: 'h3',
-  h4: 'h4',
-  h5: 'h5',
-  h6: 'h6',
-  p: 'p',
-  li: 'li',
-  span: 'span',
-  label: 'label',
-};
-
-export default function Typography({
-  tag,
-  as,
+function Typography({
+  as: Component = 'p',
+  variant,
   children,
   className,
   align = 'left',
@@ -99,13 +82,12 @@ export default function Typography({
   color,
   ...rest
 }: TypographyProps) {
-  const Component = as || TagsMapping[tag] || 'p';
   return (
     <Component
       data-testid="TypographyTest"
       className={clsx(
         styles.typography,
-        styles[tag],
+        styles[variant],
         styles[`align-${align}`],
         transform !== 'none' && styles[`transform-${transform}`],
         truncation && styles[truncation],
@@ -118,3 +100,15 @@ export default function Typography({
     </Component>
   );
 }
+
+type Props = Omit<TypographyProps, 'variant'>;
+
+export const Heading1 = (props: Props) => <Typography as="h1" variant="heading1" {...props} />;
+
+export const Heading2 = (props: Props) => <Typography as="h2" variant="heading2" {...props} />;
+
+export const Text1 = (props: Props) => <Typography as="p" variant="text1" {...props} />;
+
+export const Text2 = (props: Props) => <Typography as="p" variant="text2" {...props} />;
+
+export const Caption = (props: Props) => <Typography as="span" variant="caption" {...props} />;

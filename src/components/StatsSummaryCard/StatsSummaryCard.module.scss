@@ -4,7 +4,44 @@ styles specific to the StatsSummaryCard component
 ------------------------------------------------------
 **/
 
-.container{
- padding: 1rem
-   // Add styles here
+.statsCard {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 0.0625rem solid var(--color-gray-400);
+}
+
+.statsCardContent {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+  gap: 0.9375rem;
+}
+
+.statsCardHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 0.625rem;
+}
+
+.statsCardIcon {
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  background-color: var(--color-gray-400);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+}
+
+.statsCardFooter {
+  border-top: 0.0625rem solid var(--color-gray-400);
+  padding: var(--spacing-md);
+  align-items: center;
+  justify-content: center;
+}
+
+.statsCardUpdatedText {
+  color: var(--color-gray-400);
 }
