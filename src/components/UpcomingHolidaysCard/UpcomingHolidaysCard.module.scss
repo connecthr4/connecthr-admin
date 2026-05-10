@@ -1,0 +1,288 @@
+/**
+------------------------------------------------------
+styles specific to the UpcomingHolidaysCard component
+------------------------------------------------------
+**/
+
+.card {
+  width: 100%;
+  background-color: var(--color-white);
+  border: 1px solid #e5e7eb;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 32px 24px;
+}
+
+.title {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111827;
+}
+
+.viewAll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  font-size: 22px;
+  font-weight: 500;
+  color: #7c3aed;
+
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #6d28d9;
+  }
+}
+
+.list {
+  width: 100%;
+}
+
+.holidayItem {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+
+  padding: 40px 32px;
+
+  border-bottom: 1px solid #f3f4f6;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.dateBox {
+  width: 128px;
+  height: 128px;
+
+  border-radius: 24px;
+  background: #f5f3ff;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.day {
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #7c3aed;
+}
+
+.month {
+  margin-top: 8px;
+
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 1px;
+
+  color: #7c3aed;
+}
+
+/* =========================
+   Divider
+========================= */
+
+.divider {
+  width: 3px;
+  height: 128px;
+
+  border-radius: 999px;
+  background: #8b5cf6;
+}
+
+/* =========================
+   Content
+========================= */
+
+.content {
+  flex: 1;
+}
+
+.weekday {
+  font-size: 24px;
+  font-weight: 500;
+
+  color: #7c3aed;
+}
+
+.holidayTitle {
+  margin-top: 8px;
+
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.2;
+
+  color: #111827;
+}
+
+.duration {
+  margin-top: 12px;
+
+  font-size: 22px;
+  color: #6b7280;
+}
+
+.iconWrapper {
+  width: 64px;
+  height: 64px;
+
+  border-radius: 20px;
+  background: #ecfdf3;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.icon {
+  color: #22c55e;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  padding: 20px 32px;
+
+  background: #f9fafb;
+  border-top: 1px solid #f3f4f6;
+}
+
+.footerIcon {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 16px;
+  background: #ede9fe;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #7c3aed;
+}
+
+.footerText {
+  font-size: 18px;
+  color: #4b5563;
+}
+
+@media (max-width: 992px) {
+  .title {
+    font-size: 32px;
+  }
+
+  .holidayTitle {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 24px 20px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .viewAll {
+    font-size: 16px;
+  }
+
+  .holidayItem {
+    gap: 20px;
+    padding: 24px 20px;
+  }
+
+  .dateBox {
+    width: 90px;
+    height: 90px;
+  }
+
+  .day {
+    font-size: 34px;
+  }
+
+  .month {
+    font-size: 16px;
+  }
+
+  .divider {
+    height: 90px;
+  }
+
+  .weekday {
+    font-size: 16px;
+  }
+
+  .holidayTitle {
+    font-size: 24px;
+  }
+
+  .duration {
+    font-size: 16px;
+  }
+
+  .iconWrapper {
+    width: 52px;
+    height: 52px;
+  }
+
+  .footer {
+    padding: 18px 20px;
+  }
+
+  .footerText {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .holidayItem {
+    align-items: flex-start;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .holidayTitle {
+    font-size: 20px;
+  }
+
+  .weekday {
+    font-size: 14px;
+  }
+
+  .duration {
+    font-size: 14px;
+  }
+
+  .footer {
+    align-items: flex-start;
+  }
+}
