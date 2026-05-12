@@ -26,7 +26,7 @@ interface StatsSummaryCardProps {
 
 export default function StatsSummaryCard({ title, value, icon, updatedDate }: StatsSummaryCardProps) {
   return (
-    <div className={styles.statsCard}>
+    <div className={styles.statsCard} data-testid="StatsSummaryCard">
       <div className={styles.statsCardContent}>
         <div className={styles.statsCardHeader}>
           <div className={styles.statsCardIcon}>{icon}</div>

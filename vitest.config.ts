@@ -1,0 +1,59 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { defineConfig } from 'vitest/config';
+
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+
+import { playwright } from '@vitest/browser-playwright';
+
+import react from '@vitejs/plugin-react';
+
+const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+
+// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  test: {
+    projects: [
+      /**
+       * Storybook Tests
+       */
+      {
+        extends: true,
+        plugins: [
+          // The plugin will run tests for the stories defined in your Storybook config
+          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+          storybookTest({ configDir: path.join(dirname, '.storybook') }),
+        ],
+        test: {
+          name: 'storybook',
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+      /**
+       * Unit Tests
+       */
+      {
+        test: {
+          name: 'unit',
+          include: ['src/**/*.{test,spec}.{ts,tsx}'],
+          globals: true,
+          environment: 'jsdom',
+          setupFiles: './test/setup.ts',
+          css: true,
+        },
+      },
+    ],
+  },
+});
