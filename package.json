@@ -13,7 +13,10 @@
     "generate": "plop --plopfile generators/index.js",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "chromatic": "chromatic"
+    "chromatic": "chromatic",
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit",
+    "test:coverage": "vitest run --coverage --project unit"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -31,17 +34,23 @@
     "@storybook/addon-vitest": "^10.3.6",
     "@storybook/nextjs-vite": "^10.3.6",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/browser-playwright": "^4.1.5",
     "@vitest/coverage-v8": "^4.1.5",
     "chromatic": "^16.9.1",
+    "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-storybook": "^10.3.6",
     "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
     "lint-staged": "^17.0.2",
     "playwright": "^1.59.1",
     "plop": "^4.0.5",
@@ -50,6 +59,6 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8.0.11",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.6"
   }
 }

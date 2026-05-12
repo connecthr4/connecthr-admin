@@ -4,8 +4,7 @@ import fs from 'fs';
    Config
 ======================= */
 
-const PRIMARY_MODEL = 'gemini-2.5-flash';
-const FALLBACK_MODEL = 'gemini-1.5-flash';
+const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
 
 const MAX_CHARS = 40000;
 
@@ -22,26 +21,45 @@ function safeRead(file) {
 }
 
 async function callGemini(model, prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      contents: [
-        {
-          parts: [{ text: prompt }],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.2,
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    }),
-  });
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [{ text: prompt }],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.2,
+        },
+      }),
+    });
 
-  return response.json();
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        error: {
+          message: data?.error?.message || 'Unknown Gemini API error',
+          status: response.status,
+        },
+      };
+    }
+
+    return data;
+  } catch (err) {
+    return {
+      error: {
+        message: err.message || 'Network request failed',
+      },
+    };
+  }
 }
 
 /* =======================
@@ -152,22 +170,27 @@ ESLINT:
 ${eslintReport}
 `;
 
-  console.log(`Running AI review using ${PRIMARY_MODEL}`);
-
-  let aiData = await callGemini(PRIMARY_MODEL, prompt);
-
   /* =======================
-     Fallback Model
+     Run AI Review
   ======================= */
 
-  if (aiData.error) {
-    console.warn(`Primary model failed: ${aiData.error.message}`);
+  let aiData = null;
 
-    aiData = await callGemini(FALLBACK_MODEL, prompt);
+  for (const model of MODELS) {
+    console.log(`Running AI review using ${model}`);
+
+    aiData = await callGemini(model, prompt);
+
+    if (!aiData.error) {
+      console.log(`Success with ${model}`);
+      break;
+    }
+
+    console.warn(`${model} failed: ${aiData.error.message}`);
   }
 
-  if (aiData.error) {
-    console.error('All Gemini models failed:', JSON.stringify(aiData.error, null, 2));
+  if (!aiData || aiData.error) {
+    console.error('All Gemini models failed:', JSON.stringify(aiData?.error || {}, null, 2));
 
     process.exit(1);
   }
@@ -176,7 +199,7 @@ ${eslintReport}
      Parse AI Response
   ======================= */
 
-  const raw = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
+  const raw = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!raw) {
     console.log('No AI review generated.');
@@ -192,6 +215,10 @@ ${eslintReport}
 
   try {
     reviews = JSON.parse(cleaned);
+
+    if (!Array.isArray(reviews)) {
+      throw new Error('AI response is not an array');
+    }
   } catch (err) {
     console.error('Invalid JSON returned by AI');
     console.error(cleaned);
@@ -226,6 +253,13 @@ ${eslintReport}
 
   const prData = await prRes.json();
 
+  if (!prRes.ok) {
+    console.error('Failed to fetch PR details');
+    console.error(JSON.stringify(prData, null, 2));
+
+    process.exit(1);
+  }
+
   const commitId = prData.head.sha;
 
   /* =======================
@@ -234,9 +268,14 @@ ${eslintReport}
 
   for (const review of reviews) {
     try {
+      if (!review.file || !review.line || !review.comment) {
+        console.warn('Skipping invalid review object:', review);
+        continue;
+      }
+
       const reviewBody = `## 🤖 AI Review
 
-**Severity:** ${review.severity}
+**Severity:** ${review.severity || 'info'}
 
 ### Issue
 ${review.comment}
@@ -277,7 +316,7 @@ ${review.code}
 
       const data = await response.json();
 
-      if (data.message) {
+      if (!response.ok) {
         console.error(`Failed for ${review.file}:${review.line}`, JSON.stringify(data, null, 2));
 
         continue;
