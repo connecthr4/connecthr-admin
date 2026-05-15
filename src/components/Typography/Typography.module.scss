@@ -10,31 +10,31 @@ styles specific to the Typography component
   font-family: var(--font-inter);
   color: #16151c;
 
-  .heading1 {
+  &.heading1 {
     font-size: 40px;
     line-height: 48px;
     font-weight: 700;
   }
 
-  .heading2 {
+  &.heading2 {
     font-size: 30px;
     line-height: 40px;
     font-weight: bold;
   }
 
-  .text1 {
+  &.text1 {
     font-size: 18px;
     line-height: 28px;
-    font-weight: 400;
+    font-weight: 600;
   }
 
-  .text2 {
+  &.text2 {
     font-size: 14px;
     line-height: 22px;
     font-weight: 400;
   }
 
-  .caption {
+  &.caption {
     font-size: 12px;
     line-height: 16px;
     font-weight: 400;
