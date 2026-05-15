@@ -1,0 +1,123 @@
+/**
+------------------------------------------------------
+styles specific to the AppHeader component
+------------------------------------------------------
+**/
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  background: #ffffff;
+}
+
+.leftSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.subtitle {
+  color: var(--color-gray-400);
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.notificationButton {
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 14px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #ebebeb;
+  }
+
+  svg {
+    color: #16151c;
+  }
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nameContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profileName {
+  color: #16151c;
+}
+
+.profileRole {
+  color: var(--color-gray-400);
+}
+
+.chevronIcon {
+  color: #6b7280;
+}
+
+.profileContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+
+  padding: 6px 12px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.profileAvatar {
+  flex-shrink: 0;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
+  width: 100%;
+}
+
+.profileRole {
+  color: var(--color-gray-400);
+  width: 100%;
+}
+
+.profileDropdownIcon {
+  flex-shrink: 0;
+}

@@ -1,6 +1,7 @@
 import StatsSummaryCard from '../components/StatsSummaryCard';
 import { Users, CalendarCheck, CalendarMinus } from 'lucide-react';
 import UpcomingHolidaysCard from '../components/UpcomingHolidaysCard';
+import AppHeader from '../components/AppHeader';
 
 export default function Home() {
   // const dashboardStats = [
@@ -45,8 +46,10 @@ export default function Home() {
     //   ))}
     // </div>
 
-    <div style={{ padding: 24, background: '#f3f4f6' }}>
-      <UpcomingHolidaysCard />
-    </div>
+    // <div style={{ padding: 24, background: '#f3f4f6' }}>
+    //   <UpcomingHolidaysCard />
+    // </div>
+
+    <AppHeader />
   );
 }
