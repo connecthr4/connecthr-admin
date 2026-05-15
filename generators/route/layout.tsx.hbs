@@ -1,0 +1,26 @@
+/**
+* @module app/{{routeName}}/layout
+*/
+
+/**
+* Route layout for the {{routeName}} segment.
+*
+* Defines shared UI and structure for all pages
+* nested within this route.
+*
+* @param children - Nested route content.
+* @returns The rendered route layout.
+*/
+export default function Layout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <main>{children}</main>
+      </body>
+    </html>
+  )
+}

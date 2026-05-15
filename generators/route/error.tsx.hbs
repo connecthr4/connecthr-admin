@@ -1,0 +1,33 @@
+/**
+* @module app/{{routeName}}/error
+*/
+
+'use client';
+
+/**
+* Error boundary component for the {{routeName}} route
+*
+* This component renders a fallback UI when an error occurs
+* within the {{routeName}} route segment.
+*
+* @param error - The error object thrown in the route.
+* @param reset - Function to retry rendering the route.
+* @returns A fallback error UI.
+*/
+export default function Error({
+  error,
+  unstable_retry,
+}: {
+  error: Error & { digest?: string }
+  unstable_retry: () => void
+}) {
+return (
+    <div>
+      <p>Error: {error.message}</p>
+
+      <button onClick={() => unstable_retry()}>
+        Try Again
+      </button>
+    </div>
+  );
+}
