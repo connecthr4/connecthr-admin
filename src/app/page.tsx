@@ -2,8 +2,16 @@ import StatsSummaryCard from '../components/StatsSummaryCard';
 import { Users, CalendarCheck, CalendarMinus } from 'lucide-react';
 import UpcomingHolidaysCard from '../components/UpcomingHolidaysCard';
 import AppHeader from '../components/AppHeader';
+import BasePieChart from '../components/BasePieChart';
 
 export default function Home() {
+  const data = [
+    { name: 'Engineering', value: 35, color: '#3B82F6' },
+    { name: 'Marketing', value: 20, color: '#10B981' },
+    { name: 'Sales', value: 15, color: '#F59E0B' },
+    { name: 'HR', value: 12, color: '#EF4444' },
+  ];
+
   // const dashboardStats = [
   //   {
   //     id: 1,
@@ -50,6 +58,7 @@ export default function Home() {
     //   <UpcomingHolidaysCard />
     // </div>
 
-    <AppHeader />
+    // <AppHeader />
+    <BasePieChart data={data} height={500} />
   );
 }
