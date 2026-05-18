@@ -8,14 +8,14 @@ styles specific to the StatsSummaryCard component
   display: flex;
   flex-direction: column;
   background-color: var(--color-white);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   border: 0.0625rem solid var(--color-gray-400);
 }
 
 .statsCardContent {
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-md);
+  padding: var(--spacing-4);
   gap: 0.9375rem;
 }
 
@@ -37,7 +37,7 @@ styles specific to the StatsSummaryCard component
 
 .statsCardFooter {
   border-top: 0.0625rem solid var(--color-gray-400);
-  padding: var(--spacing-md);
+  padding: var(--spacing-4);
   align-items: center;
   justify-content: center;
 }

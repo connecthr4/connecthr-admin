@@ -8,26 +8,27 @@
   /* ==========================
      Primary Colors
   ========================== */
+  --color-violet-50: rgba(113, 82, 243, 0.08);
   --color-violet-600: #7152f3;
   --color-lime-500: #a3d139;
   --color-purple-400: #8d75f5;
 
+  --color-gray-50: rgba(243, 242, 246, 0.9);
   --color-gray-400: #a2a1a8;
   --color-gray-900: #16151c;
 
-  /* Layout */
-  /* --sidebar-width: 280px;
-  --header-height: 72px; */
-
   /* Spacing */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 15px;
-  --spacing-lg: 24px;
+  --spacing-1: 0.25rem; /* 4px */
+  --spacing-2: 0.5rem; /* 8px */
+  --spacing-4: 0.9375rem; /* 15px */
+  --spacing-5: 1rem; /* 16px */
+  --spacing-6: 1.5rem; /* 24px */
+  --spacing-10: 2.5rem; /* 40px */
 
   /* Radius */
   --radius-xs: 5px;
   --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 20px;
+  --radius-md: 10px;
+  --radius-lg: 16rem;
+  --radius-xl: 20px;
 }

@@ -16,6 +16,7 @@
 import clsx from 'clsx';
 import AppLink from '../AppLink';
 import { usePathname } from 'next/navigation';
+import { STRINGS } from '@/src/constants/strings';
 import { NAV_ITEMS } from '@/src/constants/navigation';
 import { Heading2, NavLabel } from '../Typography/Typography';
 import styles from './LeftNavBar.module.scss';
@@ -30,7 +31,7 @@ export default function LeftNavBar({}) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoSection}>
-        <Heading2>connectHR</Heading2>
+        <Heading2>{STRINGS.APP_NAME}</Heading2>
       </div>
 
       <nav className={styles.navigation}>
