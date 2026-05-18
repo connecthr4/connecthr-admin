@@ -3,6 +3,7 @@ import { Users, CalendarCheck, CalendarMinus } from 'lucide-react';
 import UpcomingHolidaysCard from '../components/UpcomingHolidaysCard';
 import AppHeader from '../components/AppHeader';
 import BasePieChart from '../components/BasePieChart';
+import LeftNavBar from '../components/LeftNavBar';
 
 export default function Home() {
   const data = [
@@ -59,6 +60,8 @@ export default function Home() {
     // </div>
 
     // <AppHeader />
-    <BasePieChart data={data} height={500} />
+    // <BasePieChart data={data} height={500} />
+
+    <LeftNavBar />
   );
 }
