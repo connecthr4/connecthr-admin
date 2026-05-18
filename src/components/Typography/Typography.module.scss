@@ -12,33 +12,40 @@ styles specific to the Typography component
 
   &.heading1 {
     font-size: 40px;
-    line-height: 48px;
+    line-height: 48;
     font-weight: 700;
   }
 
   &.heading2 {
     font-size: 30px;
-    line-height: 40px;
+    line-height: 40;
     font-weight: bold;
   }
 
   &.text1 {
     font-size: 18px;
-    line-height: 28px;
+    line-height: 28;
     font-weight: 600;
   }
 
   &.text2 {
     font-size: 14px;
-    line-height: 22px;
+    line-height: 22;
     font-weight: 400;
   }
 
   &.caption {
     font-size: 12px;
-    line-height: 16px;
+    line-height: 16;
     font-weight: 400;
   }
+
+  &.NavLabel {
+    font-size: 16px;
+    line-height: 24;
+    font-weight: 400;
+  }
+
   // Alignment
   &.align-left {
     text-align: left;
