@@ -27,39 +27,39 @@ export const NAV_ITEMS = [
     href: '/departments',
     icon: Building2,
   },
-  {
-    label: 'Attendance',
-    href: '/attendance',
-    icon: Calendar,
-  },
-  {
-    label: 'Payroll',
-    href: '/payroll',
-    icon: Wallet,
-  },
-  {
-    label: 'Jobs',
-    href: '/jobs',
-    icon: Briefcase,
-  },
-  {
-    label: 'Candidates',
-    href: '/candidates',
-    icon: UserRound,
-  },
-  {
-    label: 'Leaves',
-    href: '/leaves',
-    icon: FileText,
-  },
+  // {
+  //   label: 'Attendance',
+  //   href: '/attendance',
+  //   icon: Calendar,
+  // },
+  // {
+  //   label: 'Payroll',
+  //   href: '/payroll',
+  //   icon: Wallet,
+  // },
+  // {
+  //   label: 'Jobs',
+  //   href: '/jobs',
+  //   icon: Briefcase,
+  // },
+  // {
+  //   label: 'Candidates',
+  //   href: '/candidates',
+  //   icon: UserRound,
+  // },
+  // {
+  //   label: 'Leaves',
+  //   href: '/leaves',
+  //   icon: FileText,
+  // },
   {
     label: 'Holidays',
     href: '/holidays',
     icon: CalendarDays,
   },
-  {
-    label: 'Settings',
-    href: '/settings',
-    icon: Settings,
-  },
+  // {
+  //   label: 'Settings',
+  //   href: '/settings',
+  //   icon: Settings,
+  // },
 ];
