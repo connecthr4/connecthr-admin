@@ -17,6 +17,6 @@ styles specific to the BaseLayout component
 .mainContent {
   overflow-y: auto;
   min-height: calc(100vh - 3rem);
-  padding: 1.5rem;
+  padding-left: var(--spacing-6);
   border-radius: 20px;
 }

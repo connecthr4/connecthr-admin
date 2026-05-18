@@ -2,6 +2,8 @@
  * @module app/dashboard/page
  */
 
+import Dashboard from '@/src/components/Dashboard';
+
 /**
  * Displays an overview of key metrics, insights, and application data in a centralized dashboard interface.
  *
@@ -11,10 +13,6 @@
  *
  * @returns The page UI for the route.
  */
-export default function Layout() {
-  return (
-    <div>
-      <h1>dashboard page</h1>
-    </div>
-  );
+export default function DashboardPage() {
+  return <Dashboard />;
 }

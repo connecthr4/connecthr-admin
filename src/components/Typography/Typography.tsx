@@ -18,7 +18,7 @@ import styles from './Typography.module.scss';
 /**
  * Define the props available for the Typography component.
  */
-export type TypographyVariant = 'heading1' | 'heading2' | 'text1' | 'text2' | 'caption' | 'navLabel';
+export type TypographyVariant = 'heading1' | 'heading2' | 'heading3' | 'text1' | 'text2' | 'caption' | 'navLabel';
 
 export type TextAlign = 'left' | 'center' | 'right' | 'justify' | 'start' | 'end' | 'match-parent';
 
@@ -106,6 +106,8 @@ type Props = Omit<TypographyProps, 'variant'>;
 export const Heading1 = (props: Props) => <Typography as="h1" variant="heading1" {...props} />;
 
 export const Heading2 = (props: Props) => <Typography as="h2" variant="heading2" {...props} />;
+
+export const Heading3 = (props: Props) => <Typography as="h3" variant="heading3" {...props} />;
 
 export const Text1 = (props: Props) => <Typography as="p" variant="text1" {...props} />;
 
