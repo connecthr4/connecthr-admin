@@ -9,7 +9,7 @@ styles specific to the StatsSummaryCard component
   flex-direction: column;
   background-color: var(--color-white);
   border-radius: var(--radius-xl);
-  border: 0.0625rem solid var(--color-gray-400);
+  border: 1px solid var(--color-gray-400-30);
 }
 
 .statsCardContent {
@@ -29,14 +29,14 @@ styles specific to the StatsSummaryCard component
   display: flex;
   height: 2.5rem;
   width: 2.5rem;
-  background-color: var(--color-gray-400);
+  background-color: var(--color-violet-600-5);
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-xs);
 }
 
 .statsCardFooter {
-  border-top: 0.0625rem solid var(--color-gray-400);
+  border-top: 1px solid var(--color-gray-400-30);
   padding: var(--spacing-4);
   align-items: center;
   justify-content: center;

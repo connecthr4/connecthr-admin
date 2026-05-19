@@ -8,3 +8,9 @@ styles specific to the Dashboard component
   //  padding: 1rem
   // Add styles here
 }
+
+.statsSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
