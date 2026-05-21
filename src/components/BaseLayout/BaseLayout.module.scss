@@ -7,16 +7,23 @@ styles specific to the BaseLayout component
 .container {
   display: grid;
   grid-template-columns: 15.625rem 1fr;
-  min-height: 100vh;
+
+  height: 100vh;
   width: 100%;
+
   background-color: var(--color-gray-25);
+
   padding: 1.5rem;
   gap: 1.5rem;
+
+  overflow: hidden;
 }
 
 .mainContent {
-  overflow-y: auto;
-  min-height: calc(100vh - 3rem);
-  padding-left: var(--spacing-6);
-  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding-left: var(--spacing-8);
+  border-radius: var(--radius-xl);
 }

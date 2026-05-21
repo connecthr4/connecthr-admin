@@ -9,7 +9,12 @@
      Primary Colors
   ========================== */
   --color-violet-50: rgba(113, 82, 243, 0.08);
+  --color-violet-25: #f5f3ff;
+  --color-violet-500: #8b5cf6;
   --color-violet-600: #7152f3;
+  --color-violet-700: #7c3aed;
+  --color-green-50: #ecfdf3;
+  --color-green-500: #22c55e;
   --color-lime-500: #a3d139;
   --color-purple-400: #8d75f5;
 
@@ -27,7 +32,10 @@
   --spacing-3: 0.75rem; /* 12px */
   --spacing-4: 0.9375rem; /* 15px */
   --spacing-5: 1rem; /* 16px */
-  --spacing-6: 1.5rem; /* 24px */
+  --spacing-6: 1.125rem; /* 18 */
+  --spacing-7: 1.25; /* 20px */
+  --spacing-8: 1.5rem; /* 24px */
+  --spacing-9: 2rem; /* 32px */
   --spacing-10: 2.5rem; /* 40px */
 
   /* Radius */
