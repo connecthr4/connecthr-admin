@@ -12,6 +12,8 @@
  */
 
 import { ArrowRight, CalendarDays } from 'lucide-react';
+import { STRINGS } from '@/src/constants/strings';
+import { Heading3, Text2, Text3 } from '../Typography/Typography';
 import styles from './UpcomingHolidaysCard.module.scss';
 
 /**
@@ -66,37 +68,29 @@ export default function UpcomingHolidaysCard({ label = 'label' }: UpcomingHolida
   ];
   return (
     <div className={styles.card}>
-      {/* Header */}
       <div className={styles.header}>
-        <h2 className={styles.title}>Upcoming Holidays</h2>
-
+        <Heading3>{STRINGS.UPCOMING_HOLIDAYS}</Heading3>
         <button className={styles.viewAll}>
-          View all
+          {STRINGS.VIEW_ALL}
           <ArrowRight size={22} />
         </button>
       </div>
 
-      {/* Holiday List */}
       <div className={styles.list}>
         {holidays.map((holiday) => (
           <div key={holiday.id} className={styles.holidayItem}>
-            {/* Date Box */}
             <div className={styles.dateBox}>
-              <span className={styles.day}>{holiday.day}</span>
-
-              <span className={styles.month}>{holiday.month}</span>
+              <Text3 className={styles.dateText}>{holiday.day}</Text3>
+              <Text3 className={styles.dateText}>{holiday.month}</Text3>
             </div>
 
-            {/* Divider */}
             <div className={styles.divider} />
 
-            {/* Content */}
             <div className={styles.content}>
-              <p className={styles.weekday}>{holiday.weekday}</p>
-              <h3 className={styles.holidayTitle}>{holiday.title}</h3>
+              <Text2 className={styles.weekday}>{holiday.weekday}</Text2>
+              <Text3 className={styles.holidayTitle}>{holiday.title}</Text3>
             </div>
 
-            {/* Icon */}
             <div className={styles.iconWrapper}>
               <CalendarDays size={28} className={styles.icon} />
             </div>

@@ -12,20 +12,5 @@ styles specific to the ChartContainer component
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
-
-  /*
-   * Responsive heights
-   */
-  // @media (max-width: 1200px) {
-  //   min-height: 280px;
-  // }
-
-  // @media (max-width: 768px) {
-  //   min-height: 240px;
-  // }
-
-  // @media (max-width: 480px) {
-  //   min-height: 200px;
-  // }
+  border-radius: var(--radius-lg);
 }

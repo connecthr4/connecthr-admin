@@ -11,7 +11,7 @@
  * ```
  */
 
-import { Heading2, Text1, Text2 } from '../Typography';
+import { Heading3, Text1, Text2 } from '@/src/components/Typography';
 import { Bell, ChevronDown, CircleUserRound } from 'lucide-react';
 import styles from './AppHeader.module.scss';
 
@@ -27,7 +27,7 @@ export default function AppHeader({ title, subtitle }: AppHeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
-        <Heading2>{title}</Heading2>
+        <Heading3>{title}</Heading3>
         <Text1 className={styles.subtitle}>{subtitle}</Text1>
       </div>
 

@@ -14,6 +14,7 @@
 
 import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 import ChartContainer from '../ChartContainer';
+import { Heading1, Text1 } from '../Typography';
 import styles from './BasePieChart.module.scss';
 
 type PieChartData = {
@@ -32,6 +33,8 @@ interface BasePieChartProps {
   outerRadius?: number | string;
   showLegend?: boolean;
   isAnimationActive?: boolean;
+  centerValue?: string;
+  centerLabel?: string;
 }
 
 export default function BasePieChart({
@@ -41,27 +44,39 @@ export default function BasePieChart({
   outerRadius = '100%',
   showLegend = true,
   isAnimationActive = true,
+  centerValue,
+  centerLabel,
 }: BasePieChartProps) {
   return (
-    <ChartContainer height={height}>
-      <PieChart>
-        <Pie
-          data={data}
-          dataKey="value"
-          nameKey="name"
-          outerRadius={outerRadius}
-          innerRadius={innerRadius}
-          isAnimationActive={isAnimationActive}
-        >
-          {data.map((entry) => (
-            <Cell key={entry.name} fill={entry.color} />
-          ))}
-        </Pie>
+    <div className={styles.chartWrapper}>
+      <ChartContainer height={height}>
+        <PieChart>
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            outerRadius={outerRadius}
+            innerRadius={innerRadius}
+            isAnimationActive={isAnimationActive}
+          >
+            {data.map((entry) => (
+              <Cell key={entry.name} fill={entry.color} />
+            ))}
+          </Pie>
 
-        <Tooltip />
+          <Tooltip />
 
-        {showLegend && <Legend verticalAlign="bottom" align="center" iconType="rect" />}
-      </PieChart>
-    </ChartContainer>
+          {showLegend && <Legend verticalAlign="bottom" align="center" iconType="rect" />}
+        </PieChart>
+      </ChartContainer>
+
+      {/* Center Content */}
+      {centerValue && (
+        <div className={styles.centerContent}>
+          <Heading1>{centerValue}</Heading1>
+          <Text1 className={styles.label}>{centerLabel}</Text1>
+        </div>
+      )}
+    </div>
   );
 }

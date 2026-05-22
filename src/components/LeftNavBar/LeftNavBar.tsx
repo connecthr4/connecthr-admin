@@ -11,33 +11,33 @@
  * ```
  */
 
+'use client';
+
 import clsx from 'clsx';
 import AppLink from '../AppLink';
-import styles from './LeftNavBar.module.scss';
+import { usePathname } from 'next/navigation';
+import { STRINGS } from '@/src/constants/strings';
 import { NAV_ITEMS } from '@/src/constants/navigation';
 import { Heading2, NavLabel } from '../Typography/Typography';
+import styles from './LeftNavBar.module.scss';
 
 /**
  * Define the props available for the LeftNavBar component.
  */
-interface LeftNavBarProps {
-  label?: string;
-}
+// interface LeftNavBarProps {}
 
-export default function LeftNavBar({ label = 'label' }: LeftNavBarProps) {
+export default function LeftNavBar({}) {
+  const pathname = usePathname();
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoSection}>
-        <Heading2>connectHR</Heading2>
+        <Heading2>{STRINGS.APP_NAME}</Heading2>
       </div>
 
-      {/* Navigation */}
       <nav className={styles.navigation}>
         {NAV_ITEMS.map((item) => {
-          const isActive = '/ dashboard' === item.href;
-
+          const isActive = pathname === item.href;
           const Icon = item.icon;
-
           return (
             <AppLink
               key={item.href}
