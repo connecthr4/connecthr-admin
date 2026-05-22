@@ -46,6 +46,12 @@ styles specific to the Typography component
     font-weight: 400;
   }
 
+  &.Text3 {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+
   // Alignment
   &.align-left {
     text-align: left;
