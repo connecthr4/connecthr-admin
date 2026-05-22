@@ -44,7 +44,7 @@ interface TextInputProps {
    * The type of input (e.g., "text", "password", "email").
    * Defaults to `"text"` if not provided.
    */
-  type?: string;
+  type?: React.InputHTMLAttributes<HTMLInputElement>['type'];
 
   /**
    * The error message to display when validation fails.
@@ -109,10 +109,10 @@ interface TextInputProps {
   autoCapitalize?: string;
 
   /**
-   * to show the calender icon
+   * to show the calendar icon
    * Defaults to false.
    */
-  isCalender?: boolean;
+  isCalendar?: boolean;
 
   /**
    * Event handler triggered when the input value changes.
@@ -137,7 +137,7 @@ export default function TextInput({
   maxLength,
   minLength,
   autoCapitalize,
-  isCalender,
+  isCalendar,
   onChange,
   ...rest
 }: TextInputProps) {
@@ -179,7 +179,7 @@ export default function TextInput({
             {isPasswordVisible ? <EyeOff /> : <Eye />}
           </div>
         )}
-        {isCalender && (
+        {isCalendar && (
           <div className={styles.iconButton}>
             <Calendar size={16} className={styles.calendarIcon} />
           </div>
