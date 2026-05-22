@@ -180,7 +180,7 @@ export default function TextInput({
           </div>
         )}
         {isCalender && (
-          <div className={styles.iconButton} onClick={togglePasswordVisibility}>
+          <div className={styles.iconButton}>
             <Calendar size={16} className={styles.calendarIcon} />
           </div>
         )}
