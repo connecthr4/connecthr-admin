@@ -46,6 +46,12 @@ styles specific to the Typography component
     font-weight: bold;
   }
 
+  &.text4 {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+
   &.caption {
     font-size: 12px;
     line-height: 16px;
@@ -53,6 +59,12 @@ styles specific to the Typography component
   }
 
   &.NavLabel {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+
+  &.Text3 {
     font-size: 16px;
     line-height: 24px;
     font-weight: 400;

@@ -25,6 +25,7 @@ export type TypographyVariant =
   | 'text1'
   | 'text2'
   | 'text3'
+  | 'text4'
   | 'caption'
   | 'navLabel';
 
@@ -122,6 +123,8 @@ export const Text1 = (props: Props) => <Typography as="p" variant="text1" {...pr
 export const Text2 = (props: Props) => <Typography as="p" variant="text2" {...props} />;
 
 export const Text3 = (props: Props) => <Typography as="span" variant="text3" {...props} />;
+
+export const Text4 = (props: Props) => <Typography variant="text3" {...props} />;
 
 export const Caption = (props: Props) => <Typography as="span" variant="caption" {...props} />;
 
