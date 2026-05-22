@@ -5,12 +5,50 @@ styles specific to the Dashboard component
 **/
 
 .container {
-  //  padding: 1rem
-  // Add styles here
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+  min-height: 0;
 }
 
 .statsSummaryGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+
+  gap: 20px;
+
+  flex: 1;
+  min-height: 0;
+
+  align-items: start;
+}
+
+.holidays {
+  min-height: 0;
+  height: 100%;
+}
+
+.chartWrapper {
+  display: flex;
+  flex-direction: column;
+
+  padding: 1.6rem;
+
+  background-color: var(--color-white);
+
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-gray-400-30);
+
+  gap: 1rem;
+
+  min-height: 420px;
+
+  align-self: start;
 }

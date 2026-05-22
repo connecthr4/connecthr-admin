@@ -7,5 +7,5 @@ import LeftNavBar from '../components/LeftNavBar';
 import BaseLayout from '../components/BaseLayout';
 
 export default function Home({ children }) {
-  return <BaseLayout>{children}</BaseLayout>;
+  return <UpcomingHolidaysCard />;
 }
