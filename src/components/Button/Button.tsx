@@ -19,7 +19,7 @@ import styles from './Button.module.scss';
 /**
  * Define the props available for the Button component.
  */
-interface ButtonProps {
+interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   /**
    * The content inside the button.
    * Typically a string or JSX (e.g., <span>Save</span>).
@@ -118,7 +118,7 @@ export default function Button({
       {loading ? (
         <>
           <span className={styles.loader} />
-          <Text3 as="span" className={className} align="center">
+          <Text3 as="span" align="center">
             {children}
           </Text3>
         </>
@@ -129,7 +129,7 @@ export default function Button({
               <StartIcon size={iconSize} color={iconColor} />
             </span>
           )}
-          <Text3 as="span" className={className} align="center">
+          <Text3 as="span" align="center">
             {children}
           </Text3>
           {EndIcon && (
