@@ -14,8 +14,8 @@
 
 import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 import ChartContainer from '../ChartContainer';
-import styles from './BasePieChart.module.scss';
 import { Heading1, Text1 } from '../Typography';
+import styles from './BasePieChart.module.scss';
 
 type PieChartData = {
   name: string;
