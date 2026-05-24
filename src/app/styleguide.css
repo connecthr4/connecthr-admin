@@ -32,6 +32,9 @@
   --color-gray-400: #a2a1a8;
   --color-gray-900: #16151c;
 
+  --color-overlay-dark-15: rgba(0, 0, 0, 0.15);
+  --color-overlay-gray-20: rgba(162, 161, 168, 0.2);
+
   /* Spacing */
   --spacing-1: 0.25rem; /* 4px */
   --spacing-2: 0.5rem; /* 8px */
