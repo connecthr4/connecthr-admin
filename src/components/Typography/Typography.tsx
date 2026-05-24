@@ -22,7 +22,7 @@ export type TypographyVariant =
   | 'heading1'
   | 'heading2'
   | 'heading3'
-  | 'Heading4'
+  | 'heading4'
   | 'text1'
   | 'text2'
   | 'text3'

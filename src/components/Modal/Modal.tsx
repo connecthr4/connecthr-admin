@@ -204,7 +204,7 @@ export default function Modal({
           <div className={styles.header}>
             {title && <Heading4>{title}</Heading4>}
 
-            {showCloseButton && <X height={20} width={20} />}
+            {showCloseButton && <X height={20} width={20} onClick={onClose} aria-label="Close modal" />}
           </div>
         )}
 
