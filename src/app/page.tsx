@@ -10,6 +10,7 @@ import BaseLayout from '../components/BaseLayout';
 
 import { useState } from 'react';
 import Modal from '../components/Modal';
+import DatePicker from '../components/DatePicker';
 
 export default function Home({ children }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function Home({ children }) {
         showCloseButton
         centered
       >
-        <p>This is a reusable modal component.</p>
+        <DatePicker displayMode="modal" />
       </Modal>
     </>
   );

@@ -1,0 +1,149 @@
+/**
+------------------------------------------------------
+styles specific to the DatePicker component
+------------------------------------------------------
+**/
+
+.datePickerWrapper {
+  position: relative;
+  display: inline-block;
+  // width: 100%;
+  // padding: 0.8rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease-in-out;
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+
+  &:hover {
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.calendarIcon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #000000;
+  transition: transform 0.2s ease;
+}
+
+/* Month-Year header */
+// .header {
+//   display: flex;
+//   justify-content: center;
+//   gap: 0.5rem;
+//   margin-bottom: 0.8rem;
+// }
+
+/* DayPicker Base Styles */
+.dayPicker {
+  font-family: Arial, sans-serif;
+  color: #000000;
+}
+
+/* Weekday header */
+.dayPicker .rdp-weekday {
+  font-weight: 600;
+  color: #555;
+}
+
+/* Day cells */
+.dayPicker .rdp-day {
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+}
+
+/* Selected range */
+.dayPicker .rdp-day_selected,
+.dayPicker .rdp-day_range_start,
+.dayPicker .rdp-day_range_end {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* Range in between */
+.dayPicker .rdp-day_range_middle {
+  background-color: #cce5ff;
+}
+
+/* Disabled days */
+.dayPicker .rdp-day_disabled {
+  color: #ccc;
+  pointer-events: none;
+}
+
+/* Navigation buttons */
+.dayPicker .rdp-nav_button {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------
+   Inline Mode Styles (dropdown below text field)
+--------------------------------------------------- */
+.inlineContainer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* ---------------------------------------------------
+   Modal Mode Styles (centered overlay)
+--------------------------------------------------- */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modalContainer {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 360px;
+  animation: scaleIn 0.25s ease-in-out;
+}
+
+/* ---------------------------------------------------
+   Animations
+--------------------------------------------------- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
