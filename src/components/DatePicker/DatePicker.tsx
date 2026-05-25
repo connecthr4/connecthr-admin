@@ -93,6 +93,26 @@ interface DatePickerProps {
    * @returns void
    */
   onChange?: (value: Date | Date[] | DateRange | undefined) => void;
+
+  /**
+   *
+   */
+  minDate?: Date;
+
+  /**
+   *
+   */
+  maxDate?: Date;
+
+  /**
+   *
+   */
+  initialSelectedDate?: Date;
+
+  /**
+   *
+   */
+  initialSelectedMultipleDates?: Date[];
 }
 
 export default function DatePicker({
@@ -106,12 +126,16 @@ export default function DatePicker({
   max,
   disabled,
   inputClassName,
+  minDate,
+  maxDate,
+  initialSelectedDate,
+  initialSelectedMultipleDates,
   onChange,
 }: DatePickerProps) {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(new Date());
-  const [selected, setSelected] = useState<Date>();
-  const [selectedMultiple, setSelectedMultiple] = useState<Date[]>();
+  const [selected, setSelected] = useState<Date | undefined>(initialSelectedDate);
+  const [selectedMultiple, setSelectedMultiple] = useState<Date[] | undefined>(initialSelectedMultipleDates);
   const [range, setRange] = useState<DateRange | undefined>(initialRange);
 
   const handleSelect = (value: DatePickerValue) => {
@@ -145,8 +169,8 @@ export default function DatePicker({
           captionLayout="dropdown"
           reverseYears
           reverseMonths
-          startMonth={new Date(2024, 6)}
-          endMonth={new Date(2025, 9)}
+          startMonth={minDate || new Date(2024, 0)}
+          endMonth={maxDate || new Date(2025, 11)}
           selected={selected}
         />
       );
@@ -161,8 +185,8 @@ export default function DatePicker({
         captionLayout="dropdown"
         reverseYears
         reverseMonths
-        startMonth={new Date(2024, 6)}
-        endMonth={new Date(2025, 9)}
+        startMonth={minDate || new Date(2024, 0)}
+        endMonth={maxDate || new Date(2025, 11)}
       />
     );
   };
