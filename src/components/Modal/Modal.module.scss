@@ -9,8 +9,9 @@ styles specific to the Modal component
   inset: 0;
   display: flex;
   align-items: center;
+  padding: 10px;
   justify-content: center;
-  background: var(--color-overlay-gray-20);
+  background: var(--color-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 1000;
@@ -33,6 +34,7 @@ styles specific to the Modal component
   border-radius: var(--radius-xl);
   box-shadow: 0 10px 40px var(--color-overlay-dark-15);
   overflow: hidden;
+  padding: 26px;
   animation: modalFade 0.2s ease;
 }
 
@@ -44,7 +46,6 @@ styles specific to the Modal component
 }
 
 .body {
-  padding: var(--spacing-8);
   max-height: 80vh;
   overflow-y: auto;
 }

@@ -4,6 +4,7 @@
   ========================== */
   --color-white: #ffffff;
   --color-black: #000000;
+  --color-border: rgba(162, 161, 168, 0.2);
 
   /* ==========================
      Primary Colors
@@ -33,7 +34,6 @@
   --color-gray-900: #16151c;
 
   --color-overlay-dark-15: rgba(0, 0, 0, 0.15);
-  --color-overlay-gray-20: rgba(162, 161, 168, 0.2);
 
   /* Spacing */
   --spacing-1: 0.25rem; /* 4px */
@@ -53,4 +53,5 @@
   --radius-md: 10px;
   --radius-lg: 16rem;
   --radius-xl: 20px;
+  --radius-2xl: 24px;
 }

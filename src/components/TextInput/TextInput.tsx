@@ -109,6 +109,11 @@ interface TextInputProps {
   autoCapitalize?: string;
 
   /**
+   *
+   */
+  readOnly?: boolean;
+
+  /**
    * to show the calendar icon
    * Defaults to false.
    */
@@ -119,6 +124,11 @@ interface TextInputProps {
    * @param event - The change event containing the updated value.
    */
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+
+  /**
+   * Event handler triggered when the input is clicked.
+   */
+  onClick?: React.MouseEventHandler<HTMLInputElement>;
 }
 
 export default function TextInput({
@@ -138,6 +148,7 @@ export default function TextInput({
   minLength,
   autoCapitalize,
   isCalendar,
+  readOnly = false,
   onChange,
   ...rest
 }: TextInputProps) {
@@ -171,6 +182,7 @@ export default function TextInput({
           maxLength={maxLength}
           minLength={minLength}
           autoCapitalize={autoCapitalize}
+          readOnly={readOnly}
           onChange={onChange}
           {...rest}
         />

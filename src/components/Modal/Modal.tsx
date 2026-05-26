@@ -74,7 +74,7 @@ interface ModalProps {
   /**
    * Determines whether the close button is displayed in the modal header.
    *
-   * @default true
+   * @default false
    */
   showCloseButton?: boolean;
 
@@ -109,7 +109,7 @@ export default function Modal({
   children,
   title,
   closeOnOverlayClick = true,
-  showCloseButton = true,
+  showCloseButton = false,
   centered = true,
   className = '',
   overlayClassName = '',

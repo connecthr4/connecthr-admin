@@ -124,19 +124,11 @@ export default function Button({
         </>
       ) : (
         <>
-          {StartIcon && (
-            <span className={styles.icon}>
-              <StartIcon size={iconSize} color={iconColor} />
-            </span>
-          )}
-          <Text3 as="span" align="center">
+          {StartIcon && <StartIcon size={iconSize} color={iconColor} />}
+          <Text3 as="span" align="center" className={styles.text}>
             {children}
           </Text3>
-          {EndIcon && (
-            <span className={styles.icon}>
-              <EndIcon size={iconSize} color={iconColor} />
-            </span>
-          )}
+          {EndIcon && <EndIcon size={iconSize} color={iconColor} />}
         </>
       )}
     </button>
