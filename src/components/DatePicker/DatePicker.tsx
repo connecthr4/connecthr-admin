@@ -13,9 +13,9 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import TextInput from '@/src/components/TextInput';
 import { DayPicker, DateRange } from '@daypicker/react';
 import '@daypicker/react/style.css';
-import TextInput from '@/src/components/TextInput';
 import styles from './DatePicker.module.scss';
 
 type DatePickerValue = Date | Date[] | DateRange | undefined;
@@ -92,7 +92,7 @@ interface DatePickerProps {
    * @param value value Selected date value based on the current mode.
    * @returns void
    */
-  onChange?: (value: Date | Date[] | DateRange | undefined) => void;
+  onChange?: (value: DatePickerValue) => void;
 
   /**
    *
@@ -113,6 +113,22 @@ interface DatePickerProps {
    *
    */
   initialSelectedMultipleDates?: Date[];
+
+  /**
+   *
+   */
+  required?: boolean;
+
+  /**
+   *
+   */
+  value?: DatePickerValue;
+
+  /**
+   * The error message to display when validation fails.
+   * Typically shown below the input in a distinct color (e.g., red).
+   */
+  error?: string;
 }
 
 export default function DatePicker({
@@ -130,22 +146,53 @@ export default function DatePicker({
   maxDate,
   initialSelectedDate,
   initialSelectedMultipleDates,
+  required,
+  value,
+  error,
   onChange,
 }: DatePickerProps) {
+  const currentSelectedDate = value instanceof Date ? value : initialSelectedDate;
+
   const [open, setOpen] = useState(false);
-  const [month, setMonth] = useState(new Date());
-  const [selected, setSelected] = useState<Date | undefined>(initialSelectedDate);
+  const [month, setMonth] = useState(currentSelectedDate);
+
   const [selectedMultiple, setSelectedMultiple] = useState<Date[] | undefined>(initialSelectedMultipleDates);
+
   const [range, setRange] = useState<DateRange | undefined>(initialRange);
 
   const handleSelect = (value: DatePickerValue) => {
-    if (mode === 'range') setRange(value as DateRange);
-    else if (mode === 'single') setSelected(value as Date);
-    else if (mode === 'multiple') setSelectedMultiple(value as Date[]);
+    if (mode === 'range') {
+      setRange(value as DateRange);
+    } else if (mode === 'multiple') {
+      setSelectedMultiple(value as Date[]);
+    }
 
     onChange?.(value);
     setOpen(false);
   };
+
+  const formattedValue = useMemo(() => {
+    const currentValue = value || currentSelectedDate;
+
+    if (!currentValue) return '';
+
+    if (currentValue instanceof Date) {
+      return currentValue.toLocaleDateString();
+    }
+
+    if (Array.isArray(currentValue)) {
+      return currentValue.map((date) => date.toLocaleDateString()).join(', ');
+    }
+
+    if ('from' in currentValue) {
+      const from = currentValue.from?.toLocaleDateString() || '';
+      const to = currentValue.to?.toLocaleDateString() || '';
+
+      return `${from} - ${to}`;
+    }
+
+    return '';
+  }, [value, currentSelectedDate]);
 
   // Helper to render DayPicker for all modes
   const renderPicker = () => {
@@ -161,7 +208,7 @@ export default function DatePicker({
       onSelect: handleSelect,
     };
 
-    if (mode === 'single')
+    if (mode === 'single') {
       return (
         <DayPicker
           {...props}
@@ -170,11 +217,16 @@ export default function DatePicker({
           reverseYears
           reverseMonths
           startMonth={minDate || new Date(2024, 0)}
-          endMonth={maxDate || new Date(2025, 11)}
-          selected={selected}
+          endMonth={maxDate || new Date(2035, 11)}
+          selected={currentSelectedDate}
         />
       );
-    if (mode === 'multiple') return <DayPicker {...props} mode="multiple" selected={selectedMultiple} />;
+    }
+
+    if (mode === 'multiple') {
+      return <DayPicker {...props} mode="multiple" selected={selectedMultiple} />;
+    }
+
     return (
       <DayPicker
         {...props}
@@ -186,7 +238,7 @@ export default function DatePicker({
         reverseYears
         reverseMonths
         startMonth={minDate || new Date(2024, 0)}
-        endMonth={maxDate || new Date(2025, 11)}
+        endMonth={maxDate || new Date(2035, 11)}
       />
     );
   };
@@ -196,24 +248,26 @@ export default function DatePicker({
       <TextInput
         label={label}
         placeholder="Select date"
+        value={formattedValue}
+        required={required}
+        error={error}
         onClick={() => !disabled && setOpen((prev) => !prev)}
         className={inputClassName}
         isCalendar
+        readOnly
       />
 
       {open && (
         <div className={styles.datePickerWrapper}>
-          <>
-            {displayMode === 'inline' ? (
-              <div className={styles.inlineContainer}>{renderPicker()}</div>
-            ) : (
-              <div className={styles.modalOverlay} onClick={() => setOpen(false)}>
-                <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
-                  {renderPicker()}
-                </div>
+          {displayMode === 'inline' ? (
+            <div className={styles.inlineContainer}>{renderPicker()}</div>
+          ) : (
+            <div className={styles.modalOverlay} onClick={() => setOpen(false)}>
+              <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
+                {renderPicker()}
               </div>
-            )}
-          </>
+            </div>
+          )}
         </div>
       )}
     </div>
