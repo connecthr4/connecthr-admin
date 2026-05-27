@@ -53,3 +53,18 @@ styles specific to the Button component
 .secondary {
   background-color: var(--color-white);
 }
+
+.text {
+  padding: 0;
+  background: transparent;
+  border: none;
+  min-height: auto;
+
+  .text {
+    color: var(--color-violet-600);
+  }
+
+  &:disabled {
+    background: transparent;
+  }
+}
