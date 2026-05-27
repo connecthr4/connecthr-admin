@@ -89,7 +89,7 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
    *
    * @default "primary"
    */
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'text';
 }
 
 export default function Button({
