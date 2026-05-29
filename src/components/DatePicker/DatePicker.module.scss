@@ -30,6 +30,10 @@ styles specific to the DatePicker component
   transition: transform 0.2s ease;
 }
 
+.calendarIcon {
+  color: var(--color-black);
+}
+
 /* Month-Year header */
 // .header {
 //   display: flex;

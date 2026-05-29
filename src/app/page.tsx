@@ -11,24 +11,26 @@ import BaseLayout from '../components/BaseLayout';
 import { useState } from 'react';
 import Modal from '../components/Modal';
 import DatePicker from '../components/DatePicker';
+import SearchInput from '../components/SearchInput';
 
 export default function Home({ children }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>
-      <button onClick={() => setIsOpen(true)}>Open Modal</button>
+    <SearchInput />
+    // <>
+    //   <button onClick={() => setIsOpen(true)}>Open Modal</button>
 
-      <Modal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        title="Create Employee"
-        closeOnOverlayClick
-        showCloseButton
-        centered
-      >
-        <DatePicker displayMode="modal" />
-      </Modal>
-    </>
+    //   <Modal
+    //     isOpen={isOpen}
+    //     onClose={() => setIsOpen(false)}
+    //     title="Create Employee"
+    //     closeOnOverlayClick
+    //     showCloseButton
+    //     centered
+    //   >
+    //     <DatePicker displayMode="modal" />
+    //   </Modal>
+    // </>
   );
 }

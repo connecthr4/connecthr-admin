@@ -13,6 +13,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { Calendar } from 'lucide-react';
 import TextInput from '@/src/components/TextInput';
 import { DayPicker, DateRange } from '@daypicker/react';
 import '@daypicker/react/style.css';
@@ -253,8 +254,8 @@ export default function DatePicker({
         error={error}
         onClick={() => !disabled && setOpen((prev) => !prev)}
         className={inputClassName}
-        isCalendar
         readOnly
+        rightIcon={<Calendar size={16} className={styles.calendarIcon} />}
       />
 
       {open && (

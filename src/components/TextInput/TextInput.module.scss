@@ -16,6 +16,27 @@ styles specific to the TextInput component
   align-items: center;
   width: 100%;
   margin-top: 2px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-white);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: var(--color-gray-400-80);
+  }
+}
+
+.leftIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.875rem;
+  color: var(--color-gray-500);
+  flex-shrink: 0;
 }
 
 .inputField {
@@ -23,30 +44,26 @@ styles specific to the TextInput component
   width: 100%;
   font-size: 1rem;
   padding: 0.75rem 0.87rem;
-  border-radius: 8px;
-  border: 1px solid var(--color-gray-400-80);
-  background-color: var(--color-white);
+  border: none;
+  outline: none;
+  background-color: transparent;
   color: var(--color-black);
   color-scheme: light;
   box-sizing: border-box;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
 
-  &:focus {
-    outline: none;
-    border-color: var(--color-gray-400-80);
+  &::placeholder {
+    color: var(--color-gray-400);
   }
 
   &:disabled {
-    background-color: var(--color-gray-50);
+    background-color: transparent;
     color: var(--color-gray-400);
     cursor: not-allowed;
   }
 }
 
-.inputWithIcon {
-  padding-right: 2.5rem;
+.inputWithRightIcon {
+  padding-right: 2.75rem;
 }
 
 .iconButton {
@@ -67,10 +84,6 @@ styles specific to the TextInput component
   &:hover {
     color: var(--color-gray-900);
   }
-}
-
-.calendarIcon {
-  color: var(--color-black);
 }
 
 .container .asterisk {

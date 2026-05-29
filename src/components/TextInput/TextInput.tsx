@@ -12,8 +12,8 @@
  */
 'use client';
 
-import { useState } from 'react';
-import { EyeOff, Eye, Calendar } from 'lucide-react';
+import { ReactNode, useState } from 'react';
+import { EyeOff, Eye } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './TextInput.module.scss';
 import { Label, Text3 } from '../Typography/Typography';
@@ -114,10 +114,14 @@ interface TextInputProps {
   readOnly?: boolean;
 
   /**
-   * to show the calendar icon
-   * Defaults to false.
+   *
    */
-  isCalendar?: boolean;
+  leftIcon?: ReactNode;
+
+  /**
+   *
+   */
+  rightIcon?: ReactNode;
 
   /**
    * Event handler triggered when the input value changes.
@@ -147,9 +151,10 @@ export default function TextInput({
   maxLength,
   minLength,
   autoCapitalize,
-  isCalendar,
   readOnly = false,
   onChange,
+  leftIcon,
+  rightIcon,
   ...rest
 }: TextInputProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -167,6 +172,7 @@ export default function TextInput({
         </Label>
       )}
       <div className={styles.inputWrapper}>
+        {leftIcon && <div className={styles.leftIcon}>{leftIcon}</div>}
         <input
           type={isPasswordType && isPasswordVisible ? 'text' : type}
           id={id}
@@ -174,7 +180,7 @@ export default function TextInput({
           placeholder={placeholder}
           value={value}
           className={clsx(styles.inputField, inputClassName, {
-            [styles.inputWithIcon]: isPasswordType,
+            [styles.inputWithRightIcon]: rightIcon || isPasswordType,
           })}
           disabled={disabled}
           defaultValue={defaultValue}
@@ -186,15 +192,12 @@ export default function TextInput({
           onChange={onChange}
           {...rest}
         />
-        {isPasswordType && (
-          <div role="button" className={styles.iconButton} onClick={togglePasswordVisibility}>
-            {isPasswordVisible ? <EyeOff /> : <Eye />}
-          </div>
-        )}
-        {isCalendar && (
-          <div className={styles.iconButton}>
-            <Calendar size={16} className={styles.calendarIcon} />
-          </div>
+        {isPasswordType ? (
+          <button type="button" className={styles.iconButton} onClick={togglePasswordVisibility}>
+            {isPasswordVisible ? <EyeOff height={24} width={24} /> : <Eye height={24} width={24} />}
+          </button>
+        ) : (
+          rightIcon && <div className={styles.iconButton}>{rightIcon}</div>
         )}
       </div>
 
