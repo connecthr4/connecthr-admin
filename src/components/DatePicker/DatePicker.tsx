@@ -255,7 +255,7 @@ export default function DatePicker({
         onClick={() => !disabled && setOpen((prev) => !prev)}
         className={inputClassName}
         readOnly
-        rightIcon={<Calendar size={16} className={styles.calendarIcon} />}
+        rightIcon={<Calendar size={24} className={styles.calendarIcon} />}
       />
 
       {open && (
