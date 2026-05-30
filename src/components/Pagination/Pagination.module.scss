@@ -1,0 +1,26 @@
+/**
+------------------------------------------------------
+styles specific to the Pagination component
+------------------------------------------------------
+**/
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 1rem;
+
+  padding-top: 16px;
+}
+
+.pageInfo {
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  color: var(--color-text-secondary);
+}
+
+.button {
+  padding: 18px;
+}
