@@ -1,20 +1,27 @@
+/**
+ * A dashboard component for displaying, managing, and monitoring all employee records in a centralized view.
+ *
+ * @example
+ * ```tsx
+ * import EmployeesDashboard from '@src/components/EmployeesDashboard'
+ *
+ * export default function EmployeesDashboard() {
+ *   return <EmployeesDashboard label="Hello" />;
+ * }
+ * ```
+ */
 'use client';
 
-import StatsSummaryCard from '../components/StatsSummaryCard';
-import { Users, CalendarCheck, CalendarMinus } from 'lucide-react';
-import UpcomingHolidaysCard from '../components/UpcomingHolidaysCard';
-import AppHeader from '../components/AppHeader';
-import BasePieChart from '../components/BasePieChart';
-import LeftNavBar from '../components/LeftNavBar';
-import BaseLayout from '../components/BaseLayout';
-
-import { useState } from 'react';
-import Modal from '../components/Modal';
-import DatePicker from '../components/DatePicker';
-import SearchInput from '../components/SearchInput';
-import DataTable from '../components/DataTable';
+import AppHeader from '../AppHeader';
+import Button from '../Button';
+import SearchInput from '../SearchInput';
+import { CirclePlus, SlidersHorizontal } from 'lucide-react';
+import styles from './EmployeesDashboard.module.scss';
+import DataTable from '../DataTable';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
+import clsx from 'clsx';
+import Pagination from '../Pagination';
 
 export interface Employee {
   id: string;
@@ -27,13 +34,20 @@ export interface Employee {
   status: 'Permanent' | 'Contract' | 'Probation';
 }
 
-export default function Home({ children }) {
+/**
+ * Define the props available for the EmployeesDashboard component.
+ */
+interface EmployeesDashboardProps {
+  label?: string;
+}
+
+export default function EmployeesDashboard({ label = 'label' }: EmployeesDashboardProps) {
   const employeeColumns: ColumnDef<Employee>[] = [
     {
       accessorKey: 'name',
       header: 'Employee Name',
       cell: ({ row }) => (
-        <div className="employeeCell">
+        <div className={styles.employeeCell}>
           <img
             src={row.original.avatar}
             alt={row.original.name}
@@ -82,12 +96,16 @@ export default function Home({ children }) {
       enableSorting: false,
 
       cell: ({ row }) => (
-        <div className="actions">
-          <Eye size={18} onClick={() => console.log('View', row.original.id)} />
+        <div className={styles.actions}>
+          <Eye size={20} className={clsx(styles.actionIcon)} onClick={() => console.log('View', row.original.id)} />
 
-          <Pencil size={18} onClick={() => console.log('Edit', row.original.id)} />
+          <Pencil size={20} className={clsx(styles.actionIcon)} onClick={() => console.log('Edit', row.original.id)} />
 
-          <Trash2 size={18} onClick={() => console.log('Delete', row.original.id)} />
+          <Trash2
+            size={20}
+            className={clsx(styles.actionIcon)}
+            onClick={() => console.log('Delete', row.original.id)}
+          />
         </div>
       ),
     },
@@ -246,5 +264,34 @@ export default function Home({ children }) {
     },
   ];
 
-  return <DataTable data={employees} columns={employeeColumns} />;
+  return (
+    <div className={styles.container}>
+      <AppHeader title="All Employees" subtitle="All Employee Information" />
+
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <SearchInput placeholder="Search employee..." />
+
+          <Button startIcon={CirclePlus} onChange={() => {}} className={styles.button}>
+            Add New Employee
+          </Button>
+
+          <Button
+            startIcon={SlidersHorizontal}
+            variant="secondary"
+            onChange={() => {}}
+            className={styles.button}
+            startIconColor="var(--color-black)"
+          >
+            Filter
+          </Button>
+        </div>
+
+        <div className={styles.tableContainer}>
+          <DataTable data={employees} columns={employeeColumns} />
+        </div>
+        <Pagination />
+      </div>
+    </div>
+  );
 }

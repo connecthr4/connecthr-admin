@@ -67,12 +67,6 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   iconSize?: number;
 
   /**
-   * Color of the icons (CSS color value).
-   * Accepts named colors, hex, rgb, or CSS variables.
-   */
-  iconColor?: string;
-
-  /**
    * Additional CSS class names for customizing the button styles.
    * Useful for applying variant-specific styles.
    */
@@ -90,6 +84,16 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
    * @default "primary"
    */
   variant?: 'primary' | 'secondary' | 'text';
+
+  /**
+   *
+   */
+  startIconColor?: string;
+
+  /**
+   *
+   */
+  endIconColor?: string;
 }
 
 export default function Button({
@@ -100,10 +104,11 @@ export default function Button({
   startIcon: StartIcon,
   endIcon: EndIcon,
   iconSize,
-  iconColor,
   className,
   loading = false,
   variant = 'primary',
+  startIconColor,
+  endIconColor,
   ...rest
 }: ButtonProps) {
   return (
@@ -124,11 +129,11 @@ export default function Button({
         </>
       ) : (
         <>
-          {StartIcon && <StartIcon size={iconSize} color={iconColor} />}
+          {StartIcon && <StartIcon size={iconSize} color={startIconColor} />}
           <Text3 as="span" align="center" className={styles.text}>
             {children}
           </Text3>
-          {EndIcon && <EndIcon size={iconSize} color={iconColor} />}
+          {EndIcon && <EndIcon size={iconSize} color={endIconColor} />}
         </>
       )}
     </button>

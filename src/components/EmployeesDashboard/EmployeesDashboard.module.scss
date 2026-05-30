@@ -1,0 +1,98 @@
+/**
+------------------------------------------------------
+styles specific to the EmployeesDashboard component
+------------------------------------------------------
+**/
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-height: 0;
+
+  padding: 16px;
+
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+
+  overflow: hidden;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+}
+
+.header > :first-child {
+  width: 100%;
+}
+
+.button {
+  padding: 1rem;
+}
+
+.tableContainer {
+  flex: 1;
+  min-height: 0;
+
+  overflow-x: auto;
+  overflow-y: auto;
+
+  /* Scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+.employeeCell {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actionIcon {
+  border-radius: 0.5rem;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
