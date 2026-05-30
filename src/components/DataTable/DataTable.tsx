@@ -12,18 +12,19 @@
  */
 'use client';
 
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { memo } from 'react';
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import styles from './DataTable.module.scss';
 
 /**
  * Define the props available for the DataTable component.
  */
-interface DataTableProps {
-  data?: any;
-  columns?: any;
+interface DataTableProps<TData extends object> {
+  data: TData[];
+  columns: ColumnDef<TData>[];
 }
 
-export default function DataTable({ data, columns }: DataTableProps) {
+function DataTable<TData extends object>({ data, columns }: DataTableProps<TData>) {
   const table = useReactTable({
     data,
     columns,
@@ -55,3 +56,5 @@ export default function DataTable({ data, columns }: DataTableProps) {
     </div>
   );
 }
+
+export default memo(DataTable);
