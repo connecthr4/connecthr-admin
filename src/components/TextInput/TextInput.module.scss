@@ -26,7 +26,8 @@ styles specific to the TextInput component
     box-shadow 0.2s ease;
 
   &:focus-within {
-    border-color: var(--color-gray-400-80);
+    // border-color: var(--color-gray-400-80);
+    border-color: var(--color-violet-600);
   }
 }
 
