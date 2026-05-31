@@ -1,0 +1,31 @@
+/**
+------------------------------------------------------
+styles specific to the LoginPanel component
+------------------------------------------------------
+**/
+
+.container {
+  width: 100%;
+  // max-width: 600px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.welcomeSection {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputSection {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button {
+  margin-top: 28px;
+}
