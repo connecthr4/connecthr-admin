@@ -13,7 +13,7 @@ import styles from './page.module.scss';
  *
  * @returns The page UI for the route.
  */
-export default function loginPage() {
+export default function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.leftSection}></div>
