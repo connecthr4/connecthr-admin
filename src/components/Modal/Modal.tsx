@@ -101,6 +101,11 @@ interface ModalProps {
    * @default 1000
    */
   zIndex?: number;
+
+  /**
+   *
+   */
+  maxWidth?: string;
 }
 
 export default function Modal({
@@ -114,6 +119,7 @@ export default function Modal({
   className = '',
   overlayClassName = '',
   zIndex = 1000,
+  maxWidth = '37.5rem',
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -198,6 +204,7 @@ export default function Modal({
           ${styles.modal}
           ${className}
         `}
+        style={{ maxWidth }}
         onClick={handleModalClick}
       >
         {(title || showCloseButton) && (

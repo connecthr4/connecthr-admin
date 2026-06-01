@@ -29,3 +29,41 @@ styles specific to the LoginPanel component
 .button {
   margin-top: 28px;
 }
+
+.passwordRequirementSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.requirement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.icon {
+  width: 16px;
+  display: flex;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.valid {
+  color: #16a34a;
+}
+
+.invalid {
+  color: #6b7280;
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
