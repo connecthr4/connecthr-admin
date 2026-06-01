@@ -20,6 +20,7 @@ import Button from '../Button';
 import { useState } from 'react';
 import { isValidEmail } from '@/src/utils/helper';
 import { Check, X } from 'lucide-react';
+import Modal from '../Modal';
 
 type AuthStep = 'login' | 'reset-password';
 
@@ -39,6 +40,7 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
     newPassword: '',
     confirmPassword: '',
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [errors, setErrors] = useState({
     email: '',
@@ -130,7 +132,7 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
     try {
       // Call Reset Password API
 
-      console.log('Reset Password API');
+      setShowSuccessModal(true);
 
       // Navigate to Dashboard after success
       // router.push('/dashboard');
@@ -200,6 +202,16 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
           </Button>
         </>
       )}
+
+      {showSuccessModal && (
+        <PasswordResetSuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          onBackToLogin={() => {
+            setShowSuccessModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -244,7 +256,6 @@ function PasswordRequirements({ password }: PasswordRequirementsProps) {
     <div className={styles.passwordRequirementSection}>
       {requirements.map((requirement) => (
         <div key={requirement.label} className={styles.requirement}>
-          {/* <span className={styles.icon}>{requirement.valid ? '✓' : '✕'}</span> */}
           {requirement.valid ? (
             <Check size={24} className={styles.valid} />
           ) : (
@@ -254,5 +265,22 @@ function PasswordRequirements({ password }: PasswordRequirementsProps) {
         </div>
       ))}
     </div>
+  );
+}
+
+interface PasswordResetSuccessModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onBackToLogin: () => void;
+}
+
+function PasswordResetSuccessModal({ isOpen, onClose, onBackToLogin }: PasswordResetSuccessModalProps) {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false} maxWidth="400px">
+      <div className={styles.modalContent}>
+        <Heading2 align="center">Password Update Successfully</Heading2>
+        <Button onClick={onBackToLogin}>Back to Login</Button>
+      </div>
+    </Modal>
   );
 }
