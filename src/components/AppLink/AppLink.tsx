@@ -12,8 +12,8 @@
  */
 'use client';
 
-import { AnchorHTMLAttributes, ReactNode } from 'react';
-import Link, { LinkProps } from 'next/link';
+import { ReactNode } from 'react';
+import Link from 'next/link';
 import styles from './AppLink.module.scss';
 
 /**

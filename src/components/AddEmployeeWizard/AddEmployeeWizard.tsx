@@ -106,7 +106,10 @@ export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizard
 
   return (
     <div className={styles.container}>
-      <AppHeader title="Add New Employee" subtitle="All Employee Information" />
+      <AppHeader
+        title="Add New Employee"
+        breadcrumbs={[{ label: 'All Employees', href: '/employees' }, { label: 'Add New Employee' }]}
+      />
 
       <div className={styles.content}>
         <Stepper currentStep={currentStep} steps={STEPS} />
