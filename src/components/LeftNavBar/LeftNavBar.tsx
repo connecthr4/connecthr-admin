@@ -36,7 +36,7 @@ export default function LeftNavBar({}) {
 
       <nav className={styles.navigation}>
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (
             <AppLink
