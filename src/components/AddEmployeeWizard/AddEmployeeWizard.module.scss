@@ -4,7 +4,28 @@ styles specific to the AddEmployeeWizard component
 ------------------------------------------------------
 **/
 
-.container{
- padding: 1rem
-   // Add styles here
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-height: 0;
+
+  padding: 16px;
+
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+
+  overflow: hidden;
 }
