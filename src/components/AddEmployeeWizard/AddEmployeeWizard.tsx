@@ -15,6 +15,8 @@
 import { useState } from 'react';
 import styles from './AddEmployeeWizard.module.scss';
 import AppHeader from '../AppHeader';
+import { User, BriefcaseBusiness, FileText, Lock } from 'lucide-react';
+import Stepper from '../Stepper';
 
 /**
  * Define the props available for the AddEmployeeWizard component.
@@ -27,22 +29,22 @@ const STEPS = [
   {
     id: 'personal-information',
     label: 'Personal Information',
-    // component: PersonalInformationStep,
+    icon: User,
   },
   {
     id: 'professional-information',
     label: 'Professional Information',
-    // component: ProfessionalInformationStep,
+    icon: BriefcaseBusiness,
   },
   {
     id: 'documents',
     label: 'Documents',
-    // component: DocumentsStep,
+    icon: FileText,
   },
   {
     id: 'account-access',
     label: 'Account Access',
-    // component: AccountAccessStep,
+    icon: Lock,
   },
 ] as const;
 
@@ -106,7 +108,9 @@ export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizard
     <div className={styles.container}>
       <AppHeader title="Add New Employee" subtitle="All Employee Information" />
 
-      <div className={styles.content}></div>
+      <div className={styles.content}>
+        <Stepper currentStep={currentStep} steps={STEPS} />
+      </div>
     </div>
   );
 }
