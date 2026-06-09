@@ -128,7 +128,7 @@ export const Text2 = (props: Props) => <Typography as="p" variant="text2" {...pr
 
 export const Text3 = (props: Props) => <Typography as="span" variant="text3" {...props} />;
 
-export const Text4 = (props: Props) => <Typography variant="text3" {...props} />;
+export const Text4 = (props: Props) => <Typography as="span" variant="text4" {...props} />;
 
 export const Label = (props: Props) => <Typography as="label" variant="label" {...props} />;
 

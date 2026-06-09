@@ -17,6 +17,8 @@ import styles from './AddEmployeeWizard.module.scss';
 import AppHeader from '../AppHeader';
 import { User, BriefcaseBusiness, FileText, Lock } from 'lucide-react';
 import Stepper from '../Stepper';
+import PersonalInformationForm from '../PersonalInformationForm';
+import Button from '../Button';
 
 /**
  * Define the props available for the AddEmployeeWizard component.
@@ -88,21 +90,64 @@ const STEPS = [
 export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizardProps) {
   // const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
-
-  // const ActiveStep = STEPS[currentStep].component;
+  const [employeeData, setEmployeeData] = useState({});
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === STEPS.length - 1;
 
-  // const handleCancel = () => {
-  //   router.push('/employees');
-  // };
+  const handleNext = () => {
+    if (isLastStep) return;
 
-  // const handleBack = () => {
-  //   if (isFirstStep) return;
+    setCurrentStep((prev) => prev + 1);
+  };
 
-  //   setCurrentStep((prev) => prev - 1);
-  // };
+  const handleBack = () => {
+    if (isFirstStep) return;
+
+    setCurrentStep((prev) => prev - 1);
+  };
+
+  const handlePersonalInformationSubmit = (data: any) => {
+    setEmployeeData((prev) => ({
+      ...prev,
+      personalInformation: data,
+    }));
+
+    setCurrentStep((prev) => prev + 1);
+  };
+
+  const renderFooter = () => (
+    <div className={styles.footer}>
+      <div>
+        {!isFirstStep && (
+          <Button type="button" variant="secondary" onClick={handleBack}>
+            Back
+          </Button>
+        )}
+      </div>
+
+      <Button type="submit">{isLastStep ? 'Create Employee' : 'Next'}</Button>
+    </div>
+  );
+
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 0:
+        return <PersonalInformationForm onSubmit={handlePersonalInformationSubmit} footer={renderFooter()} />;
+
+      case 1:
+        return <div>Professional Information Form</div>;
+
+      case 2:
+        return <div>Documents Form</div>;
+
+      case 3:
+        return <div>Account Access Form</div>;
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -113,6 +158,7 @@ export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizard
 
       <div className={styles.content}>
         <Stepper currentStep={currentStep} steps={STEPS} />
+        <div className={styles.formContainer}>{renderCurrentStep()}</div>
       </div>
     </div>
   );
