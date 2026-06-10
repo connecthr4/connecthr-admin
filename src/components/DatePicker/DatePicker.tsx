@@ -133,7 +133,7 @@ interface DatePickerProps {
 }
 
 export default function DatePicker({
-  displayMode = 'inline',
+  displayMode = 'modal',
   label,
   mode = 'single',
   initialRange,

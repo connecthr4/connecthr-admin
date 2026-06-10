@@ -1,0 +1,28 @@
+/**
+------------------------------------------------------
+styles specific to the DynamicForm component
+------------------------------------------------------
+**/
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+.field--full {
+  grid-column: span 12;
+}
+
+.field--half {
+  grid-column: span 6;
+}
+
+.field--third {
+  grid-column: span 4;
+}
+
+.footerWrapper {
+  grid-column: span 12;
+  width: 100%;
+}
