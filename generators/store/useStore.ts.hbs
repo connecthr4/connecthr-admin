@@ -1,0 +1,16 @@
+/**
+* {{ storeDescription }}
+*
+*/
+
+import { create } from "zustand"
+import { {{pascalCase name}}State } from "./types"
+
+const initialState = {
+// default values here
+}
+
+export const use{{pascalCase name}}Store = create<{{pascalCase name}}State>((set) => ({
+    ...initialState,
+    // actions here
+}))
