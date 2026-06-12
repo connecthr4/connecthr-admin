@@ -21,11 +21,11 @@ import { payrollInformationSchema } from './PayrollInformationForm.schema';
  * Define the props available for the PayrollInformationForm component.
  */
 interface PayrollInformationFormProps {
-  onSubmit: (data: PayrollInformationFormData) => void;
+  onSubmit: (data: PayrollInformationFormValues) => void;
   footer?: React.ReactNode;
 }
 
-export const professionalInformationFormConfig: FieldConfig[] = [
+export const payrollInformationFormConfig: FieldConfig[] = [
   {
     name: 'bankAccountDetailsLabel',
     label: 'Bank Account Details',
@@ -115,7 +115,7 @@ export const professionalInformationFormConfig: FieldConfig[] = [
 export default function PayrollInformationForm({ onSubmit, footer }: PayrollInformationFormProps) {
   return (
     <DynamicForm
-      fields={professionalInformationFormConfig}
+      fields={payrollInformationFormConfig}
       schema={payrollInformationSchema}
       onSubmit={onSubmit}
       footer={footer}

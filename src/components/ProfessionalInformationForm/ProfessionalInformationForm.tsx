@@ -21,7 +21,7 @@ import { professionalInformationSchema } from './ProfessionalInformationForm.sch
  * Define the props available for the ProfessionalInformationForm component.
  */
 interface ProfessionalInformationFormProps {
-  onSubmit: (data: ProfessionalInformationFormData) => void;
+  onSubmit: (data: ProfessionalInformationFormValues) => void;
   footer?: React.ReactNode;
 }
 
@@ -65,7 +65,7 @@ export const professionalInformationFormConfig: FieldConfig[] = [
     required: true,
   },
   {
-    name: 'firstName',
+    name: 'department',
     label: 'Department',
     placeholder: 'Select Department',
     type: 'input',
