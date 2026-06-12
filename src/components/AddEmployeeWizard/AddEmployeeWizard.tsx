@@ -15,10 +15,12 @@
 import { useState } from 'react';
 import styles from './AddEmployeeWizard.module.scss';
 import AppHeader from '../AppHeader';
-import { User, BriefcaseBusiness, FileText, Lock } from 'lucide-react';
+import { User, BriefcaseBusiness, FileText, Wallet } from 'lucide-react';
 import Stepper from '../Stepper';
 import PersonalInformationForm from '../PersonalInformationForm';
 import Button from '../Button';
+import ProfessionalInformationForm from '../ProfessionalInformationForm';
+import PayrollInformationForm from '../PayrollInformationForm';
 
 /**
  * Define the props available for the AddEmployeeWizard component.
@@ -39,14 +41,14 @@ const STEPS = [
     icon: BriefcaseBusiness,
   },
   {
+    id: 'payroll-information',
+    label: 'Payroll Information',
+    icon: Wallet,
+  },
+  {
     id: 'documents',
     label: 'Documents',
     icon: FileText,
-  },
-  {
-    id: 'account-access',
-    label: 'Account Access',
-    icon: Lock,
   },
 ] as const;
 
@@ -89,7 +91,7 @@ const STEPS = [
 
 export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizardProps) {
   // const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(2);
   const [employeeData, setEmployeeData] = useState({});
 
   const isFirstStep = currentStep === 0;
@@ -136,10 +138,10 @@ export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizard
         return <PersonalInformationForm onSubmit={handlePersonalInformationSubmit} footer={renderFooter()} />;
 
       case 1:
-        return <div>Professional Information Form</div>;
+        return <ProfessionalInformationForm onSubmit={handlePersonalInformationSubmit} footer={renderFooter()} />;
 
       case 2:
-        return <div>Documents Form</div>;
+        return <PayrollInformationForm onSubmit={handlePersonalInformationSubmit} footer={renderFooter()} />;
 
       case 3:
         return <div>Account Access Form</div>;
