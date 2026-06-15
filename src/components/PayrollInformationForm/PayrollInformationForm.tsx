@@ -114,7 +114,7 @@ export const payrollInformationFormConfig: FieldConfig[] = [
 ];
 
 export default function PayrollInformationForm({ onSubmit, footer }: PayrollInformationFormProps) {
-  const payrollInformation = useEmployeeStore((state) => state.personalInformation);
+  const payrollInformation = useEmployeeStore((state) => state.payrollInformation);
   return (
     <DynamicForm
       fields={payrollInformationFormConfig}
