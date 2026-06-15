@@ -76,7 +76,7 @@ export const professionalInformationFormConfig: FieldConfig[] = [
 ];
 
 export default function ProfessionalInformationForm({ onSubmit, footer }: ProfessionalInformationFormProps) {
-  const professionalInformation = useEmployeeStore((state) => state.personalInformation);
+  const professionalInformation = useEmployeeStore((state) => state.professionalInformation);
   return (
     <DynamicForm
       fields={professionalInformationFormConfig}
