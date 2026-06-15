@@ -11,6 +11,7 @@
  * ```
  */
 
+import { useEmployeeStore } from '@/src/store/employeeStore';
 import DynamicForm from '../DynamicForm';
 import { FieldConfig, FieldWidth } from '../DynamicForm/DynamicForm';
 import { Text1 } from '../Typography';
@@ -113,10 +114,12 @@ export const payrollInformationFormConfig: FieldConfig[] = [
 ];
 
 export default function PayrollInformationForm({ onSubmit, footer }: PayrollInformationFormProps) {
+  const payrollInformation = useEmployeeStore((state) => state.personalInformation);
   return (
     <DynamicForm
       fields={payrollInformationFormConfig}
       schema={payrollInformationSchema}
+      defaultValues={payrollInformation}
       onSubmit={onSubmit}
       footer={footer}
     />

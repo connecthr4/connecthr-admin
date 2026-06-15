@@ -21,6 +21,7 @@ import PersonalInformationForm from '../PersonalInformationForm';
 import Button from '../Button';
 import ProfessionalInformationForm from '../ProfessionalInformationForm';
 import PayrollInformationForm from '../PayrollInformationForm';
+import { useEmployeeStore } from '@/src/store/employeeStore';
 
 /**
  * Define the props available for the AddEmployeeWizard component.
@@ -91,8 +92,10 @@ const STEPS = [
 
 export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizardProps) {
   // const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(2);
-  const [employeeData, setEmployeeData] = useState({});
+  const [currentStep, setCurrentStep] = useState(0);
+  const setPersonalInformation = useEmployeeStore((state) => state.setPersonalInformation);
+  const setProfessionalInformation = useEmployeeStore((state) => state.setProfessionalInformation);
+  const setPayrollInformation = useEmployeeStore((state) => state.setPayrollInformation);
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === STEPS.length - 1;
@@ -110,12 +113,21 @@ export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizard
   };
 
   const handlePersonalInformationSubmit = (data: any) => {
-    setEmployeeData((prev) => ({
-      ...prev,
-      personalInformation: data,
-    }));
+    setPersonalInformation(data);
 
-    setCurrentStep((prev) => prev + 1);
+    handleNext();
+  };
+
+  const handleProfessionalInformationSubmit = (data: any) => {
+    setProfessionalInformation(data);
+
+    handleNext();
+  };
+
+  const handlePayrollInformationSubmit = (data: any) => {
+    setPayrollInformation(data);
+
+    handleNext();
   };
 
   const renderFooter = () => (
@@ -138,10 +150,10 @@ export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizard
         return <PersonalInformationForm onSubmit={handlePersonalInformationSubmit} footer={renderFooter()} />;
 
       case 1:
-        return <ProfessionalInformationForm onSubmit={handlePersonalInformationSubmit} footer={renderFooter()} />;
+        return <ProfessionalInformationForm onSubmit={handleProfessionalInformationSubmit} footer={renderFooter()} />;
 
       case 2:
-        return <PayrollInformationForm onSubmit={handlePersonalInformationSubmit} footer={renderFooter()} />;
+        return <PayrollInformationForm onSubmit={handlePayrollInformationSubmit} footer={renderFooter()} />;
 
       case 3:
         return <div>Account Access Form</div>;

@@ -57,8 +57,8 @@ styles specific to the TextInput component
   }
 
   &:disabled {
-    background-color: transparent;
-    color: var(--color-gray-400);
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-500);
     cursor: not-allowed;
   }
 }
