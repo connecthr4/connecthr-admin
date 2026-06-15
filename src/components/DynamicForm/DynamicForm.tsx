@@ -12,7 +12,7 @@
  */
 'use client';
 
-import React, { ComponentType, ReactNode } from 'react';
+import React, { ComponentType, ReactNode, useEffect } from 'react';
 import { useForm, SubmitHandler, FieldValues, Resolver, Path, Controller, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ZodSchema } from 'zod';
@@ -86,6 +86,11 @@ export interface FieldConfig<T extends FieldValues> {
   labelComponent?: ComponentType<any>;
   minDate?: Date;
   maxDate?: Date;
+  disabledWhen?: Path<T>;
+  syncFields?: {
+    source: Path<T>;
+    target: Path<T>;
+  }[];
 }
 
 type FieldType = 'label' | 'input' | 'checkbox' | 'datePicker';
@@ -104,6 +109,7 @@ export default function DynamicForm<T extends FieldValues>({
     reValidateMode: 'onChange',
     defaultValues,
   });
+  const watchedValues = methods.watch();
 
   const {
     register,
@@ -111,6 +117,28 @@ export default function DynamicForm<T extends FieldValues>({
     handleSubmit,
     formState: { errors },
   } = methods;
+
+  const isFieldDisabled = (field: FieldConfig<T>) => {
+    if (!field.disabledWhen) return false;
+
+    return Boolean(watchedValues[field.disabledWhen]);
+  };
+
+  useEffect(() => {
+    fields.forEach((field) => {
+      if (field.type !== 'checkbox' || !field.syncFields) return;
+
+      const isChecked = watchedValues[field.name];
+
+      field.syncFields.forEach(({ source, target }) => {
+        if (isChecked) {
+          methods.setValue(target, watchedValues[source]);
+        } else {
+          methods.setValue(target, '');
+        }
+      });
+    });
+  }, [watchedValues, fields, methods]);
 
   const renderField = (field: FieldConfig<T>) => {
     switch (field.type) {
@@ -125,6 +153,7 @@ export default function DynamicForm<T extends FieldValues>({
             {...register(field.name)}
             label={field.label}
             placeholder={field.placeholder}
+            disabled={isFieldDisabled(field)}
             type={field.type}
             required={field.required}
             className={field.className}

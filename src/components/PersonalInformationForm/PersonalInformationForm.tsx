@@ -15,6 +15,7 @@ import DynamicForm, { FieldConfig, FieldWidth } from '../DynamicForm/DynamicForm
 import { Text1 } from '../Typography';
 import { personalInformationSchema } from './PersonalInformationForm.schema';
 import styles from './PersonalInformationForm.module.scss';
+import { useEmployeeStore } from '@/src/store/employeeStore';
 
 /**
  * Define the props available for the PersonalInformationForm component.
@@ -84,7 +85,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     placeholder: 'Enter Nationality',
     type: 'input',
     width: FieldWidth.HALF,
-    required: false,
+    required: true,
   },
   {
     name: 'maritalStatus',
@@ -145,6 +146,24 @@ export const personalInformationFormConfig: FieldConfig[] = [
     label: 'Permanent Address is same as Current Address',
     type: 'checkbox',
     width: FieldWidth.FULL,
+    syncFields: [
+      {
+        source: 'currentAddress',
+        target: 'permanentAddress',
+      },
+      {
+        source: 'currentCity',
+        target: 'permanentCity',
+      },
+      {
+        source: 'currentState',
+        target: 'permanentState',
+      },
+      {
+        source: 'currentPinCode',
+        target: 'permanentPinCode',
+      },
+    ],
   },
   {
     name: 'permanentAddress',
@@ -153,6 +172,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     type: 'input',
     width: FieldWidth.FULL,
     required: true,
+    disabledWhen: 'sameAsCurrentAddress',
   },
   {
     name: 'permanentCity',
@@ -161,6 +181,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     type: 'input',
     width: FieldWidth.THIRD,
     required: true,
+    disabledWhen: 'sameAsCurrentAddress',
   },
   {
     name: 'permanentState',
@@ -169,6 +190,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     type: 'input',
     width: FieldWidth.THIRD,
     required: true,
+    disabledWhen: 'sameAsCurrentAddress',
   },
   {
     name: 'permanentPinCode',
@@ -177,6 +199,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     type: 'input',
     width: FieldWidth.THIRD,
     required: true,
+    disabledWhen: 'sameAsCurrentAddress',
   },
   {
     name: 'emergencyContactLabel',
@@ -185,7 +208,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     labelComponent: Text1,
   },
   {
-    name: 'contactName',
+    name: 'emergencyContactName',
     label: 'Contact Name',
     placeholder: 'Enter Contact Name',
     type: 'input',
@@ -193,7 +216,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     required: true,
   },
   {
-    name: 'relationship',
+    name: 'emergencyRelationship',
     label: 'Relationship',
     placeholder: 'Enter Relationship',
     type: 'input',
@@ -201,7 +224,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     required: true,
   },
   {
-    name: 'phoneNumber',
+    name: 'emergencyPhoneNumber',
     label: 'Phone Number',
     placeholder: 'Enter Phone Number',
     type: 'input',
@@ -209,7 +232,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     required: true,
   },
   {
-    name: 'address',
+    name: 'emergencyAddress',
     label: 'Address',
     placeholder: 'Enter Address',
     type: 'input',
@@ -219,10 +242,12 @@ export const personalInformationFormConfig: FieldConfig[] = [
 ];
 
 export default function PersonalInformationForm({ onSubmit, footer }: PersonalInformationFormProps) {
+  const personalInformation = useEmployeeStore((state) => state.personalInformation);
   return (
     <DynamicForm
       fields={personalInformationFormConfig}
       schema={personalInformationSchema}
+      defaultValues={personalInformation}
       onSubmit={onSubmit}
       footer={footer}
     />

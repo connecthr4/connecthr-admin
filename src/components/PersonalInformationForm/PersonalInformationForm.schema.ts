@@ -14,7 +14,7 @@ export const personalInformationSchema = z.object({
     required_error: 'Date of Birth is required',
   }),
   gender: z.string().min(1, 'Gender is required'),
-  nationality: z.string().optional(),
+  nationality: z.string().min(1, 'Nationality is required'),
   maritalStatus: z.string().min(1, 'Marital Status is required'),
   aadhaarNumber: z
     .string()
@@ -38,14 +38,13 @@ export const personalInformationSchema = z.object({
     .regex(/^\d+$/, 'PIN Code must contain only numbers'),
 
   // Emergency Contact
-  contactName: z.string().min(1, 'Contact Name is required'),
-  relationship: z.string().min(1, 'Relationship is required'),
-  phoneNumber: z
+  emergencyContactName: z.string().min(1, 'Contact Name is required'),
+  emergencyRelationship: z.string().min(1, 'Relationship is required'),
+  emergencyPhoneNumber: z
     .string()
     .length(10, 'Phone Number must be 10 digits')
     .regex(/^\d+$/, 'Phone Number must contain only numbers'),
-
-  address: z.string().min(1, 'Address is required'),
+  emergencyAddress: z.string().min(1, 'Address is required'),
 });
 
 export type PersonalInformationFormValues = z.infer<typeof personalInformationSchema>;
