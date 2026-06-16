@@ -23,6 +23,7 @@ export type TypographyVariant =
   | 'heading2'
   | 'heading3'
   | 'heading4'
+  | 'heading5'
   | 'text1'
   | 'text2'
   | 'text3'
@@ -120,7 +121,9 @@ export const Heading2 = (props: Props) => <Typography as="h2" variant="heading2"
 
 export const Heading3 = (props: Props) => <Typography as="h3" variant="heading3" {...props} />;
 
-export const Heading4 = (props: Props) => <Typography as="span" variant="heading3" {...props} />;
+export const Heading4 = (props: Props) => <Typography as="span" variant="heading4" {...props} />;
+
+export const Heading5 = (props: Props) => <Typography as="span" variant="heading5" {...props} />;
 
 export const Text1 = (props: Props) => <Typography as="p" variant="text1" {...props} />;
 
