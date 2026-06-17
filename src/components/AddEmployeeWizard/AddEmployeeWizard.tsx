@@ -15,13 +15,13 @@
 import { useState } from 'react';
 import styles from './AddEmployeeWizard.module.scss';
 import AppHeader from '../AppHeader';
-import { User, BriefcaseBusiness, FileText, Wallet } from 'lucide-react';
 import Stepper from '../Stepper';
 import PersonalInformationForm from '../PersonalInformationForm';
 import Button from '../Button';
 import ProfessionalInformationForm from '../ProfessionalInformationForm';
 import PayrollInformationForm from '../PayrollInformationForm';
 import { useEmployeeStore } from '@/src/store/employeeStore';
+import { STEPS } from '@/src/constants/strings';
 
 /**
  * Define the props available for the AddEmployeeWizard component.
@@ -29,29 +29,6 @@ import { useEmployeeStore } from '@/src/store/employeeStore';
 interface AddEmployeeWizardProps {
   label?: string;
 }
-
-const STEPS = [
-  {
-    id: 'personal-information',
-    label: 'Personal Information',
-    icon: User,
-  },
-  {
-    id: 'professional-information',
-    label: 'Professional Information',
-    icon: BriefcaseBusiness,
-  },
-  {
-    id: 'payroll-information',
-    label: 'Payroll Information',
-    icon: Wallet,
-  },
-  {
-    id: 'documents',
-    label: 'Documents',
-    icon: FileText,
-  },
-] as const;
 
 // const defaultValues: EmployeeFormData = {
 //   // Personal Information

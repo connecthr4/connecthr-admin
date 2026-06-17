@@ -203,7 +203,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
   },
   {
     name: 'emergencyContactLabel',
-    label: 'Emergency Contact',
+    label: 'Emergency Contact Details',
     type: 'label',
     labelComponent: Text1,
   },
