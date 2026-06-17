@@ -65,3 +65,100 @@ styles specific to the EmployeeDetails component
   align-items: center;
   gap: 0.75rem;
 }
+
+.subContent {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+.sidebar {
+  margin-top: 58px;
+  width: 242px;
+  flex-shrink: 0;
+}
+
+.itemContainer {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  padding: 16px;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-gray-50);
+  }
+}
+
+.active {
+  background: var(--color-violet-600);
+
+  &:hover {
+    background: var(--color-violet-600);
+  }
+
+  svg {
+    color: var(--color-white);
+  }
+
+  p,
+  span {
+    color: var(--color-white);
+  }
+}
+
+.sectionContainer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.infoItem {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.detailsContent {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.infoHeader {
+  margin-top: 8px;
+}

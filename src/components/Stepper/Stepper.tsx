@@ -28,9 +28,10 @@ interface Step {
 interface StepperProps {
   currentStep: number;
   steps: readonly Step[];
+  onStepChange?: (step: number) => void;
 }
 
-export default function Stepper({ currentStep, steps }: StepperProps) {
+export default function Stepper({ currentStep, steps, onStepChange }: StepperProps) {
   return (
     <div className={styles.container}>
       {steps.map((step, index) => {
@@ -41,6 +42,7 @@ export default function Stepper({ currentStep, steps }: StepperProps) {
         return (
           <div
             key={step.id}
+            onClick={() => onStepChange?.(index)}
             className={clsx(styles.step, {
               [styles.active]: isActive,
             })}
