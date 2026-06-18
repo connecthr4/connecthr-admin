@@ -75,9 +75,19 @@ export const personalInformationFormConfig: FieldConfig[] = [
     name: 'gender',
     label: 'Gender',
     placeholder: 'Select Gender',
-    type: 'input',
+    type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
+    options: [
+      {
+        label: 'Male',
+        value: 'male',
+      },
+      {
+        label: 'Female',
+        value: 'female',
+      },
+    ],
   },
   {
     name: 'nationality',
