@@ -23,6 +23,7 @@ import TextInput from '../TextInput';
 import { Heading4, TextAlign } from '../Typography/Typography';
 import Checkbox from '../Checkbox';
 import DatePicker from '../DatePicker';
+import Dropdown from '../Dropdown';
 
 /**
  * Define the props available for the DynamicForm component.
@@ -93,7 +94,7 @@ export interface FieldConfig<T extends FieldValues> {
   }[];
 }
 
-type FieldType = 'label' | 'input' | 'checkbox' | 'datePicker';
+type FieldType = 'label' | 'input' | 'checkbox' | 'datePicker' | 'dropdown';
 
 export default function DynamicForm<T extends FieldValues>({
   fields,
@@ -193,6 +194,22 @@ export default function DynamicForm<T extends FieldValues>({
                 minDate={field.minDate}
                 maxDate={field.maxDate}
                 error={errors[field.name]?.message as string}
+              />
+            )}
+          />
+        );
+
+      case 'dropdown':
+        return (
+          <Controller
+            name={field.name}
+            control={control}
+            render={({ field: controllerField, fieldState }) => (
+              <Dropdown
+                {...field}
+                value={controllerField.value}
+                onChange={controllerField.onChange}
+                error={fieldState.error?.message}
               />
             )}
           />
