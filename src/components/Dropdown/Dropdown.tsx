@@ -96,6 +96,9 @@ export default function Dropdown({
       <div ref={wrapperRef} className={styles.dropdown}>
         <button
           type="button"
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          aria-controls="dropdown-menu"
           disabled={disabled || isLoading}
           className={clsx(styles.trigger, error && styles.triggerError)}
           onClick={() => setIsOpen((prev) => !prev)}
