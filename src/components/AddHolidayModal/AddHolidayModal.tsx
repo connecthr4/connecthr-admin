@@ -49,7 +49,6 @@ export default function AddHolidayModal({ isOpen, onclose, onSubmit }: AddHolida
       holidayDate: '',
     };
 
-    console.log('formData>>', formData);
     if (!formData.holidayName.trim()) {
       newErrors.holidayName = 'Holiday name is required';
     }
