@@ -21,6 +21,7 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import Stepper from '../Stepper';
 import { STEPS } from '@/src/constants/strings';
+import { useRouter } from 'next/navigation';
 
 /**
  * Define the props available for the EmployeeDetails component.
@@ -201,10 +202,15 @@ interface EmployeeProfileHeaderProps {
     phone: string;
     avatar: string;
   };
-  onEdit?: () => void;
 }
 
-function EmployeeProfileHeader({ employeeInfo, onEdit }: EmployeeProfileHeaderProps) {
+function EmployeeProfileHeader({ employeeInfo }: EmployeeProfileHeaderProps) {
+  const router = useRouter();
+
+  const handleEdit = () => {
+    router.push('/employees/EMP001/edit');
+  };
+
   return (
     <div className={styles.profileHeader}>
       <div className={styles.employeeInfo}>
@@ -223,7 +229,9 @@ function EmployeeProfileHeader({ employeeInfo, onEdit }: EmployeeProfileHeaderPr
           </div>
         </div>
       </div>
-      <Button startIcon={PencilLine}>Edit Profile</Button>
+      <Button startIcon={PencilLine} onClick={handleEdit}>
+        Edit Profile
+      </Button>
     </div>
   );
 }

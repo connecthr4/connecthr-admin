@@ -87,6 +87,7 @@ export interface FieldConfig<T extends FieldValues> {
   labelComponent?: ComponentType<any>;
   minDate?: Date;
   maxDate?: Date;
+  disabled?: boolean;
   disabledWhen?: Path<T>;
   syncFields?: {
     source: Path<T>;
@@ -116,6 +117,7 @@ export default function DynamicForm<T extends FieldValues>({
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = methods;
 
@@ -124,6 +126,10 @@ export default function DynamicForm<T extends FieldValues>({
 
     return Boolean(watchedValues[field.disabledWhen]);
   };
+
+  useEffect(() => {
+    reset(defaultValues);
+  }, [defaultValues, reset]);
 
   useEffect(() => {
     fields.forEach((field) => {
@@ -154,7 +160,7 @@ export default function DynamicForm<T extends FieldValues>({
             {...register(field.name)}
             label={field.label}
             placeholder={field.placeholder}
-            disabled={isFieldDisabled(field)}
+            disabled={field.disabled || isFieldDisabled(field)}
             type={field.type}
             required={field.required}
             className={field.className}

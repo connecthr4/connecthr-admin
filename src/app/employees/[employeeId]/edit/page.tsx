@@ -1,5 +1,5 @@
 /**
- * @module app/employees/new/page
+ * @module app/employees/[employeeId]
  */
 
 import EmployeeWizard from '@/src/components/EmployeeWizard';
@@ -9,10 +9,10 @@ import EmployeeWizard from '@/src/components/EmployeeWizard';
  *
  * @remarks
  * This page is responsible for rendering the UI
- * for the `employees` route.
+ * for the `particular employee details` route.
  *
  * @returns The page UI for the route.
  */
-export default function EmployeesNewPage() {
-  return <EmployeeWizard mode="create" />;
+export default function EmployeeDetailsPage() {
+  return <EmployeeWizard mode="edit" />;
 }

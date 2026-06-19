@@ -253,6 +253,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
 
 export default function PersonalInformationForm({ onSubmit, footer }: PersonalInformationFormProps) {
   const personalInformation = useEmployeeStore((state) => state.personalInformation);
+
   return (
     <DynamicForm
       fields={personalInformationFormConfig}

@@ -10,9 +10,7 @@ export const personalInformationSchema = z.object({
     .max(10, 'Mobile Number must be 10 digits')
     .regex(/^\d+$/, 'Mobile Number must contain only numbers'),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
-  dateOfBirth: z.date({
-    required_error: 'Date of Birth is required',
-  }),
+  dateOfBirth: z.string().min(1, 'Date of Birth is required'),
   gender: z.string().min(1, 'Gender is required'),
   nationality: z.string().min(1, 'Nationality is required'),
   maritalStatus: z.string().min(1, 'Marital Status is required'),

@@ -3,17 +3,17 @@
  *
  * @example
  * ```tsx
- * import AddEmployeeWizard from '@src/components/AddEmployeeWizard'
+ * import EmployeeWizard from '@src/components/EmployeeWizard'
  *
- * export default function AddEmployeeWizard() {
- *   return <AddEmployeeWizard label="Hello" />;
+ * export default function EmployeeWizard() {
+ *   return <EmployeeWizard label="Hello" />;
  * }
  * ```
  */
 'use client';
 
-import { useState } from 'react';
-import styles from './AddEmployeeWizard.module.scss';
+import { useEffect, useState } from 'react';
+import styles from './EmployeeWizard.module.scss';
 import AppHeader from '../AppHeader';
 import Stepper from '../Stepper';
 import PersonalInformationForm from '../PersonalInformationForm';
@@ -24,50 +24,66 @@ import { useEmployeeStore } from '@/src/store/employeeStore';
 import { STEPS } from '@/src/constants/strings';
 
 /**
- * Define the props available for the AddEmployeeWizard component.
+ * Define the props available for the EmployeeWizard component.
  */
-interface AddEmployeeWizardProps {
-  label?: string;
+interface EmployeeWizardProps {
+  mode: 'create' | 'edit';
+  employeeId?: string;
 }
 
-// const defaultValues: EmployeeFormData = {
-//   // Personal Information
-//   profilePhoto: null,
-//   firstName: '',
-//   lastName: '',
-//   mobileNumber: '',
-//   emailAddress: '',
-//   dateOfBirth: '',
-//   maritalStatus: '',
-//   gender: '',
-//   nationality: '',
-//   address: '',
-//   city: '',
-//   state: '',
-//   zipCode: '',
+// mocks/employee.ts
 
-//   // Professional Information
-//   employeeId: '',
-//   employeeType: '',
-//   department: '',
-//   designation: '',
-//   workingDays: '',
-//   joiningDate: '',
-//   officeLocation: '',
-//   userName: '',
+export const mockEmployee = {
+  personalInformation: {
+    firstName: 'Brooklyn',
+    lastName: 'Simmons',
+    mobileNumber: '9876543210',
+    email: 'brooklyn.s@example.com',
+    dateOfBirth: '1992-07-10',
+    gender: 'Female',
+    nationality: 'American',
+    maritalStatus: 'Single',
+    aadhaarNumber: '123456789012',
 
-//   // Documents
-//   appointmentLetter: null,
-//   salarySlips: null,
-//   relievingLetter: null,
-//   experienceLetter: null,
+    currentAddress: '2464 Royal Ln.',
+    currentCity: 'Mesa',
+    currentState: 'New Jersey',
+    currentPinCode: '560001',
+    sameAsCurrentAddress: false,
 
-//   // Account Access
-//   officialEmail: '',
-//   role: '',
-// };
+    permanentAddress: '2464 Royal Ln.',
+    permanentCity: 'Mesa',
+    permanentState: 'New Jersey',
+    permanentPinCode: '560001',
 
-export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizardProps) {
+    emergencyContactName: 'Robert Simmons',
+    emergencyRelationship: 'Father',
+    emergencyPhoneNumber: '9123456789',
+    emergencyAddress: '123 Main Street, Mesa, New Jersey',
+  },
+
+  professionalInformation: {
+    employeeID: 'EMP001',
+    employeeType: 'Full Time',
+    employmentStatus: 'Active',
+    dateOfJoining: '1992-07-10',
+    department: 'Engineering',
+  },
+
+  payrollInformation: {
+    accountHolderName: 'Brooklyn Simmons',
+    bankName: 'HDFC Bank',
+    accountNumber: '1234567890123456',
+    confirmAccountNumber: '1234567890123456',
+    ifscCode: 'HDFC0001234',
+    branchName: 'Koramangala Branch',
+    panNumber: 'ABCDE1234F',
+    uanNumber: '100200300400',
+    esicNumber: '1234567890',
+  },
+};
+
+export default function EmployeeWizard({ mode, employeeId }: EmployeeWizardProps) {
   // const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const setPersonalInformation = useEmployeeStore((state) => state.setPersonalInformation);
@@ -76,6 +92,16 @@ export default function AddEmployeeWizard({ label = 'label' }: AddEmployeeWizard
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === STEPS.length - 1;
+
+  useEffect(() => {
+    if (mode !== 'edit') return;
+
+    setPersonalInformation(mockEmployee.personalInformation);
+
+    setProfessionalInformation(mockEmployee.professionalInformation);
+
+    setPayrollInformation(mockEmployee.payrollInformation);
+  }, [mode, setPersonalInformation, setProfessionalInformation, setPayrollInformation]);
 
   const handleNext = () => {
     if (isLastStep) return;

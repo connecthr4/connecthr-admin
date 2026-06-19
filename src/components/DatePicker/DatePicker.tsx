@@ -17,6 +17,7 @@ import { Calendar } from 'lucide-react';
 import TextInput from '@/src/components/TextInput';
 import { DayPicker, DateRange } from '@daypicker/react';
 import '@daypicker/react/style.css';
+import { formatDisplayDate } from '@/src/utils/date';
 import styles from './DatePicker.module.scss';
 
 type DatePickerValue = Date | Date[] | DateRange | undefined;
@@ -152,7 +153,19 @@ export default function DatePicker({
   error,
   onChange,
 }: DatePickerProps) {
-  const currentSelectedDate = value instanceof Date ? value : initialSelectedDate;
+  const currentSelectedDate = useMemo(() => {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? undefined : value;
+    }
+
+    if (typeof value === 'string' && value.trim()) {
+      const date = new Date(value);
+
+      return Number.isNaN(date.getTime()) ? undefined : date;
+    }
+
+    return initialSelectedDate;
+  }, [value, initialSelectedDate]);
 
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(currentSelectedDate);
@@ -162,7 +175,12 @@ export default function DatePicker({
   const [range, setRange] = useState<DateRange | undefined>(initialRange);
 
   const handleSelect = (value: DatePickerValue) => {
-    if (mode === 'range') {
+    if (mode === 'single' && value instanceof Date) {
+      const isoDate = value.toISOString().split('T')[0];
+      onChange?.(isoDate as any);
+      setOpen(false);
+      return;
+    } else if (mode === 'range') {
       setRange(value as DateRange);
     } else if (mode === 'multiple') {
       setSelectedMultiple(value as Date[]);
@@ -177,17 +195,25 @@ export default function DatePicker({
 
     if (!currentValue) return '';
 
+    // Handle ISO string values from store/API
+    if (typeof currentValue === 'string') {
+      const date = new Date(currentValue);
+
+      return Number.isNaN(date.getTime()) ? '' : formatDisplayDate(date);
+    }
+
     if (currentValue instanceof Date) {
-      return currentValue.toLocaleDateString();
+      return formatDisplayDate(currentValue);
     }
 
     if (Array.isArray(currentValue)) {
-      return currentValue.map((date) => date.toLocaleDateString()).join(', ');
+      return currentValue.map(formatDisplayDate).join(', ');
     }
 
-    if ('from' in currentValue) {
-      const from = currentValue.from?.toLocaleDateString() || '';
-      const to = currentValue.to?.toLocaleDateString() || '';
+    if (typeof currentValue === 'object' && currentValue !== null && 'from' in currentValue) {
+      const from = currentValue.from ? formatDisplayDate(currentValue.from) : '';
+
+      const to = currentValue.to ? formatDisplayDate(currentValue.to) : '';
 
       return `${from} - ${to}`;
     }

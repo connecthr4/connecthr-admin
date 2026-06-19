@@ -39,15 +39,26 @@ export const professionalInformationFormConfig: FieldConfig[] = [
     placeholder: 'Enter Employee ID',
     type: 'input',
     width: FieldWidth.HALF,
+    disabled: true,
     required: false,
   },
   {
     name: 'employeeType',
     label: 'Employee Type',
     placeholder: 'Select Employee Type',
-    type: 'input',
+    type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
+    options: [
+      {
+        label: 'Full-Time',
+        value: 'full_time',
+      },
+      {
+        label: 'Contract',
+        value: 'contract',
+      },
+    ],
   },
   {
     name: 'employmentStatus',
@@ -56,12 +67,22 @@ export const professionalInformationFormConfig: FieldConfig[] = [
     type: 'input',
     width: FieldWidth.HALF,
     required: true,
+    options: [
+      {
+        label: 'Active',
+        value: 'active',
+      },
+      {
+        label: 'In Active',
+        value: 'inActive',
+      },
+    ],
   },
   {
     name: 'dateOfJoining',
     label: 'Date of Joining',
     placeholder: 'Select Date of Joining',
-    type: 'input',
+    type: 'datePicker',
     width: FieldWidth.HALF,
     required: true,
   },
@@ -72,6 +93,20 @@ export const professionalInformationFormConfig: FieldConfig[] = [
     type: 'input',
     width: FieldWidth.HALF,
     required: true,
+    options: [
+      {
+        label: 'Engineering',
+        value: 'engineering',
+      },
+      {
+        label: 'Finance',
+        value: 'finance',
+      },
+      {
+        label: 'Quality Assurance',
+        value: 'quality_assurance',
+      },
+    ],
   },
 ];
 
