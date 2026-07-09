@@ -1,5 +1,6 @@
 import { apiConfig } from '../config/api';
 import type { ApiRequestOptions, RequestBody } from './types';
+
 import {
   ApiError,
   BadRequestError,
@@ -41,29 +42,101 @@ export class ApiClient {
   }
 
   /**
+   * Builds request URL with query parameters.
+   */
+  private buildUrl(endpoint: string, query?: ApiRequestOptions['query']): string {
+    if (!query) {
+      return `${this.baseUrl}${endpoint}`;
+    }
+
+    const url = new URL(`${this.baseUrl}${endpoint}`);
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (value === null || value === undefined) {
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (item !== null && item !== undefined) {
+            url.searchParams.append(key, String(item));
+          }
+        });
+
+        return;
+      }
+
+      url.searchParams.append(key, String(value));
+    });
+
+    return url.toString();
+  }
+
+  /**
+   * Prepare request body.
+   */
+  private prepareBody(body?: RequestBody): BodyInit | undefined {
+    if (body === undefined || body === null) {
+      return undefined;
+    }
+
+    if (
+      body instanceof FormData ||
+      body instanceof Blob ||
+      body instanceof URLSearchParams ||
+      body instanceof ArrayBuffer ||
+      typeof body === 'string'
+    ) {
+      return body;
+    }
+
+    return JSON.stringify(body);
+  }
+
+  /**
+   * Build request headers.
+   */
+  private buildHeaders(headers?: HeadersInit, body?: RequestBody): HeadersInit {
+    const finalHeaders = new Headers({
+      ...this.defaultHeaders,
+      ...headers,
+    });
+
+    /**
+     * Browser automatically sets multipart boundary.
+     */
+    if (body instanceof FormData || body instanceof Blob) {
+      finalHeaders.delete('Content-Type');
+    }
+
+    return finalHeaders;
+  }
+
+  /**
    * Generic request method
    */
   private async request<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
+    const { query, timeout: requestTimeout, body, ...fetchOptions } = options;
+
     const controller = new AbortController();
 
-    const timeout = options.timeout ?? this.timeout;
+    const timeout = requestTimeout ?? this.timeout;
 
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, timeout);
 
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        ...options,
+      const url = this.buildUrl(endpoint, query);
+
+      const response = await fetch(url, {
+        ...fetchOptions,
 
         signal: controller.signal,
 
-        headers: {
-          ...this.defaultHeaders,
-          ...options.headers,
-        },
+        headers: this.buildHeaders(fetchOptions.headers, body),
 
-        body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+        body: this.prepareBody(body),
       });
 
       clearTimeout(timeoutId);
@@ -106,7 +179,7 @@ export class ApiClient {
   }
 
   /**
-   * Maps HTTP response to custom API errors
+   * Maps HTTP response to custom API errors.
    */
   private async createApiError(response: Response): Promise<ApiError> {
     let payload: Record<string, unknown> = {};
@@ -209,6 +282,6 @@ export class ApiClient {
 }
 
 /**
- * Singleton API client
+ * Singleton API Client
  */
 export const apiClient = new ApiClient();
