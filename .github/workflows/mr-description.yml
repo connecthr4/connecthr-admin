@@ -1,0 +1,45 @@
+name: AI MR Description
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  generate-description:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate Diff
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+
+          git diff \
+            origin/${{ github.event.pull_request.base.ref }}...HEAD \
+            > diff.txt
+
+          git diff --name-only \
+            origin/${{ github.event.pull_request.base.ref }}...HEAD \
+            > files.txt
+
+      - name: Generate PR Description
+        run: node .github/scripts/generate-mr-description.js
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
