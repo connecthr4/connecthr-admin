@@ -21,6 +21,7 @@ import { useState } from 'react';
 import { isValidEmail } from '@/src/utils/helper';
 import { Check, X } from 'lucide-react';
 import Modal from '../Modal';
+import { AuthApi } from '@/src/lib/api/auth';
 
 type AuthStep = 'login' | 'reset-password';
 
@@ -99,8 +100,8 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
       return;
     }
 
-    // Call login API
-    console.log('Login API');
+    const res = AuthApi.login(formData);
+    console.log('res>>', res);
   };
 
   const handleResetPassword = async () => {
