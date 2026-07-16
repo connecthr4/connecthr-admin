@@ -1,0 +1,194 @@
+/**
+------------------------------------------------------
+styles specific to the NotificationContainer component
+------------------------------------------------------
+**/
+
+/* Wrapper for positions */
+.notificationWrapper {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none; // allow clicks to pass through empty space
+}
+
+/* Notification box */
+.notification {
+  pointer-events: auto; // clickable
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 280px;
+  max-width: 360px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  color: var(--color-white);
+  font-size: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: slideIn 0.3s ease forwards;
+  border-left: 4px solid;
+}
+
+/* Icon */
+.notificationIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3%;
+}
+
+/* Text block */
+.notificationText {
+  flex: 1;
+}
+
+.notificationTitle {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 2px;
+  display: block;
+
+  &.successTitle {
+    color: var(--notification-success-title);
+  }
+
+  &.errorTitle {
+    color: var(--notification-error-title);
+  }
+
+  &.warningTitle {
+    color: var(--notification-warning-title);
+  }
+
+  &.infoTitle {
+    color: var(--notification-info-title);
+  }
+}
+
+.notificationMessage {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+
+  &.successNotificationMessage {
+    color: var(--notification-success-message);
+  }
+
+  &.errorNotificationMessage {
+    color: var(--notification-error-message);
+  }
+
+  &.warningNotificationMessage {
+    color: var(--notification-warning-message);
+  }
+
+  &.infoNotificationMessage {
+    color: var(--notification-info-message);
+  }
+}
+
+/* Close button */
+.notificationClose {
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+/* Type colors */
+.success {
+  border-left-color: var(--notification-success-border);
+  background: linear-gradient(135deg, var(--notification-success-bg-start) 0%, var(--notification-success-bg-end) 100%);
+}
+
+.error {
+  border-left-color: var(--notification-error-border);
+  background: linear-gradient(135deg, var(--notification-error-bg-start) 0%, var(--notification-error-bg-end) 100%);
+}
+
+.warning {
+  border-left-color: var(--notification-warning-border);
+  background: linear-gradient(135deg, var(--notification-warning-bg-start) 0%, var(--notification-warning-bg-end) 100%);
+}
+
+.info {
+  border-left-color: var(--notification-info-border);
+  background: linear-gradient(135deg, var(--notification-info-bg-start) 0%, var(--notification-info-bg-end) 100%);
+}
+
+/* Progress bar container */
+.notificationProgress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--notification-progress-bg);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+
+/* Animated progress bar */
+.notificationProgressBar {
+  height: 100%;
+  background: var(--notification-progress-bar);
+  width: 100%;
+  animation-name: progressBar;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* Position wrappers */
+.top-right {
+  top: 20px;
+  right: 20px;
+  align-items: flex-end;
+}
+
+.top-left {
+  top: 20px;
+  left: 20px;
+  align-items: flex-start;
+}
+
+.bottom-right {
+  bottom: 20px;
+  right: 20px;
+  align-items: flex-end;
+}
+
+.bottom-left {
+  bottom: 20px;
+  left: 20px;
+  align-items: flex-start;
+}
+
+.top-center {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+
+/* Animations */
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -5,14 +5,14 @@ export interface LoginRequest {
 
 export interface User {
   id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   role: string;
+  status: string;
+  mustChangePassword: boolean;
 }
 
 export interface LoginResponse {
   accessToken: string;
   user: User;
-  requiresPasswordChange: boolean;
 }

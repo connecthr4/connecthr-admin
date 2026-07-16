@@ -42,7 +42,7 @@
   --spacing-3: 0.75rem; /* 12px */
   --spacing-4: 0.9375rem; /* 15px */
   --spacing-5: 1rem; /* 16px */
-  --spacing-6: 1.125rem; /* 18 */
+  --spacing-6: 1.125rem; /* 18px */
   --spacing-7: 1.25; /* 20px */
   --spacing-8: 1.5rem; /* 24px */
   --spacing-9: 2rem; /* 32px */
@@ -55,4 +55,47 @@
   --radius-lg: 16rem;
   --radius-xl: 20px;
   --radius-2xl: 24px;
+
+  /* ==========================
+     Notification Colors
+  ========================== */
+
+  /* Success */
+  --notification-success-border: #10b981;
+  --notification-success-bg-start: #ecfdf5;
+  --notification-success-bg-end: #f0fdf4;
+  --notification-success-title: #065f46;
+  --notification-success-message: #047857;
+  --notification-success-icon: #10b981;
+
+  /* Error */
+  --notification-error-border: #ef4444;
+  --notification-error-bg-start: #fef2f2;
+  --notification-error-bg-end: #fef7f7;
+  --notification-error-title: #991b1b;
+  --notification-error-message: #dc2626;
+  --notification-error-icon: #ef4444;
+
+  /* Warning */
+  --notification-warning-border: #f59e0b;
+  --notification-warning-bg-start: #fffbeb;
+  --notification-warning-bg-end: #fefce8;
+  --notification-warning-title: #92400e;
+  --notification-warning-message: #d97706;
+  --notification-warning-icon: #f59e0b;
+
+  /* Info */
+  --notification-info-border: #3b82f6;
+  --notification-info-bg-start: #eff6ff;
+  --notification-info-bg-end: #f0f9ff;
+  --notification-info-title: #1e40af;
+  --notification-info-message: #2563eb;
+  --notification-info-icon: #3b82f6;
+
+  /* Close Button */
+  --notification-close-icon: #6b7280;
+
+  /* Progress bar */
+  --notification-progress-bg: rgba(255, 255, 255, 0.2);
+  --notification-progress-bar: rgba(255, 255, 255, 0.7);
 }

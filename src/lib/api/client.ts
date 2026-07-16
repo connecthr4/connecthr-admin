@@ -1,4 +1,5 @@
 import { apiConfig } from '../config/api';
+import { useAuthStore } from '@/src/store/auth';
 import type { ApiRequestOptions, RequestBody } from './types';
 
 import {
@@ -109,6 +110,12 @@ export class ApiClient {
       finalHeaders.delete('Content-Type');
     }
 
+    const accessToken = useAuthStore.getState().accessToken;
+
+    if (accessToken && !finalHeaders.has('Authorization')) {
+      finalHeaders.set('Authorization', `Bearer ${accessToken}`);
+    }
+
     return finalHeaders;
   }
 
@@ -194,7 +201,10 @@ export class ApiClient {
 
     const code = payload.code as string | undefined;
 
-    const details = payload.details;
+    // Preserve the full payload when `details` is not provided so callers
+    // can access fields like `success` that may be present at the top-level
+    // of the API response (e.g. { success: false, message: '...' }).
+    const details = payload.details ?? payload;
 
     const ErrorConstructor = ERROR_MAP[response.status as ErrorStatus] as
       | (new (message?: string, code?: string, details?: unknown) => ApiError)
