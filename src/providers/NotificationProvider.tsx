@@ -1,8 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import NotificationContainer from '../components/NotificationContainer';
-import { Notification } from '../components/NotificationContainer/NotificationContainer';
+import { createContext, useContext, useState, ReactNode } from 'react';
+import NotificationContainer from '@/src/components/NotificationContainer';
+import { Notification } from '@/src/components/NotificationContainer/NotificationContainer';
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
 export type NotificationPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center';

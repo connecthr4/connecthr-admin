@@ -35,8 +35,8 @@ import { useEffect, useState } from 'react';
 import { CircleCheck, CircleX, Info, TriangleAlert, X } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './NotificationContainer.module.scss';
-import { Heading4, Text4 } from '../Typography/Typography';
-import { NOTIFICATION_TYPES } from '../../constants/strings';
+import { Heading4, Text4 } from '@/src/components/Typography';
+import { NOTIFICATION_TYPES } from '@/src/constants/strings';
 
 /**
  * Define the props available for the NotificationContainer component.
@@ -156,13 +156,13 @@ export default function NotificationContainer({ notifications, removeNotificatio
                     </Text4>
                   </div>
 
-                  <div
+                  <button
                     className={styles.notificationClose}
                     data-testid="notification-close-btn"
                     onClick={() => removeNotification(n.id)}
                   >
                     <X height={24} width={24} color="var(--notification-close-icon)" />
-                  </div>
+                  </button>
                   {n.showProgress && n.duration && (
                     <div className={styles.notificationProgress}>
                       <div
