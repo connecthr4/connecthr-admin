@@ -12,16 +12,21 @@
  */
 'use client';
 
-import { STRINGS } from '@/src/constants/strings';
-import styles from './LoginPanel.module.scss';
-import { Heading1, Heading2, Text1, Text2 } from '../Typography';
-import TextInput from '../TextInput';
-import Button from '../Button';
 import { useState } from 'react';
-import { isValidEmail } from '@/src/utils/helper';
 import { Check, X } from 'lucide-react';
-import Modal from '../Modal';
+import Modal from '@/src/components/Modal';
+import { useRouter } from 'next/navigation';
 import { AuthApi } from '@/src/lib/api/auth';
+import Button from '@/src/components/Button';
+import { useAuthStore } from '@/src/store/auth';
+import { STRINGS } from '@/src/constants/strings';
+import { isValidEmail } from '@/src/utils/helper';
+import TextInput from '@/src/components/TextInput';
+import { getApiErrorInfo } from '@/src/lib/api/helpers';
+import type { LoginResponse } from '@/src/lib/types/auth';
+import { Heading1, Heading2, Text1, Text2 } from '../Typography';
+import { useNotification } from '@/src/providers/NotificationProvider';
+import styles from './LoginPanel.module.scss';
 
 type AuthStep = 'login' | 'reset-password';
 
@@ -33,6 +38,10 @@ interface LoginPanelProps {
 }
 
 export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const { showNotification } = useNotification();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -76,20 +85,20 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
     }));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const newErrors = {
       email: '',
       password: '',
     };
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email address is required';
+      newErrors.email = STRINGS.EMAIL_REQUIRED;
     } else if (!isValidEmail(formData?.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = STRINGS.EMAIL_INVALID;
     }
 
     if (!formData.password.trim()) {
-      newErrors.password = 'Password is required';
+      newErrors.password = STRINGS.PASSWORD_REQUIRED;
     }
 
     setErrors(newErrors);
@@ -100,8 +109,22 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
       return;
     }
 
-    const res = AuthApi.login(formData);
-    console.log('res>>', res);
+    try {
+      setLoading(true);
+      const response = (await AuthApi.login(formData)) as LoginResponse;
+      const updatePassword = response.data?.user?.mustChangePassword;
+      useAuthStore.getState().login(response.data);
+      if (updatePassword) {
+        router.push('/reset-password');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      const { message } = getApiErrorInfo(err);
+      showNotification(STRINGS.LOGIN_FAILED, message, 'error', 5000, 'top-right', false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResetPassword = async () => {
@@ -149,26 +172,26 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
       {step === 'login' && (
         <>
           <div className={styles.welcomeSection}>
-            <Heading2>Welcome</Heading2>
-            <Text2>Please login here</Text2>
+            <Heading2>{STRINGS.WELCOME}</Heading2>
+            <Text2 className={styles.welcomeText}>{STRINGS.PLEASE_LOGIN_HERE}</Text2>
           </div>
           <div className={styles.inputSection}>
             <TextInput
-              label="Email Address"
-              placeholder="Enter email address"
+              label={STRINGS.EMAIL_ADDRESS}
+              placeholder={STRINGS.EMAIL_ADDRESS_PLACEHOLDER}
               onChange={(e) => handleChange('email', e.target.value)}
               error={errors.email}
             />
             <TextInput
-              label="Password"
-              placeholder="Enter password"
+              label={STRINGS.PASSWORD}
+              placeholder={STRINGS.PASSWORD_PLACEHOLDER}
               type="password"
               onChange={(e) => handleChange('password', e.target.value)}
               error={errors.password}
             />
           </div>
-          <Button className={styles.button} onClick={handleLogin}>
-            <Text1 color="var(--color-white)">Login</Text1>
+          <Button className={styles.button} onClick={handleLogin} disabled={loading} loading={loading}>
+            <Text1 color="var(--color-white)">{STRINGS.LOGIN}</Text1>
           </Button>
         </>
       )}
