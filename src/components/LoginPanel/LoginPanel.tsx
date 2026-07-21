@@ -19,11 +19,11 @@ import { useRouter } from 'next/navigation';
 import { AuthApi } from '@/src/lib/api/auth';
 import Button from '@/src/components/Button';
 import { useAuthStore } from '@/src/store/auth';
-import { STRINGS } from '@/src/constants/strings';
+import { ROUTES, STRINGS } from '@/src/constants/strings';
 import { isValidEmail } from '@/src/utils/helper';
 import TextInput from '@/src/components/TextInput';
 import { getApiErrorInfo } from '@/src/lib/api/helpers';
-import type { LoginResponse } from '@/src/lib/types/auth';
+import type { ChangePasswordResponse, LoginResponse } from '@/src/lib/types/auth';
 import { Heading1, Heading2, Text1, Text2 } from '../Typography';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import styles from './LoginPanel.module.scss';
@@ -39,6 +39,9 @@ interface LoginPanelProps {
 
 export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
   const router = useRouter();
+  const login = useAuthStore((state) => state.login);
+  const setTempPassword = useAuthStore((state) => state.setTempPassword);
+  const tempPassword = useAuthStore((state) => state.tempPassword);
   const [loading, setLoading] = useState(false);
   const { showNotification } = useNotification();
 
@@ -113,11 +116,12 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
       setLoading(true);
       const response = (await AuthApi.login(formData)) as LoginResponse;
       const updatePassword = response.data?.user?.mustChangePassword;
-      useAuthStore.getState().login(response.data);
+      login(response.data);
       if (updatePassword) {
-        router.push('/reset-password');
+        setTempPassword(formData.password);
+        router.push(ROUTES.RESET_PASSWORD);
       } else {
-        router.push('/dashboard');
+        router.push(ROUTES.DASHBOARD);
       }
     } catch (err) {
       const { message } = getApiErrorInfo(err);
@@ -154,8 +158,13 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
     }
 
     try {
-      // Call Reset Password API
+      const payload = {
+        ...resetPasswordData,
+        currentPassword: tempPassword ?? '',
+      };
 
+      const response = (await AuthApi.changePassword(payload)) as ChangePasswordResponse;
+      console.log('response>>>', response);
       setShowSuccessModal(true);
 
       // Navigate to Dashboard after success
@@ -233,6 +242,7 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
           onClose={() => setShowSuccessModal(false)}
           onBackToLogin={() => {
             setShowSuccessModal(false);
+            router.push('/login');
           }}
         />
       )}
