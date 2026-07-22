@@ -7,14 +7,20 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role?: string;
   status: string;
   mustChangePassword: boolean;
 }
 
-export interface LoginResponse {
+export interface LoginData {
   accessToken: string;
   user: User;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: LoginData;
 }
 
 export interface ChangePasswordRequest {

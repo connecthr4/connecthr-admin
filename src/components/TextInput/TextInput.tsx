@@ -167,7 +167,7 @@ export default function TextInput({
   return (
     <div data-testid="TextFieldTest" className={clsx(styles.container, className)}>
       {label && (
-        <Label>
+        <Label htmlFor={id}>
           {label} {required && <Text3 className={styles.asterisk}>*</Text3>}
         </Label>
       )}
@@ -193,7 +193,13 @@ export default function TextInput({
           {...rest}
         />
         {isPasswordType ? (
-          <button type="button" className={styles.iconButton} onClick={togglePasswordVisibility}>
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={togglePasswordVisibility}
+            aria-label={isPasswordVisible ? 'Hide password' : 'Show password'}
+            aria-pressed={isPasswordVisible}
+          >
             {isPasswordVisible ? <EyeOff height={24} width={24} /> : <Eye height={24} width={24} />}
           </button>
         ) : (

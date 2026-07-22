@@ -1,11 +1,11 @@
-import { LoginResponse, User } from '@/src/lib/types/auth';
+import { LoginData, User } from '@/src/lib/types/auth';
 
 export interface AuthState {
   accessToken: string | null;
   tempPassword: string | null;
   user: User | null;
 
-  login: (data: LoginResponse) => void;
+  login: (data: LoginData) => void;
   logout: () => void;
   clearAuth: () => void;
 
