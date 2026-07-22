@@ -26,6 +26,7 @@ import { getApiErrorInfo } from '@/src/lib/api/helpers';
 import type { ChangePasswordResponse, LoginResponse } from '@/src/lib/types/auth';
 import { Heading1, Heading2, Text1, Text2 } from '../Typography';
 import { useNotification } from '@/src/providers/NotificationProvider';
+import { logger } from '@/src/lib/logger';
 import styles from './LoginPanel.module.scss';
 
 type AuthStep = 'login' | 'reset-password';
@@ -164,13 +165,13 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
       };
 
       const response = (await AuthApi.changePassword(payload)) as ChangePasswordResponse;
-      console.log('response>>>', response);
+      logger.info('response>>>', response);
       setShowSuccessModal(true);
 
       // Navigate to Dashboard after success
       // router.push('/dashboard');
     } catch (error) {
-      console.error(error);
+      logger.error('Error occurred while resetting password:', error);
     }
   };
 
