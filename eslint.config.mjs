@@ -1,5 +1,5 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
+import storybook from 'eslint-plugin-storybook';
 
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
@@ -30,6 +30,7 @@ const eslintConfig = defineConfig([
       'react/no-unescaped-entities': 'off',
       '@next/next/no-page-custom-font': 'off',
       '@typescript-eslint/no-require-imports': 'off',
+      'no-console': 'error',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -38,7 +39,7 @@ const eslintConfig = defineConfig([
       ],
     },
   },
-  ...storybook.configs["flat/recommended"]
+  ...storybook.configs['flat/recommended'],
 ]);
 
 export default eslintConfig;
