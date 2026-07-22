@@ -9,7 +9,6 @@ export interface User {
   email: string;
   role: string;
   status: string;
-  tempPassword: string;
   mustChangePassword: boolean;
 }
 

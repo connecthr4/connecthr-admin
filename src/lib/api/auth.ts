@@ -1,7 +1,7 @@
 import { apiClient } from './client';
 import { API_ENDPOINTS } from './endpoints';
 
-import type { LoginRequest, LoginResponse, ChangePasswordRequest } from '../types/auth';
+import type { LoginRequest, LoginResponse, ChangePasswordRequest, ChangePasswordResponse } from '../types/auth';
 
 export const AuthApi = {
   login(data: LoginRequest) {
@@ -9,7 +9,7 @@ export const AuthApi = {
   },
 
   changePassword(data: ChangePasswordRequest) {
-    return apiClient.post<ChangePasswordRequest>(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
+    return apiClient.post<ChangePasswordResponse>(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
   },
 
   //   logout() {
