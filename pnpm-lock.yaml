@@ -144,6 +144,9 @@ importers:
       vite:
         specifier: ^8.0.11
         version: 8.0.11(@types/node@20.19.39)(esbuild@0.27.7)(jiti@2.7.0)(sass@1.99.0)(yaml@2.8.4)
+      vite-tsconfig-paths:
+        specifier: ^6.1.1
+        version: 6.1.1(typescript@5.9.3)(vite@8.0.11(@types/node@20.19.39)(esbuild@0.27.7)(jiti@2.7.0)(sass@1.99.0)(yaml@2.8.4))
       vitest:
         specifier: ^4.1.6
         version: 4.1.6(@types/node@20.19.39)(@vitest/browser-playwright@4.1.6)(@vitest/coverage-v8@4.1.6)(jsdom@29.1.1)(vite@8.0.11(@types/node@20.19.39)(esbuild@0.27.7)(jiti@2.7.0)(sass@1.99.0)(yaml@2.8.4))
@@ -3734,6 +3737,7 @@ packages:
   tsconfck@3.1.6:
     resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
     engines: {node: ^18 || >=20}
+    deprecated: unmaintained
     hasBin: true
     peerDependencies:
       typescript: ^5.0.0
@@ -3856,6 +3860,11 @@ packages:
     peerDependenciesMeta:
       vite:
         optional: true
+
+  vite-tsconfig-paths@6.1.1:
+    resolution: {integrity: sha512-2cihq7zliibCCZ8P9cKJrQBkfgdvcFkOOc3Y02o3GWUDLgqjWsZudaoiuOwO/gzTzy17cS5F7ZPo4bsnS4DGkg==}
+    peerDependencies:
+      vite: '*'
 
   vite@8.0.11:
     resolution: {integrity: sha512-Jz1mxtUBR5xTT65VOdJZUUeoyLtqljmFkiUXhPTLZka3RDc9vpi/xXkyrnsdRcm2lIi3l3GPMnAidTsEGIj3Ow==}
@@ -7879,6 +7888,16 @@ snapshots:
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.9.3)
     optionalDependencies:
+      vite: 8.0.11(@types/node@20.19.39)(esbuild@0.27.7)(jiti@2.7.0)(sass@1.99.0)(yaml@2.8.4)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
+  vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@8.0.11(@types/node@20.19.39)(esbuild@0.27.7)(jiti@2.7.0)(sass@1.99.0)(yaml@2.8.4)):
+    dependencies:
+      debug: 4.4.3
+      globrex: 0.1.2
+      tsconfck: 3.1.6(typescript@5.9.3)
       vite: 8.0.11(@types/node@20.19.39)(esbuild@0.27.7)(jiti@2.7.0)(sass@1.99.0)(yaml@2.8.4)
     transitivePeerDependencies:
       - supports-color

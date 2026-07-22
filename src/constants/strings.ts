@@ -41,6 +41,13 @@ export const STEPS = [
   },
 ] as const;
 
+export const ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+  RESET_PASSWORD: '/reset-password',
+  DASHBOARD: '/dashboard',
+} as const;
+
 export const NOTIFICATION_TYPES: Record<string, NotificationType> = {
   SUCCESS: 'success',
   ERROR: 'error',

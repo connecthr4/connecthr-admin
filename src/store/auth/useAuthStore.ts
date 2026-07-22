@@ -8,6 +8,7 @@ import { AuthState } from './types';
 
 const initialState = {
   accessToken: null,
+  tempPassword: null,
   user: null,
 };
 
@@ -17,6 +18,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({
       accessToken: data.accessToken,
       user: data.user,
+    }),
+
+  setTempPassword: (tempPassword) =>
+    set({
+      tempPassword,
     }),
 
   logout: () =>

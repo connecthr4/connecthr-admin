@@ -10,6 +10,7 @@
  * }
  * ```
  */
+'use client';
 
 import AppHeader from '@/src/components/AppHeader';
 import { getGreeting } from '@/src/utils/date';
@@ -19,15 +20,13 @@ import { Users, CalendarCheck, CalendarMinus } from 'lucide-react';
 import { Heading3 } from '../Typography';
 import BasePieChart from '../BasePieChart';
 import UpcomingHolidaysCard from '../UpcomingHolidaysCard';
+import { useAuthStore } from '@/src/store/auth/useAuthStore';
 
 /**
  * Define the props available for the Dashboard component.
  */
-interface DashboardProps {
-  label?: string;
-}
-
-export default function Dashboard({ label = 'label' }: DashboardProps) {
+export default function Dashboard() {
+  const userDetails = useAuthStore((state) => state.user);
   const dashboardStats = [
     {
       id: 1,
@@ -60,7 +59,7 @@ export default function Dashboard({ label = 'label' }: DashboardProps) {
   ];
   return (
     <div className={styles.container}>
-      <AppHeader title="Hello Robert" subtitle={getGreeting()} />
+      <AppHeader title={`Hello, ${userDetails?.name || 'User'}`} subtitle={getGreeting()} userDetails={userDetails} />
 
       <div className={styles.statsSummaryGrid}>
         {dashboardStats.map((item) => (
