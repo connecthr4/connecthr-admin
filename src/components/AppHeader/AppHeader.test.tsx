@@ -1,9 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import type { User } from '@/src/lib/types/auth';
+import styles from './AppHeader.module.scss';
 
 // Mock the child components using relative paths
-vi.mock('@/src/components/Breadcrumbs', () => ({
+vi.mock('../Breadcrumbs', () => ({
   default: ({ items }: { items: Array<{ label: string; href?: string }> }) => (
     <div data-testid="breadcrumbs">
       {items.map((item, idx) => (
@@ -106,7 +107,7 @@ describe('AppHeader', () => {
     it('should display user name from userDetails', () => {
       render(<AppHeader title="Dashboard" userDetails={mockUser} />);
 
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('John Doe', { selector: `.${styles.profileName}` })).toBeInTheDocument();
     });
 
     it('should display user role from userDetails', () => {
@@ -205,7 +206,7 @@ describe('AppHeader', () => {
 
       expect(screen.getByText('Employee Directory')).toBeInTheDocument();
       expect(screen.getByText('Manage all employees')).toBeInTheDocument();
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('John Doe', { selector: `.${styles.profileName}` })).toBeInTheDocument();
       expect(screen.getByText('Manager')).toBeInTheDocument();
       expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument();
     });
@@ -229,7 +230,7 @@ describe('AppHeader', () => {
     it('should render profile info section with user details', () => {
       render(<AppHeader title="Test" userDetails={mockUser} />);
 
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('John Doe', { selector: `.${styles.profileName}` })).toBeInTheDocument();
       expect(screen.getByText('Manager')).toBeInTheDocument();
     });
 
@@ -251,14 +252,14 @@ describe('AppHeader', () => {
     it('should have left section with title', () => {
       const { container } = render(<AppHeader title="Test Title" />);
 
-      const leftSection = container.querySelector('.leftSection');
+      const leftSection = container.querySelector(`.${styles.leftSection}`);
       expect(leftSection?.textContent).toContain('Test Title');
     });
 
     it('should have right section with profile', () => {
       const { container } = render(<AppHeader title="Test" />);
 
-      const rightSection = container.querySelector('.rightSection');
+      const rightSection = container.querySelector(`.${styles.rightSection}`);
       expect(rightSection).toBeInTheDocument();
     });
   });
