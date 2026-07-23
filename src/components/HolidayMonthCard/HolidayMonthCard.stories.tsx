@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 /**
 import { fn } from 'storybook/test';
 */
-import HolidayMonthCard from './HolidayMonthCard'
+import HolidayMonthCard from './HolidayMonthCard';
 
 const meta = {
   title: 'components/HolidayMonthCard',
@@ -11,15 +11,10 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  argTypes: {
-    label: { 
-        control: 'text', 
-        description: 'Sample label for the component' 
-        },
-  },
-  args: { 
+  argTypes: {},
+  args: {
     /** onClick: fn() **/
-    },
+  },
 } satisfies Meta<typeof HolidayMonthCard>;
 
 export default meta;

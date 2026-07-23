@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 /**
 import { fn } from 'storybook/test';
 */
-import Modal from './Modal'
+import Modal from './Modal';
 
 const meta = {
   title: 'components/Modal',
@@ -11,15 +11,10 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  argTypes: {
-    label: { 
-        control: 'text', 
-        description: 'Sample label for the component' 
-        },
-  },
-  args: { 
+  argTypes: {},
+  args: {
     /** onClick: fn() **/
-    },
+  },
 } satisfies Meta<typeof Modal>;
 
 export default meta;

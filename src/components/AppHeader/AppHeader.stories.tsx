@@ -36,7 +36,6 @@ const mockUser: User = {
   email: 'john.doe@example.com',
   role: 'Manager',
   status: 'active',
-  tempPassword: '',
   mustChangePassword: false,
 };
 
