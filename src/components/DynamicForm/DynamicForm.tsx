@@ -13,9 +13,19 @@
 'use client';
 
 import React, { ComponentType, ReactNode, useEffect } from 'react';
-import { useForm, SubmitHandler, FieldValues, Resolver, Path, Controller, FormProvider } from 'react-hook-form';
+import {
+  useForm,
+  SubmitHandler,
+  FieldValues,
+  DefaultValues,
+  Resolver,
+  Path,
+  PathValue,
+  Controller,
+  FormProvider,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { LucideIcon } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './DynamicForm.module.scss';
@@ -24,6 +34,7 @@ import { Heading4, TextAlign } from '../Typography/Typography';
 import Checkbox from '../Checkbox';
 import DatePicker from '../DatePicker';
 import Dropdown from '../Dropdown';
+import { DropdownOption } from '../Dropdown/Dropdown';
 
 /**
  * Define the props available for the DynamicForm component.
@@ -37,7 +48,7 @@ interface DynamicFormProps<T extends FieldValues> {
   /**
    * Zod schema used for form validation.
    */
-  schema: ZodSchema<T>;
+  schema: ZodType<T, T>;
 
   /**
    * CSS class name applied to the form container.
@@ -52,7 +63,7 @@ interface DynamicFormProps<T extends FieldValues> {
   /**
    *
    */
-  defaultValues?: Partial<T>;
+  defaultValues?: DefaultValues<T>;
 
   /**
    *
@@ -87,6 +98,7 @@ export interface FieldConfig<T extends FieldValues> {
   labelComponent?: ComponentType<any>;
   minDate?: Date;
   maxDate?: Date;
+  options?: DropdownOption[];
   disabled?: boolean;
   disabledWhen?: Path<T>;
   syncFields?: {
@@ -141,7 +153,7 @@ export default function DynamicForm<T extends FieldValues>({
         if (isChecked) {
           methods.setValue(target, watchedValues[source]);
         } else {
-          methods.setValue(target, '');
+          methods.setValue(target, '' as PathValue<T, Path<T>>);
         }
       });
     });
@@ -213,6 +225,8 @@ export default function DynamicForm<T extends FieldValues>({
             render={({ field: controllerField, fieldState }) => (
               <Dropdown
                 {...field}
+                label={field.label as string}
+                options={field.options ?? ([] as DropdownOption[])}
                 value={controllerField.value}
                 onChange={controllerField.onChange}
                 error={fieldState.error?.message}

@@ -11,12 +11,7 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  argTypes: {
-    label: {
-      control: 'text',
-      description: 'Sample label for the component',
-    },
-  },
+  argTypes: {},
   args: {
     /** onClick: fn() **/
   },

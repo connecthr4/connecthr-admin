@@ -40,7 +40,8 @@
   ],
 
   "containerEnv": {
-    "PNPM_STORE_DIR": "/home/node/.pnpm-store"
+    "PNPM_STORE_DIR": "/home/node/.pnpm-store",
+    "SHELL": "/bin/bash"
   },
 
   "remoteUser": "node"

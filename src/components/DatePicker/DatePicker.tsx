@@ -20,7 +20,7 @@ import '@daypicker/react/style.css';
 import { formatDisplayDate } from '@/src/utils/date';
 import styles from './DatePicker.module.scss';
 
-type DatePickerValue = Date | Date[] | DateRange | undefined;
+type DatePickerValue = Date | Date[] | DateRange | string | undefined;
 
 /**
  * Define the props available for the DatePicker component.
