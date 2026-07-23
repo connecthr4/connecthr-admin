@@ -14,19 +14,19 @@
 
 import { useState } from 'react';
 import { Check, X } from 'lucide-react';
+import { logger } from '@/src/lib/logger';
 import Modal from '@/src/components/Modal';
 import { useRouter } from 'next/navigation';
 import { AuthApi } from '@/src/lib/api/auth';
 import Button from '@/src/components/Button';
 import { useAuthStore } from '@/src/store/auth';
-import { ROUTES, STRINGS } from '@/src/constants/strings';
 import { isValidEmail } from '@/src/utils/helper';
 import TextInput from '@/src/components/TextInput';
 import { getApiErrorInfo } from '@/src/lib/api/helpers';
-import type { ChangePasswordResponse, LoginResponse } from '@/src/lib/types/auth';
 import { Heading1, Heading2, Text1, Text2 } from '../Typography';
 import { useNotification } from '@/src/providers/NotificationProvider';
-import { logger } from '@/src/lib/logger';
+import type { ChangePasswordResponse } from '@/src/lib/types/auth';
+import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
 import styles from './LoginPanel.module.scss';
 
 type AuthStep = 'login' | 'reset-password';
@@ -115,8 +115,8 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
 
     try {
       setLoading(true);
-      const response = (await AuthApi.login(formData)) as LoginResponse;
-      const updatePassword = response.data?.user?.mustChangePassword;
+      const response = await AuthApi.login(formData);
+      const updatePassword = response.data.user.mustChangePassword;
       login(response.data);
       if (updatePassword) {
         setTempPassword(formData.password);
@@ -126,7 +126,7 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
       }
     } catch (err) {
       const { message } = getApiErrorInfo(err);
-      showNotification(STRINGS.LOGIN_FAILED, message, 'error', 5000, 'top-right', false);
+      showNotification(STRINGS.LOGIN_FAILED, message, NOTIFICATION_TYPES.ERROR, 5000, 'top-right', false);
     } finally {
       setLoading(false);
     }
@@ -139,19 +139,18 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
     };
 
     if (!resetPasswordData.newPassword.trim()) {
-      newErrors.newPassword = 'New password is required';
+      newErrors.newPassword = STRINGS.NEW_PASSWORD_REQUIRED;
     } else if (resetPasswordData.newPassword.length < 8) {
-      newErrors.newPassword = 'Password must be at least 8 characters long';
+      newErrors.newPassword = STRINGS.NEW_PASSWORD_MIN_LENGTH;
     }
 
     if (!resetPasswordData.confirmPassword.trim()) {
-      newErrors.confirmPassword = 'Confirm password is required';
+      newErrors.confirmPassword = STRINGS.CONFIRM_PASSWORD_REQUIRED;
     } else if (resetPasswordData.newPassword !== resetPasswordData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = STRINGS.PASSWORDS_DO_NOT_MATCH;
     }
 
     setResetPasswordErrors(newErrors);
-
     const hasErrors = Object.values(newErrors).some(Boolean);
 
     if (hasErrors) {
@@ -163,15 +162,14 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
         ...resetPasswordData,
         currentPassword: tempPassword ?? '',
       };
-
       const response = (await AuthApi.changePassword(payload)) as ChangePasswordResponse;
-      logger.info('response>>>', response);
-      setShowSuccessModal(true);
-
-      // Navigate to Dashboard after success
-      // router.push('/dashboard');
+      if (response.success) {
+        setShowSuccessModal(true);
+      }
     } catch (error) {
       logger.error('Error occurred while resetting password:', error);
+      const { message } = getApiErrorInfo(error);
+      showNotification(STRINGS.PASSWORD_RESET_FAILED, message, NOTIFICATION_TYPES.ERROR, 5000, 'top-right', false);
     }
   };
 
@@ -209,21 +207,21 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
       {step === 'reset-password' && (
         <>
           <div className={styles.welcomeSection}>
-            <Heading2>Reset Password</Heading2>
-            <Text2>Please create a new password.</Text2>
+            <Heading2>{STRINGS.RESET_PASSWORD}</Heading2>
+            <Text2>{STRINGS.PLEASE_CREATE_NEW_PASSWORD}</Text2>
           </div>
           <div className={styles.inputSection}>
             <TextInput
-              label="New Password"
-              placeholder="Enter new password"
+              label={STRINGS.NEW_PASSWORD}
+              placeholder={STRINGS.ENTER_NEW_PASSWORD}
               type="password"
               value={resetPasswordData.newPassword}
               onChange={(e) => handleResetPasswordChange('newPassword', e.target.value)}
               error={resetPasswordErrors.newPassword}
             />
             <TextInput
-              label="Confirm Password"
-              placeholder="Confirm new password"
+              label={STRINGS.CONFIRM_PASSWORD}
+              placeholder={STRINGS.CONFIRM_NEW_PASSWORD}
               type="password"
               value={resetPasswordData.confirmPassword}
               onChange={(e) => handleResetPasswordChange('confirmPassword', e.target.value)}
@@ -232,7 +230,7 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
             <PasswordRequirements password={resetPasswordData.newPassword} />
           </div>
           <Button className={styles.button} onClick={handleResetPassword}>
-            <Text1 color="var(--color-white)">Reset Password</Text1>
+            <Text1 color="var(--color-white)">{STRINGS.RESET_PASSWORD}</Text1>
           </Button>
         </>
       )}
@@ -266,23 +264,23 @@ function PasswordRequirements({ password }: PasswordRequirementsProps) {
 
   const requirements = [
     {
-      label: 'At least 8 characters',
+      label: STRINGS.PASSWORD_REQUIREMENT_MIN_LENGTH,
       valid: checks.minLength,
     },
     {
-      label: 'One uppercase letter',
+      label: STRINGS.PASSWORD_REQUIREMENT_UPPERCASE,
       valid: checks.uppercase,
     },
     {
-      label: 'One lowercase letter',
+      label: STRINGS.PASSWORD_REQUIREMENT_LOWERCASE,
       valid: checks.lowercase,
     },
     {
-      label: 'One number',
+      label: STRINGS.PASSWORD_REQUIREMENT_NUMBER,
       valid: checks.number,
     },
     {
-      label: 'One special character',
+      label: STRINGS.PASSWORD_REQUIREMENT_SPECIAL_CHARACTER,
       valid: checks.specialCharacter,
     },
   ];
@@ -296,7 +294,7 @@ function PasswordRequirements({ password }: PasswordRequirementsProps) {
           ) : (
             <X size={24} className={styles.invalid} />
           )}
-          <span>{requirement.label}</span>
+          <Text2 as="span">{requirement.label}</Text2>
         </div>
       ))}
     </div>
@@ -313,8 +311,8 @@ function PasswordResetSuccessModal({ isOpen, onClose, onBackToLogin }: PasswordR
   return (
     <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false} maxWidth="400px">
       <div className={styles.modalContent}>
-        <Heading2 align="center">Password Update Successfully</Heading2>
-        <Button onClick={onBackToLogin}>Back to Login</Button>
+        <Heading2 align="center">{STRINGS.PASSWORD_UPDATED_SUCCESSFULLY}</Heading2>
+        <Button onClick={onBackToLogin}>{STRINGS.BACK_TO_LOGIN}</Button>
       </div>
     </Modal>
   );
