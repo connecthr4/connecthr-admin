@@ -1,0 +1,55 @@
+/**
+------------------------------------------------------
+styles specific to the Checkbox component
+------------------------------------------------------
+**/
+
+.checkBoxContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+
+  input[type='checkbox'] {
+    appearance: none;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+
+    &:checked {
+      background-color: var(--color-violet-600);
+      border-color: var(--color-violet-600);
+      box-shadow: 0 0 0 4px var(--color-gray-400-30);
+    }
+
+    &:checked::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      width: 6px;
+      height: 11px;
+      border: solid var(--color-white);
+      border-width: 0 2px 2px 0;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: var(--color-gray-50);
+      border-color: var(--color-gray-200);
+      opacity: 0.6;
+    }
+  }
+}
+
+.errorText {
+  color: var(--color-red-500);
+  font-size: 0.875rem;
+  margin-top: 4px;
+}

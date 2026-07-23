@@ -1,0 +1,120 @@
+:root {
+  font-family: var(--font-lexend);
+}
+
+/* -----------------------------
+  Global Reset & Base Styles
+----------------------------- */
+
+/* Box sizing for predictable layouts */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* Remove default margins */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+/* Remove list styles */
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+/* Remove default padding for ul/ol */
+ul,
+ol {
+  padding: 0;
+}
+
+/* Set core root defaults */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-lexend);
+  min-height: 100vh;
+  font-weight: 400;
+  line-height: 1.5;
+  background-color: var(--color-white);
+  color: var(--color-gray-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+/* Images & media responsive */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Forms & inputs */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Remove animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}

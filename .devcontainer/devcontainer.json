@@ -1,0 +1,48 @@
+{
+  "name": "connecthr-admin",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "files.eol": "\n",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "eamodio.gitlens",
+        "ms-azuretools.vscode-docker",
+        "naumovs.color-highlight",
+        "streetsidesoftware.code-spell-checker"
+      ]
+    }
+  },
+
+  "postStartCommand": "sh .devcontainer/checkout-main.sh",
+
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js App",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind",
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+    "source=pnpm-store,target=/home/node/.pnpm-store,type=volume"
+  ],
+
+  "containerEnv": {
+    "PNPM_STORE_DIR": "/home/node/.pnpm-store",
+    "SHELL": "/bin/bash"
+  },
+
+  "remoteUser": "node"
+}

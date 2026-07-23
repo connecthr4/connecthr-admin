@@ -1,0 +1,74 @@
+import { User, BriefcaseBusiness, FileText, Wallet } from 'lucide-react';
+import { NotificationType } from '../providers/NotificationProvider';
+
+export const STRINGS = {
+  APP_NAME: 'connectHR',
+  UPCOMING_HOLIDAYS: 'Upcoming Holidays',
+  VIEW_ALL: 'View all',
+  EMAIL_ADDRESS: 'Email Address',
+  EMAIL_ADDRESS_PLACEHOLDER: 'Enter email address',
+  PASSWORD: 'Password',
+  PASSWORD_PLACEHOLDER: 'Enter password',
+  LOGIN: 'Login',
+  PASSWORD_REQUIRED: 'Password is required',
+  EMAIL_REQUIRED: 'Email address is required',
+  EMAIL_INVALID: 'Please enter a valid email address',
+  LOGIN_FAILED: 'Login Failed',
+  WELCOME: 'Welcome',
+  PLEASE_LOGIN_HERE: 'Please login here',
+  PASSWORD_RESET_FAILED: 'Password Reset Failed',
+  NEW_PASSWORD_REQUIRED: 'New password is required',
+  NEW_PASSWORD_MIN_LENGTH: 'Password must be at least 8 characters long',
+  CONFIRM_PASSWORD_REQUIRED: 'Confirm password is required',
+  PASSWORDS_DO_NOT_MATCH: 'Passwords do not match',
+  NEW_PASSWORD: 'New Password',
+  ENTER_NEW_PASSWORD: 'Enter new password',
+  CONFIRM_PASSWORD: 'Confirm Password',
+  CONFIRM_NEW_PASSWORD: 'Confirm new password',
+  RESET_PASSWORD: 'Reset Password',
+  PLEASE_CREATE_NEW_PASSWORD: 'Please create a new password.',
+  PASSWORD_UPDATED_SUCCESSFULLY: 'Password updated successfully.',
+  BACK_TO_LOGIN: 'Back to Login',
+  PASSWORD_REQUIREMENT_MIN_LENGTH: 'At least 8 characters',
+  PASSWORD_REQUIREMENT_UPPERCASE: 'One uppercase letter',
+  PASSWORD_REQUIREMENT_LOWERCASE: 'One lowercase letter',
+  PASSWORD_REQUIREMENT_NUMBER: 'One number',
+  PASSWORD_REQUIREMENT_SPECIAL_CHARACTER: 'One special character',
+};
+
+export const STEPS = [
+  {
+    id: 'personal-information',
+    label: 'Personal Information',
+    icon: User,
+  },
+  {
+    id: 'professional-information',
+    label: 'Professional Information',
+    icon: BriefcaseBusiness,
+  },
+  {
+    id: 'payroll-information',
+    label: 'Payroll Information',
+    icon: Wallet,
+  },
+  {
+    id: 'documents',
+    label: 'Documents',
+    icon: FileText,
+  },
+] as const;
+
+export const ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+  RESET_PASSWORD: '/reset-password',
+  DASHBOARD: '/dashboard',
+} as const;
+
+export const NOTIFICATION_TYPES: Record<string, NotificationType> = {
+  SUCCESS: 'success',
+  ERROR: 'error',
+  WARNING: 'warning',
+  INFO: 'info',
+};

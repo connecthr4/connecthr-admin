@@ -1,0 +1,35 @@
+/**
+------------------------------------------------------
+styles specific to the AddHolidayModal component
+------------------------------------------------------
+**/
+
+.button {
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.add {
+  margin-top: 30px;
+  width: 166px;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.modal {
+  min-width: 450px;
+}

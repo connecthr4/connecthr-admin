@@ -1,0 +1,98 @@
+/**
+------------------------------------------------------
+styles specific to the TextInput component
+------------------------------------------------------
+**/
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 4px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-white);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus-within {
+    // border-color: var(--color-gray-400-80);
+    border-color: var(--color-violet-600);
+  }
+}
+
+.leftIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.875rem;
+  color: var(--color-gray-500);
+  flex-shrink: 0;
+}
+
+.inputField {
+  flex: 1;
+  width: 100%;
+  font-size: 1rem;
+  padding: 0.75rem 0.87rem;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: var(--color-black);
+  color-scheme: light;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  &:disabled {
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+  }
+}
+
+.inputWithRightIcon {
+  padding-right: 2.75rem;
+}
+
+.iconButton {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: var(--color-gray-900);
+  }
+}
+
+.container .asterisk {
+  color: var(--color-red-500);
+}
+
+.errorText {
+  color: var(--color-red-500);
+  font-size: 0.875rem;
+  margin-top: 4px;
+}

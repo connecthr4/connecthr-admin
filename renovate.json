@@ -1,0 +1,78 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "baseBranches": ["develop"],
+
+  "extends": [
+    "config:recommended",
+    "group:allNonMajor",
+    ":semanticCommits",
+    ":separateMajorReleases",
+    ":timezone(Asia/Kolkata)",
+    "helpers:pinGitHubActionDigests"
+  ],
+
+  "labels": ["dependencies"],
+
+  "rangeStrategy": "bump",
+
+  "dependencyDashboard": true,
+
+  "rebaseWhen": "behind-base-branch",
+
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 2,
+
+  "schedule": ["before 6am on monday"],
+
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+
+  "packageRules": [
+    {
+      "description": "Group all development dependencies",
+      "matchDepTypes": ["devDependencies"],
+      "groupName": "dev-dependencies"
+    },
+
+    {
+      "description": "Group React and Next.js ecosystem",
+      "matchPackagePatterns": ["^react", "^next"],
+      "groupName": "react-next-ecosystem"
+    },
+
+    {
+      "description": "Group ESLint packages",
+      "matchPackagePatterns": ["^eslint", "^@typescript-eslint"],
+      "groupName": "eslint-packages"
+    },
+
+    {
+      "description": "Group testing libraries",
+      "matchPackagePatterns": ["^vitest", "^jest", "^@testing-library"],
+      "groupName": "testing-packages"
+    },
+
+    {
+      "description": "Group Storybook packages",
+      "matchPackagePatterns": ["^@storybook"],
+      "groupName": "storybook-packages"
+    },
+
+    {
+      "description": "Group TypeScript related packages",
+      "matchPackagePatterns": ["^typescript", "^ts-node", "^@types"],
+      "groupName": "typescript-packages"
+    },
+
+    {
+      "description": "Require approval for major updates",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    }
+  ],
+
+  "automerge": false
+}

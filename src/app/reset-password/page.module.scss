@@ -1,0 +1,24 @@
+.container {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 24px;
+  background-color: var(--color-white);
+}
+
+.leftSection {
+  flex: 1;
+  height: 100%;
+  border-radius: 30px;
+  background-color: var(--color-violet-600-5);
+}
+
+.rightSection {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+}

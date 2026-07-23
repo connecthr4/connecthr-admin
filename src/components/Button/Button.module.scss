@@ -1,0 +1,71 @@
+/**
+------------------------------------------------------
+styles specific to the Button component
+------------------------------------------------------
+**/
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  border: none;
+  transition: all 0.3s ease;
+  padding: 1rem;
+  color: var(--color-white);
+
+  &:disabled {
+    color: var(--color-gray-400);
+    opacity: 0.6;
+    background: var(--color-gray-400);
+    cursor: not-allowed;
+  }
+}
+
+.loader {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid var(--color-white);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================
+   Variants
+========================== */
+
+.primary {
+  background-color: var(--color-violet-600);
+  .text {
+    color: var(--color-white);
+  }
+}
+
+.secondary {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+}
+
+.text {
+  padding: 0;
+  background: transparent;
+  border: none;
+  min-height: auto;
+
+  .text {
+    color: var(--color-violet-600);
+  }
+
+  &:disabled {
+    background: transparent;
+  }
+}

@@ -1,0 +1,16 @@
+/**
+------------------------------------------------------
+styles specific to the ChartContainer component
+------------------------------------------------------
+**/
+
+.chartContainer {
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+}

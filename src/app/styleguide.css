@@ -1,0 +1,101 @@
+:root {
+  /* ==========================
+     Base Colors
+  ========================== */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-border: rgba(162, 161, 168, 0.2);
+  --light-text: #a2a1a8;
+
+  /* ==========================
+     Primary Colors
+  ========================== */
+  --color-violet-50: rgba(113, 82, 243, 0.08);
+  --color-violet-25: #f5f3ff;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7152f3;
+  --color-violet-700: #7c3aed;
+  --color-green-50: #ecfdf3;
+  --color-green-500: #22c55e;
+  --color-lime-500: #a3d139;
+  --color-purple-400: #8d75f5;
+  --color-red-500: #dc3545;
+
+  /* ==========================
+     Gray Scale
+  ========================== */
+  --color-gray-50: rgba(243, 242, 246, 0.9);
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #ebebeb;
+  --color-gray-400-30: #a2a1a84d;
+  --color-gray-400-80: #a2a1a8cc;
+  --color-gray-500: #6b7280;
+  --color-violet-600-5: #7152f30d;
+  --color-gray-400: #a2a1a8;
+  --color-gray-900: #16151c;
+
+  --color-overlay-dark-15: rgba(0, 0, 0, 0.15);
+
+  /* Spacing */
+  --spacing-1: 0.25rem; /* 4px */
+  --spacing-2: 0.5rem; /* 8px */
+  --spacing-3: 0.75rem; /* 12px */
+  --spacing-4: 0.9375rem; /* 15px */
+  --spacing-5: 1rem; /* 16px */
+  --spacing-6: 1.125rem; /* 18px */
+  --spacing-7: 1.25; /* 20px */
+  --spacing-8: 1.5rem; /* 24px */
+  --spacing-9: 2rem; /* 32px */
+  --spacing-10: 2.5rem; /* 40px */
+
+  /* Radius */
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16rem;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+
+  /* ==========================
+     Notification Colors
+  ========================== */
+
+  /* Success */
+  --notification-success-border: #10b981;
+  --notification-success-bg-start: #ecfdf5;
+  --notification-success-bg-end: #f0fdf4;
+  --notification-success-title: #065f46;
+  --notification-success-message: #047857;
+  --notification-success-icon: #10b981;
+
+  /* Error */
+  --notification-error-border: #ef4444;
+  --notification-error-bg-start: #fef2f2;
+  --notification-error-bg-end: #fef7f7;
+  --notification-error-title: #991b1b;
+  --notification-error-message: #dc2626;
+  --notification-error-icon: #ef4444;
+
+  /* Warning */
+  --notification-warning-border: #f59e0b;
+  --notification-warning-bg-start: #fffbeb;
+  --notification-warning-bg-end: #fefce8;
+  --notification-warning-title: #92400e;
+  --notification-warning-message: #d97706;
+  --notification-warning-icon: #f59e0b;
+
+  /* Info */
+  --notification-info-border: #3b82f6;
+  --notification-info-bg-start: #eff6ff;
+  --notification-info-bg-end: #f0f9ff;
+  --notification-info-title: #1e40af;
+  --notification-info-message: #2563eb;
+  --notification-info-icon: #3b82f6;
+
+  /* Close Button */
+  --notification-close-icon: #6b7280;
+
+  /* Progress bar */
+  --notification-progress-bg: rgba(255, 255, 255, 0.2);
+  --notification-progress-bar: rgba(255, 255, 255, 0.7);
+}
