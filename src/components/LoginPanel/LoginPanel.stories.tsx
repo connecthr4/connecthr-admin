@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-/**
-import { fn } from 'storybook/test';
-*/
+
+import { NotificationProvider } from '@/src/providers/NotificationProvider';
 import LoginPanel from './LoginPanel';
 
 const meta = {
@@ -11,11 +10,32 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  argTypes: {},
+  decorators: [
+    (Story) => (
+      <NotificationProvider>
+        <Story />
+      </NotificationProvider>
+    ),
+  ],
+  argTypes: {
+    step: {
+      control: 'select',
+      options: ['login', 'reset-password'],
+      description: 'Which auth step of the panel to display',
+    },
+  },
   args: {
-    /** onClick: fn() **/
+    step: 'login',
   },
 } satisfies Meta<typeof LoginPanel>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const Login: Story = {};
+
+export const ResetPassword: Story = {
+  args: {
+    step: 'reset-password',
+  },
+};

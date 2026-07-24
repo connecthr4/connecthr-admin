@@ -47,6 +47,7 @@ export default defineConfig({
        * Unit Tests
        */
       {
+        extends: true,
         test: {
           name: 'unit',
           include: ['src/**/*.{test,spec}.{ts,tsx}'],
