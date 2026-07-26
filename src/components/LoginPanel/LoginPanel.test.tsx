@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import LoginPanel from './LoginPanel';
-import { AuthApi } from '@/src/lib/api/auth';
+import { changePasswordAction, loginAction } from '@/src/lib/actions/auth';
 import { ROUTES } from '@/src/constants/strings';
 
 const pushMock = vi.fn();
@@ -41,11 +41,9 @@ vi.mock('@/src/providers/NotificationProvider', () => ({
   useNotification: () => ({ showNotification: showNotificationMock }),
 }));
 
-vi.mock('@/src/lib/api/auth', () => ({
-  AuthApi: {
-    login: vi.fn(),
-    changePassword: vi.fn(),
-  },
+vi.mock('@/src/lib/actions/auth', () => ({
+  loginAction: vi.fn(),
+  changePasswordAction: vi.fn(),
 }));
 
 const mockUser = {
@@ -81,7 +79,7 @@ describe('LoginPanel', () => {
 
       expect(await screen.findByText('Email address is required')).toBeInTheDocument();
       expect(screen.getByText('Password is required')).toBeInTheDocument();
-      expect(AuthApi.login).not.toHaveBeenCalled();
+      expect(loginAction).not.toHaveBeenCalled();
     });
 
     it('shows an error for an invalid email address', async () => {
@@ -93,7 +91,7 @@ describe('LoginPanel', () => {
       await user.click(screen.getByRole('button', { name: 'Login' }));
 
       expect(await screen.findByText('Please enter a valid email address')).toBeInTheDocument();
-      expect(AuthApi.login).not.toHaveBeenCalled();
+      expect(loginAction).not.toHaveBeenCalled();
     });
 
     it('clears a field error as soon as the user edits that field', async () => {
@@ -109,11 +107,7 @@ describe('LoginPanel', () => {
 
     it('logs in and redirects to the dashboard when no password change is required', async () => {
       const user = userEvent.setup();
-      vi.mocked(AuthApi.login).mockResolvedValue({
-        success: true,
-        message: 'ok',
-        data: { accessToken: 'token', user: mockUser },
-      });
+      vi.mocked(loginAction).mockResolvedValue({ success: true, user: mockUser });
 
       render(<LoginPanel step="login" />);
 
@@ -122,19 +116,18 @@ describe('LoginPanel', () => {
       await user.click(screen.getByRole('button', { name: 'Login' }));
 
       await waitFor(() =>
-        expect(AuthApi.login).toHaveBeenCalledWith({ email: 'jane@example.com', password: 'password123' })
+        expect(loginAction).toHaveBeenCalledWith({ email: 'jane@example.com', password: 'password123' })
       );
-      expect(loginMock).toHaveBeenCalledWith({ accessToken: 'token', user: mockUser });
+      expect(loginMock).toHaveBeenCalledWith({ user: mockUser });
       expect(setTempPasswordMock).not.toHaveBeenCalled();
       expect(pushMock).toHaveBeenCalledWith(ROUTES.DASHBOARD);
     });
 
     it('redirects to reset password and stores the temp password when a password change is required', async () => {
       const user = userEvent.setup();
-      vi.mocked(AuthApi.login).mockResolvedValue({
+      vi.mocked(loginAction).mockResolvedValue({
         success: true,
-        message: 'ok',
-        data: { accessToken: 'token', user: { ...mockUser, mustChangePassword: true } },
+        user: { ...mockUser, mustChangePassword: true },
       });
 
       render(<LoginPanel step="login" />);
@@ -149,7 +142,7 @@ describe('LoginPanel', () => {
 
     it('shows a notification when login fails', async () => {
       const user = userEvent.setup();
-      vi.mocked(AuthApi.login).mockRejectedValue(new Error('Invalid credentials'));
+      vi.mocked(loginAction).mockResolvedValue({ success: false, message: 'Invalid credentials' });
 
       render(<LoginPanel step="login" />);
 
@@ -204,7 +197,7 @@ describe('LoginPanel', () => {
 
       expect(await screen.findByText('New password is required')).toBeInTheDocument();
       expect(screen.getByText('Confirm password is required')).toBeInTheDocument();
-      expect(AuthApi.changePassword).not.toHaveBeenCalled();
+      expect(changePasswordAction).not.toHaveBeenCalled();
     });
 
     it('shows a minimum length error for a short new password', async () => {
@@ -227,12 +220,12 @@ describe('LoginPanel', () => {
       await user.click(screen.getByRole('button', { name: 'Reset Password' }));
 
       expect(await screen.findByText('Passwords do not match')).toBeInTheDocument();
-      expect(AuthApi.changePassword).not.toHaveBeenCalled();
+      expect(changePasswordAction).not.toHaveBeenCalled();
     });
 
     it('resets the password and shows the success modal', async () => {
       const user = userEvent.setup();
-      vi.mocked(AuthApi.changePassword).mockResolvedValue({ success: true, message: 'ok' });
+      vi.mocked(changePasswordAction).mockResolvedValue({ success: true });
 
       render(<LoginPanel step="reset-password" />);
 
@@ -241,7 +234,7 @@ describe('LoginPanel', () => {
       await user.click(screen.getByRole('button', { name: 'Reset Password' }));
 
       await waitFor(() =>
-        expect(AuthApi.changePassword).toHaveBeenCalledWith({
+        expect(changePasswordAction).toHaveBeenCalledWith({
           newPassword: 'Password1!',
           confirmPassword: 'Password1!',
           currentPassword: 'temp-pass',
@@ -258,7 +251,7 @@ describe('LoginPanel', () => {
     it('falls back to an empty current password when no temp password is stored', async () => {
       const user = userEvent.setup();
       authState.tempPassword = null;
-      vi.mocked(AuthApi.changePassword).mockResolvedValue({ success: true, message: 'ok' });
+      vi.mocked(changePasswordAction).mockResolvedValue({ success: true });
 
       render(<LoginPanel step="reset-password" />);
 
@@ -267,13 +260,13 @@ describe('LoginPanel', () => {
       await user.click(screen.getByRole('button', { name: 'Reset Password' }));
 
       await waitFor(() =>
-        expect(AuthApi.changePassword).toHaveBeenCalledWith(expect.objectContaining({ currentPassword: '' }))
+        expect(changePasswordAction).toHaveBeenCalledWith(expect.objectContaining({ currentPassword: '' }))
       );
     });
 
-    it('shows a notification and logs the error when resetting the password fails', async () => {
+    it('shows a notification when resetting the password fails', async () => {
       const user = userEvent.setup();
-      vi.mocked(AuthApi.changePassword).mockRejectedValue(new Error('Reset failed'));
+      vi.mocked(changePasswordAction).mockResolvedValue({ success: false, message: 'Reset failed' });
 
       render(<LoginPanel step="reset-password" />);
 

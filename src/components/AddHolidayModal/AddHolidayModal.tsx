@@ -12,17 +12,14 @@
  */
 
 import { useState } from 'react';
-import Button from '../Button';
-import DatePicker from '../DatePicker';
 import Modal from '../Modal';
+import Button from '../Button';
 import TextInput from '../TextInput';
-import styles from './AddHolidayModal.module.scss';
 import { Text1 } from '../Typography';
-
-interface HolidayFormData {
-  holidayName: string;
-  holidayDate: Date | undefined;
-}
+import DatePicker from '../DatePicker';
+import { STRINGS } from '@/src/constants/strings';
+import type { CreateHolidayRequest } from '@/src/lib/types/holidays';
+import styles from './AddHolidayModal.module.scss';
 
 /**
  * Define the props available for the AddHolidayModal component.
@@ -30,99 +27,105 @@ interface HolidayFormData {
 interface AddHolidayModalProps {
   isOpen: boolean;
   onclose: () => void;
-  onSubmit: (data: HolidayFormData) => void;
+  isSubmitting?: boolean;
+  onSubmit: (data: CreateHolidayRequest) => void;
 }
 
-export default function AddHolidayModal({ isOpen, onclose, onSubmit }: AddHolidayModalProps) {
+export default function AddHolidayModal({ isOpen, onclose, onSubmit, isSubmitting = false }: AddHolidayModalProps) {
+  const currentYear = new Date().getFullYear();
+  const minDate = new Date(currentYear, 0, 1);
+  const maxDate = new Date(currentYear, 11, 31);
+
   const [formData, setFormData] = useState({
-    holidayName: '',
-    holidayDate: undefined as Date | undefined,
+    name: '',
+    date: undefined as string | undefined,
   });
   const [errors, setErrors] = useState({
-    holidayName: '',
-    holidayDate: '',
+    name: '',
+    date: '',
   });
 
   const handleSubmit = () => {
     const newErrors = {
-      holidayName: '',
-      holidayDate: '',
+      name: '',
+      date: '',
     };
 
-    if (!formData.holidayName.trim()) {
-      newErrors.holidayName = 'Holiday name is required';
+    if (!formData.name.trim()) {
+      newErrors.name = STRINGS.HOLIDAY_NAME_IS_REQUIRED;
     }
 
-    if (!formData.holidayDate) {
-      newErrors.holidayDate = 'Holiday date is required';
+    if (!formData.date) {
+      newErrors.date = STRINGS.HOLIDAY_DATE_IS_REQUIRED;
     }
 
     setErrors(newErrors);
-
     const hasErrors = Object.values(newErrors).some(Boolean);
+    if (hasErrors || !formData.date) return;
 
-    if (hasErrors) return;
-
-    onSubmit(formData);
+    onSubmit({ name: formData.name, date: formData.date });
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onclose}
-      title="Add New Holiday"
-      closeOnOverlayClick
+      onClose={isSubmitting ? () => {} : onclose}
+      title={STRINGS.ADD_NEW_HOLIDAY}
+      closeOnOverlayClick={!isSubmitting}
       centered
       className={styles.modal}
     >
       <div className={styles.inputContainer}>
         <TextInput
-          label="Holiday Name"
+          label={STRINGS.HOLIDAY_NAME}
           required
-          placeholder="Enter Holiday Name"
-          value={formData?.holidayName}
-          error={errors.holidayName}
+          placeholder={STRINGS.HOLIDAY_NAME_PLACEHOLDER}
+          value={formData?.name}
+          error={errors.name}
           onChange={(e) => {
             setFormData((prev) => ({
               ...prev,
-              holidayName: e.target.value,
+              name: e.target.value,
             }));
 
-            if (errors.holidayName) {
+            if (errors.name) {
               setErrors((prev) => ({
                 ...prev,
-                holidayName: '',
+                name: '',
               }));
             }
           }}
         />
         <DatePicker
           displayMode="modal"
-          label="Select Date"
+          label={STRINGS.SELECT_DATE}
           required
-          value={formData?.holidayDate}
-          error={errors.holidayDate}
+          value={formData?.date}
+          error={errors.date}
+          minDate={minDate}
+          maxDate={maxDate}
           onChange={(date) => {
+            const selectedDate = typeof date === 'string' && date ? date : undefined;
             setFormData((prev) => ({
               ...prev,
-              holidayDate: date instanceof Date ? date : undefined,
+              date: selectedDate,
             }));
 
-            if (errors.holidayDate) {
+            if (errors.date) {
               setErrors((prev) => ({
                 ...prev,
-                holidayDate: '',
+                date: '',
               }));
             }
           }}
         />
       </div>
       <div className={styles.buttonContainer}>
-        <Button variant="secondary" className={styles.add} onClick={onclose}>
-          <Text1>Cancel</Text1>
+        <Button variant="secondary" className={styles.add} onClick={onclose} disabled={isSubmitting}>
+          <Text1>{STRINGS.CANCEL}</Text1>
         </Button>
-        <Button variant="primary" className={styles.add} onClick={handleSubmit}>
-          <Text1>Add</Text1>
+        <Button variant="primary" className={styles.add} onClick={handleSubmit} loading={isSubmitting}>
+          <Text1>{STRINGS.ADD}</Text1>
         </Button>
       </div>
     </Modal>

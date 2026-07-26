@@ -7,9 +7,10 @@
  *
  * Consumers should import from:
  *
- * import { apiClient, ApiError, API_ENDPOINTS } from '@/lib/api';
+ * import { ApiClient, ApiError, API_ENDPOINTS } from '@/lib/api';
  *
- * instead of importing individual files.
+ * instead of importing individual files. Server-side callers should get an
+ * instance via `getServerApiClient()` rather than constructing `ApiClient` directly.
  */
 
 /**

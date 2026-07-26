@@ -17,7 +17,7 @@ import { Calendar } from 'lucide-react';
 import TextInput from '@/src/components/TextInput';
 import { DayPicker, DateRange } from '@daypicker/react';
 import '@daypicker/react/style.css';
-import { formatDisplayDate } from '@/src/utils/date';
+import { formatDisplayDate, parseLocalDate } from '@/src/utils/date';
 import styles from './DatePicker.module.scss';
 
 type DatePickerValue = Date | Date[] | DateRange | string | undefined;
@@ -97,32 +97,32 @@ interface DatePickerProps {
   onChange?: (value: DatePickerValue) => void;
 
   /**
-   *
+   * Earliest date that can be navigated to or selected.
    */
   minDate?: Date;
 
   /**
-   *
+   * Latest date that can be navigated to or selected.
    */
   maxDate?: Date;
 
   /**
-   *
+   * Initial selected date when using single mode.
    */
   initialSelectedDate?: Date;
 
   /**
-   *
+   * Initial selected dates when using multiple mode.
    */
   initialSelectedMultipleDates?: Date[];
 
   /**
-   *
+   * Marks the field as required, showing a required indicator on the label.
    */
   required?: boolean;
 
   /**
-   *
+   * Controlled value of the date picker. Accepts a Date, array of dates, a date range, or an ISO date string.
    */
   value?: DatePickerValue;
 
@@ -159,9 +159,7 @@ export default function DatePicker({
     }
 
     if (typeof value === 'string' && value.trim()) {
-      const date = new Date(value);
-
-      return Number.isNaN(date.getTime()) ? undefined : date;
+      return parseLocalDate(value.trim());
     }
 
     return initialSelectedDate;
@@ -176,8 +174,8 @@ export default function DatePicker({
 
   const handleSelect = (value: DatePickerValue) => {
     if (mode === 'single' && value instanceof Date) {
-      const isoDate = value.toISOString().split('T')[0];
-      onChange?.(isoDate as any);
+      const isoDate = formatDisplayDate(value);
+      onChange?.(isoDate);
       setOpen(false);
       return;
     } else if (mode === 'range') {
@@ -197,9 +195,9 @@ export default function DatePicker({
 
     // Handle ISO string values from store/API
     if (typeof currentValue === 'string') {
-      const date = new Date(currentValue);
+      const date = parseLocalDate(currentValue);
 
-      return Number.isNaN(date.getTime()) ? '' : formatDisplayDate(date);
+      return date ? formatDisplayDate(date) : '';
     }
 
     if (currentValue instanceof Date) {

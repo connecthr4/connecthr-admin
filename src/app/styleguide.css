@@ -20,6 +20,8 @@
   --color-lime-500: #a3d139;
   --color-purple-400: #8d75f5;
   --color-red-500: #dc3545;
+  --color-red-400: #ff4d4f;
+  --color-red-400-10: #ff4d4f1a;
 
   /* ==========================
      Gray Scale
@@ -31,6 +33,7 @@
   --color-gray-400-80: #a2a1a8cc;
   --color-gray-500: #6b7280;
   --color-violet-600-5: #7152f30d;
+  --color-violet-600-40: #7152f366;
   --color-gray-400: #a2a1a8;
   --color-gray-900: #16151c;
 
@@ -43,7 +46,7 @@
   --spacing-4: 0.9375rem; /* 15px */
   --spacing-5: 1rem; /* 16px */
   --spacing-6: 1.125rem; /* 18px */
-  --spacing-7: 1.25; /* 20px */
+  --spacing-7: 1.25rem; /* 20px */
   --spacing-8: 1.5rem; /* 24px */
   --spacing-9: 2rem; /* 32px */
   --spacing-10: 2.5rem; /* 40px */

@@ -3,6 +3,7 @@ import { NotificationType } from '../providers/NotificationProvider';
 
 export const STRINGS = {
   APP_NAME: 'connectHR',
+  YEAR: 'Year - 2026',
   UPCOMING_HOLIDAYS: 'Upcoming Holidays',
   VIEW_ALL: 'View all',
   EMAIL_ADDRESS: 'Email Address',
@@ -34,6 +35,21 @@ export const STRINGS = {
   PASSWORD_REQUIREMENT_LOWERCASE: 'One lowercase letter',
   PASSWORD_REQUIREMENT_NUMBER: 'One number',
   PASSWORD_REQUIREMENT_SPECIAL_CHARACTER: 'One special character',
+  HOLIDAY_CREATION_FAILED: 'Holiday creation failed',
+  HOLIDAY_CREATED_SUCCESSFULLY: 'Holiday created successfully',
+  HOLIDAY_DELETION_FAILED: 'Holiday deletion failed',
+  HOLIDAY_DELETED_SUCCESSFULLY: 'Holiday deleted successfully',
+  ADD_NEW_HOLIDAY: 'Add New Holiday',
+  HOLIDAYS: 'Holidays',
+  ALL_HOLIDAY_LISTS: 'All Holiday Lists',
+  HOLIDAY_NAME_IS_REQUIRED: 'Holiday name is required',
+  HOLIDAY_DATE_IS_REQUIRED: 'Holiday date is required',
+  HOLIDAY_NAME: 'Holiday Name',
+  HOLIDAY_NAME_PLACEHOLDER: 'Enter Holiday Name',
+  SELECT_DATE: 'Select Date',
+  CANCEL: 'Cancel',
+  ADD: 'Add',
+  NO_HOLIDAYS_ADDED: 'No holidays added yet',
 };
 
 export const STEPS = [
