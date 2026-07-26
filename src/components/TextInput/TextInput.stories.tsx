@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { Mail, Search } from 'lucide-react';
+import { Calendar, Search, X } from 'lucide-react';
 import TextInput from './TextInput';
 
 const meta = {
-  title: 'Components/Form/TextInput',
+  title: 'components/TextInput',
   component: TextInput,
   parameters: {
     layout: 'centered',
@@ -17,8 +17,8 @@ const meta = {
     ),
   ],
   args: {
-    label: 'Email address',
-    placeholder: 'you@example.com',
+    label: 'Email Address',
+    placeholder: 'Enter email address',
   },
 } satisfies Meta<typeof TextInput>;
 
@@ -29,8 +29,8 @@ export const Default: Story = {};
 
 export const Required: Story = {
   args: {
-    label: 'Full name',
-    placeholder: 'Enter your full name',
+    label: 'Holiday Name',
+    placeholder: 'Enter Holiday Name',
     required: true,
   },
 };
@@ -38,24 +38,33 @@ export const Required: Story = {
 export const Password: Story = {
   args: {
     label: 'Password',
-    placeholder: 'Enter your password',
+    placeholder: 'Enter password',
     type: 'password',
   },
 };
 
-export const WithIcons: Story = {
+export const WithLeftIcon: Story = {
   args: {
-    label: 'Search',
-    placeholder: 'Search employees',
-    leftIcon: <Search aria-hidden="true" />,
-    rightIcon: <Mail aria-label="Email action" />,
+    label: undefined,
+    placeholder: 'Search',
+    leftIcon: <Search height={24} width={24} />,
+    rightIcon: <X height={24} width={24} onClick={() => {}} />,
+  },
+};
+
+export const WithRightIcon: Story = {
+  args: {
+    label: 'Select Date',
+    placeholder: 'Select date',
+    readOnly: true,
+    rightIcon: <Calendar size={24} />,
   },
 };
 
 export const Error: Story = {
   args: {
-    label: 'Work email',
-    value: 'invalid-email',
-    error: 'Enter a valid email address.',
+    label: 'Email Address',
+    defaultValue: 'invalid-email',
+    error: 'Please enter a valid email address',
   },
 };
