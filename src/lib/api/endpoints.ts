@@ -6,7 +6,7 @@ export const API_ENDPOINTS = {
 
     LOGOUT: '/auth/logout',
 
-    REFRESH: '/auth/refresh-token',
+    REFRESH: '/auth/refresh',
 
     PROFILE: '/auth/profile',
   },
@@ -29,7 +29,11 @@ export const API_ENDPOINTS = {
     CREATE: '/departments',
   },
 
-  HOLIDAY: {
-    GET_ALL: '/holidays',
+  HOLIDAYS: {
+    GET_HOLIDAYS_LIST: '/holidays',
+
+    CREATE_HOLIDAY: '/holidays',
+
+    DELETE_HOLIDAY: (id: string) => `/holidays/${id}`,
   },
 } as const;

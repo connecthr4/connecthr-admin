@@ -11,8 +11,9 @@
  * ```
  */
 
-import { Trash2, CalendarDays } from 'lucide-react';
 import { Heading4, Text2 } from '../Typography';
+import { STRINGS } from '@/src/constants/strings';
+import { Trash2, CalendarDays, Loader2 } from 'lucide-react';
 import styles from './HolidayMonthCard.module.scss';
 
 interface Holiday {
@@ -29,16 +30,18 @@ interface HolidayMonthCardProps {
   month: string;
   holidays: Holiday[];
   onDelete: (id: string) => void;
+  deletingId?: string | null;
 }
 
-export default function HolidayMonthCard({ month, holidays, onDelete }: HolidayMonthCardProps) {
+export default function HolidayMonthCard({ month, holidays, onDelete, deletingId }: HolidayMonthCardProps) {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
         <Heading4>{month}</Heading4>
-
         <div className={styles.count}>
-          <Text2 className={styles.countText}>{holidays.length} Holidays</Text2>
+          <Text2 className={styles.countText}>
+            {holidays.length} {STRINGS.HOLIDAYS}
+          </Text2>
         </div>
       </div>
 
@@ -51,16 +54,18 @@ export default function HolidayMonthCard({ month, holidays, onDelete }: HolidayM
 
                 <div className={styles.content}>
                   <Text2>{holiday.name}</Text2>
-
                   <Text2 className={styles.day}>{holiday.day}</Text2>
                 </div>
               </div>
 
               <div className={styles.right}>
                 <Text2 className={styles.date}>{holiday.date}</Text2>
-
-                <button className={styles.deleteButton} onClick={() => onDelete(holiday.id)}>
-                  <Trash2 size={16} />
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => onDelete(holiday.id)}
+                  disabled={Boolean(deletingId)}
+                >
+                  {deletingId === holiday.id ? <Loader2 size={16} className={styles.spinner} /> : <Trash2 size={16} />}
                 </button>
               </div>
             </div>
@@ -71,8 +76,7 @@ export default function HolidayMonthCard({ month, holidays, onDelete }: HolidayM
           <div className={styles.emptyIcon}>
             <CalendarDays size={48} />
           </div>
-
-          <Text2 className={styles.emptyText}>No holidays added yet</Text2>
+          <Text2 className={styles.emptyText}>{STRINGS.NO_HOLIDAYS_ADDED}</Text2>
         </div>
       )}
     </div>

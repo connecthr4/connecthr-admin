@@ -48,7 +48,7 @@ export interface ApiRequestOptions extends Omit<RequestInit, 'body'> {
 /**
  * Generic request body.
  */
-export type RequestBody = Record<string, unknown> | unknown[] | FormData | Blob | string | null | undefined;
+export type RequestBody = object | unknown[] | FormData | Blob | string | null | undefined;
 
 /**
  * ============================================================================
@@ -154,7 +154,13 @@ export interface AuthTokens {
  * Refresh token response.
  */
 export interface RefreshTokenResponse {
-  accessToken: string;
+  success: boolean;
+
+  message: string;
+
+  data: {
+    accessToken: string;
+  };
 }
 
 /**

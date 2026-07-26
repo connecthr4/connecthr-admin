@@ -17,7 +17,6 @@ import { Check, X } from 'lucide-react';
 import { logger } from '@/src/lib/logger';
 import Modal from '@/src/components/Modal';
 import { useRouter } from 'next/navigation';
-import { AuthApi } from '@/src/lib/api/auth';
 import Button from '@/src/components/Button';
 import { useAuthStore } from '@/src/store/auth';
 import { isValidEmail } from '@/src/utils/helper';
@@ -25,7 +24,7 @@ import TextInput from '@/src/components/TextInput';
 import { getApiErrorInfo } from '@/src/lib/api/helpers';
 import { Heading1, Heading2, Text1, Text2 } from '../Typography';
 import { useNotification } from '@/src/providers/NotificationProvider';
-import type { ChangePasswordResponse } from '@/src/lib/types/auth';
+import { changePasswordAction, loginAction } from '@/src/lib/actions/auth';
 import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
 import styles from './LoginPanel.module.scss';
 
@@ -115,10 +114,16 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
 
     try {
       setLoading(true);
-      const response = await AuthApi.login(formData);
-      const updatePassword = response.data.user.mustChangePassword;
-      login(response.data);
-      if (updatePassword) {
+      const result = await loginAction(formData);
+
+      if (!result.success) {
+        showNotification(STRINGS.LOGIN_FAILED, result.message, NOTIFICATION_TYPES.ERROR, 5000, 'top-right', false);
+        return;
+      }
+
+      login({ user: result.user });
+
+      if (result.user.mustChangePassword) {
         setTempPassword(formData.password);
         router.push(ROUTES.RESET_PASSWORD);
       } else {
@@ -162,10 +167,21 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
         ...resetPasswordData,
         currentPassword: tempPassword ?? '',
       };
-      const response = (await AuthApi.changePassword(payload)) as ChangePasswordResponse;
-      if (response.success) {
-        setShowSuccessModal(true);
+      const result = await changePasswordAction(payload);
+
+      if (!result.success) {
+        showNotification(
+          STRINGS.PASSWORD_RESET_FAILED,
+          result.message,
+          NOTIFICATION_TYPES.ERROR,
+          5000,
+          'top-right',
+          false
+        );
+        return;
       }
+
+      setShowSuccessModal(true);
     } catch (error) {
       logger.error('Error occurred while resetting password:', error);
       const { message } = getApiErrorInfo(error);

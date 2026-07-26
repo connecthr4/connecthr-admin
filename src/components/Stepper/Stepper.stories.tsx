@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { CheckCircle, FileText, User } from 'lucide-react';
 import { fn } from 'storybook/test';
-
 import Stepper from './Stepper';
 
 const steps = [

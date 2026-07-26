@@ -1,5 +1,5 @@
 import { apiConfig } from '../config/api';
-import { useAuthStore } from '@/src/store/auth';
+import { API_ENDPOINTS } from './endpoints';
 import type { ApiRequestOptions, RequestBody } from './types';
 
 import {
@@ -29,6 +29,16 @@ const ERROR_MAP = {
 
 type ErrorStatus = keyof typeof ERROR_MAP;
 
+/**
+ * Supplies the Authorization header and performs token refresh. Implemented
+ * per execution context (e.g. server, backed by cookies) since each has a
+ * different way of authenticating a refresh call.
+ */
+export interface ApiAuthAdapter {
+  getAuthHeaderValue(): Promise<string | null>;
+  refresh(): Promise<string>;
+}
+
 export class ApiClient {
   private readonly baseUrl: string;
 
@@ -36,10 +46,18 @@ export class ApiClient {
 
   private readonly defaultHeaders: HeadersInit;
 
-  constructor() {
+  private readonly authAdapter: ApiAuthAdapter;
+
+  /**
+   * Shares a single in-flight refresh call across concurrent 401s.
+   */
+  private refreshPromise: Promise<string> | null = null;
+
+  constructor(authAdapter: ApiAuthAdapter) {
     this.baseUrl = apiConfig.baseUrl;
     this.timeout = apiConfig.timeout;
     this.defaultHeaders = apiConfig.headers;
+    this.authAdapter = authAdapter;
   }
 
   /**
@@ -97,7 +115,7 @@ export class ApiClient {
   /**
    * Build request headers.
    */
-  private buildHeaders(headers?: HeadersInit, body?: RequestBody): HeadersInit {
+  private async buildHeaders(headers?: HeadersInit, body?: RequestBody): Promise<HeadersInit> {
     const finalHeaders = new Headers({
       ...this.defaultHeaders,
       ...headers,
@@ -110,10 +128,10 @@ export class ApiClient {
       finalHeaders.delete('Content-Type');
     }
 
-    const accessToken = useAuthStore.getState().accessToken;
+    const authHeader = await this.authAdapter.getAuthHeaderValue();
 
-    if (accessToken && !finalHeaders.has('Authorization')) {
-      finalHeaders.set('Authorization', `Bearer ${accessToken}`);
+    if (authHeader && !finalHeaders.has('Authorization')) {
+      finalHeaders.set('Authorization', authHeader);
     }
 
     return finalHeaders;
@@ -122,7 +140,7 @@ export class ApiClient {
   /**
    * Generic request method
    */
-  private async request<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
+  private async request<T>(endpoint: string, options: ApiRequestOptions = {}, isRetry = false): Promise<T> {
     const { query, timeout: requestTimeout, body, ...fetchOptions } = options;
 
     const controller = new AbortController();
@@ -136,12 +154,14 @@ export class ApiClient {
     try {
       const url = this.buildUrl(endpoint, query);
 
+      const headers = await this.buildHeaders(fetchOptions.headers, body);
+
       const response = await fetch(url, {
         ...fetchOptions,
 
         signal: controller.signal,
 
-        headers: this.buildHeaders(fetchOptions.headers, body),
+        headers,
 
         body: this.prepareBody(body),
       });
@@ -149,7 +169,25 @@ export class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw await this.createApiError(response);
+        const error = await this.createApiError(response);
+
+        const canRetryWithRefresh =
+          error instanceof UnauthorizedError &&
+          !isRetry &&
+          endpoint !== API_ENDPOINTS.AUTH.REFRESH &&
+          endpoint !== API_ENDPOINTS.AUTH.LOGIN;
+
+        if (canRetryWithRefresh) {
+          try {
+            await this.refreshAccessToken();
+
+            return await this.request<T>(endpoint, options, true);
+          } catch {
+            throw error;
+          }
+        }
+
+        throw error;
       }
 
       /**
@@ -226,6 +264,20 @@ export class ApiClient {
   }
 
   /**
+   * Refreshes the access token via the auth adapter.
+   * Concurrent 401s share a single in-flight refresh call.
+   */
+  private async refreshAccessToken(): Promise<string> {
+    if (!this.refreshPromise) {
+      this.refreshPromise = this.authAdapter.refresh().finally(() => {
+        this.refreshPromise = null;
+      });
+    }
+
+    return this.refreshPromise;
+  }
+
+  /**
    * GET
    */
   public get<T>(endpoint: string, options?: Omit<ApiRequestOptions, 'method' | 'body'>): Promise<T> {
@@ -290,8 +342,3 @@ export class ApiClient {
     });
   }
 }
-
-/**
- * Singleton API Client
- */
-export const apiClient = new ApiClient();

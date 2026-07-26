@@ -1,0 +1,76 @@
+'use server';
+
+import { redirect } from 'next/navigation';
+import { apiConfig } from '../config/api';
+import { API_ENDPOINTS } from '../api/endpoints';
+import { getApiErrorInfo } from '../api/helpers';
+import { getServerApiClient } from '../api/getServerApiClient';
+import { buildCookieCarrier } from '../auth/cookieRelay';
+import { clearSession, setSession } from '../auth/session';
+import { ROUTES } from '@/src/constants/strings';
+
+import type { ChangePasswordRequest, ChangePasswordResponse, LoginRequest, LoginResponse, User } from '../types/auth';
+
+type LoginActionResult = { success: true; user: User } | { success: false; message: string };
+
+/**
+ * Runs server-side so the session cookie can be set as httpOnly — a client
+ * component can never do that itself. Returns rather than throws on
+ * expected failures (bad credentials) per this fork's error-handling guide.
+ */
+export async function loginAction(credentials: LoginRequest): Promise<LoginActionResult> {
+  try {
+    const response = await fetch(`${apiConfig.baseUrl}${API_ENDPOINTS.AUTH.LOGIN}`, {
+      method: 'POST',
+      headers: apiConfig.headers,
+      body: JSON.stringify(credentials),
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+      return { success: false, message: (payload as { message?: string })?.message ?? 'Login failed' };
+    }
+
+    const { accessToken, user } = (payload as LoginResponse).data;
+    const refreshCarrier = buildCookieCarrier(response.headers.getSetCookie());
+
+    await setSession({ accessToken, refreshCarrier });
+
+    return { success: true, user };
+  } catch (error) {
+    const { message } = getApiErrorInfo(error);
+
+    return { success: false, message };
+  }
+}
+
+type ChangePasswordActionResult = { success: true } | { success: false; message: string };
+
+export async function changePasswordAction(data: ChangePasswordRequest): Promise<ChangePasswordActionResult> {
+  try {
+    const client = getServerApiClient();
+
+    await client.post<ChangePasswordResponse>(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
+
+    return { success: true };
+  } catch (error) {
+    const { message } = getApiErrorInfo(error);
+
+    return { success: false, message };
+  }
+}
+
+export async function logoutAction(): Promise<void> {
+  try {
+    const client = getServerApiClient();
+
+    await client.post(API_ENDPOINTS.AUTH.LOGOUT);
+  } catch {
+    // Best-effort — the session is cleared locally regardless.
+  } finally {
+    await clearSession();
+  }
+
+  redirect(ROUTES.LOGIN);
+}

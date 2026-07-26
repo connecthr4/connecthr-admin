@@ -32,5 +32,25 @@ export const formatDisplayDate = (date?: Date) => {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
 
-  return `${day}/${month}/${year}`;
+  return `${year}-${month}-${day}`;
+};
+
+const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Parses a "YYYY-MM-DD" string as a local calendar date, not UTC midnight —
+ * `new Date("YYYY-MM-DD")` is spec'd to parse as UTC, which rolls the date
+ * back or forward a day once read through local getters, depending on the
+ * viewer's timezone offset.
+ */
+export const parseLocalDate = (value: string): Date | undefined => {
+  if (DATE_ONLY_PATTERN.test(value)) {
+    const [year, month, day] = value.split('-').map(Number);
+
+    return new Date(year, month - 1, day);
+  }
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime()) ? undefined : date;
 };
