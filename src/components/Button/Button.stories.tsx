@@ -40,13 +40,6 @@ export const Secondary: Story = {
   },
 };
 
-export const Text: Story = {
-  args: {
-    variant: 'text',
-    children: 'View all employees',
-  },
-};
-
 export const WithIcons: Story = {
   args: {
     children: 'Add employee',
