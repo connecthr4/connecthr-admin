@@ -12,9 +12,9 @@
  */
 
 import React, { useEffect, useRef, ReactNode } from 'react';
-import styles from './Checkbox.module.scss';
-import { Text3, Text4 } from '../Typography/Typography';
 import { clsx } from 'clsx';
+import { Text4 } from '../Typography/Typography';
+import styles from './Checkbox.module.scss';
 
 /**
  * Define the props available for the Checkbox component.

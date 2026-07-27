@@ -8,12 +8,12 @@ styles specific to the Button component
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--spacing-2);
   cursor: pointer;
   border-radius: var(--radius-md);
   border: none;
   transition: all 0.3s ease;
-  padding: 1rem;
+  padding: var(--spacing-5);
   color: var(--color-white);
 
   &:disabled {
