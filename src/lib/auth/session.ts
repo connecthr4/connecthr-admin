@@ -1,8 +1,6 @@
 import 'server-only';
 import { cookies } from 'next/headers';
-
-const ACCESS_TOKEN_COOKIE = 'chr_access_token';
-const REFRESH_CARRIER_COOKIE = 'chr_refresh_carrier';
+import { ACCESS_TOKEN_COOKIE, REFRESH_CARRIER_COOKIE } from './cookies';
 
 /**
  * The backend's own token expiry is the real security boundary here, so the

@@ -49,26 +49,11 @@ styles specific to the EmployeesDashboard component
 }
 
 .tableContainer {
+  display: flex;
+  flex-direction: column;
+
   flex: 1;
   min-height: 0;
-
-  overflow-x: auto;
-  overflow-y: auto;
-
-  /* Scrollbar */
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 999px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
 }
 
 .employeeCell {
