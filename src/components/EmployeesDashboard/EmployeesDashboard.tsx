@@ -21,7 +21,6 @@ import DataTable from '../DataTable';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
-import Pagination from '../Pagination';
 
 export interface Employee {
   id: string;
@@ -290,7 +289,6 @@ export default function EmployeesDashboard({ label = 'label' }: EmployeesDashboa
         <div className={styles.tableContainer}>
           <DataTable data={employees} columns={employeeColumns} />
         </div>
-        <Pagination />
       </div>
     </div>
   );

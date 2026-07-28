@@ -50,6 +50,8 @@ export const STRINGS = {
   CANCEL: 'Cancel',
   ADD: 'Add',
   NO_HOLIDAYS_ADDED: 'No holidays added yet',
+  NO_DATA_FOUND: 'No data found',
+  SHOWING: 'Showing',
 };
 
 export const STEPS = [
