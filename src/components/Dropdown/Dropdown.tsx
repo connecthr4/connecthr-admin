@@ -11,10 +11,11 @@
  * ```
  */
 
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Check, ChevronDown, Loader2, Search } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
 import { Label, Text3 } from '../Typography/Typography';
+import { ChevronDown, Loader2, Search } from 'lucide-react';
+
 import styles from './Dropdown.module.scss';
 
 export interface DropdownOption {
@@ -52,8 +53,10 @@ export default function Dropdown({
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [openUpward, setOpenUpward] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((option) => option.value === value);
 
@@ -64,6 +67,25 @@ export default function Dropdown({
 
     return options.filter((option) => option.label.toLowerCase().includes(search.toLowerCase()));
   }, [options, search, searchable]);
+
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const trigger = wrapperRef.current;
+    const menu = menuRef.current;
+
+    if (!trigger || !menu) {
+      return;
+    }
+
+    const triggerRect = trigger.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+
+    setOpenUpward(spaceBelow < menu.offsetHeight && spaceAbove > spaceBelow);
+  }, [isOpen, filteredOptions.length]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -115,7 +137,7 @@ export default function Dropdown({
         </button>
 
         {isOpen && !isLoading && (
-          <div className={styles.menu}>
+          <div ref={menuRef} className={clsx(styles.menu, openUpward && styles.menuUp)}>
             {searchable && (
               <div className={styles.searchBox}>
                 <Search size={16} />

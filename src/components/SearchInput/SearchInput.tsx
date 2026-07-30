@@ -24,15 +24,34 @@ interface SearchInputProps {
    *
    */
   placeholder?: string;
+
+  /**
+   * The current search query (controlled).
+   */
+  value?: string;
+
+  /**
+   * Called with the raw input value on every keystroke.
+   */
+  onChange?: (value: string) => void;
+
+  /**
+   * Called when the clear (X) icon is clicked. Defaults to clearing via `onChange('')`.
+   */
+  onClear?: () => void;
 }
 
-export default function SearchInput({ placeholder = 'Search' }: SearchInputProps) {
+export default function SearchInput({ placeholder = 'Search', value, onChange, onClear }: SearchInputProps) {
   return (
     <div className={styles.container}>
       <TextInput
         placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChange?.(event.target.value)}
         leftIcon={<Search height={24} width={24} />}
-        rightIcon={<X height={24} width={24} onClick={() => {}} />}
+        rightIcon={
+          value ? <X height={24} width={24} onClick={() => (onClear ? onClear() : onChange?.(''))} /> : undefined
+        }
       />
     </div>
   );

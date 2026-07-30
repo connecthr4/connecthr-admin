@@ -26,13 +26,32 @@ styles specific to the DataTable component
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: var(--color-gray-300);
     border-radius: 999px;
   }
 
   &::-webkit-scrollbar-track {
     background: transparent;
   }
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.bone {
+  height: 0.875rem;
+  border-radius: var(--radius-md);
+  background: var(--color-gray-200);
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 
 .table {
@@ -44,18 +63,18 @@ styles specific to the DataTable component
   text-align: left;
   font-size: 16px;
   font-weight: 500;
-  padding: 20px 24px;
-  border-bottom: 1px solid #ececec;
-  color: #8c8c8c;
+  padding: var(--spacing-7) var(--spacing-8);
+  border-bottom: 1px solid var(--color-gray-225);
+  color: var(--color-gray-600);
 }
 
 .table tbody td {
-  padding: 18px 24px;
-  border-bottom: 1px solid #f1f1f1;
+  padding: 18px var(--spacing-8);
+  border-bottom: 1px solid var(--color-gray-175);
 }
 
 .table tbody tr:hover {
-  background: #fafafa;
+  background: var(--color-gray-150);
 }
 
 .footer {
@@ -83,7 +102,7 @@ styles specific to the DataTable component
   white-space: nowrap;
 }
 
-.emptyCell {
+.table tbody td.emptyCell {
   padding: 4rem var(--spacing-8);
   border-bottom: none;
   text-align: center;
@@ -101,7 +120,7 @@ styles specific to the DataTable component
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-violet-600-40);
+  color: var(--color-gray-400);
 }
 
 .emptyText {

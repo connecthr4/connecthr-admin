@@ -14,6 +14,10 @@ export const API_ENDPOINTS = {
   EMPLOYEE: {
     GET_ALL: '/employees',
 
+    LIST: '/employees',
+
+    GET_COLUMNS: '/employees/columns',
+
     CREATE: '/employees',
 
     GET_BY_ID: (id: string) => `/employees/${id}`,

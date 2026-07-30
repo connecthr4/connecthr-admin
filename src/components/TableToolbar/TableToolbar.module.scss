@@ -1,0 +1,37 @@
+/**
+------------------------------------------------------
+styles specific to the TableToolbar component
+------------------------------------------------------
+**/
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search {
+  width: 20.625rem;
+  flex-shrink: 0;
+}
+
+.filterButton {
+  flex-shrink: 0;
+  padding: 1rem;
+}

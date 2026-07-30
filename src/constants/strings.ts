@@ -52,6 +52,7 @@ export const STRINGS = {
   NO_HOLIDAYS_ADDED: 'No holidays added yet',
   NO_DATA_FOUND: 'No data found',
   SHOWING: 'Showing',
+  EMPLOYEES_FETCH_FAILED: 'Failed to load employees',
 };
 
 export const STEPS = [
