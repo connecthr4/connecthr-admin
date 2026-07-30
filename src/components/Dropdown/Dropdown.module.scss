@@ -72,6 +72,11 @@ styles specific to the Dropdown component
   z-index: 1000;
 }
 
+.menuUp {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
 .searchBox {
   display: flex;
   align-items: center;

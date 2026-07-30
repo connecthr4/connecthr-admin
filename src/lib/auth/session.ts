@@ -35,19 +35,38 @@ export async function getSession(): Promise<Session | null> {
   };
 }
 
-export async function setSession(session: Session): Promise<void> {
+/**
+ * Next.js only allows cookie mutation inside a Server Action or Route
+ * Handler; calling `.set()`/`.delete()` during a Server Component render
+ * (e.g. a token refresh triggered by an SSR page's initial data fetch)
+ * throws. That's a legitimate, expected context here — callers that need
+ * the refreshed token for the current request read it from the auth
+ * adapter's in-memory cache instead, and the next Route Handler-originated
+ * request persists it for real. So failures here are swallowed.
+ */
+async function trySetCookies(mutate: (store: Awaited<ReturnType<typeof cookies>>) => void): Promise<void> {
   const store = await cookies();
 
-  store.set(ACCESS_TOKEN_COOKIE, session.accessToken, cookieOptions);
-
-  if (session.refreshCarrier) {
-    store.set(REFRESH_CARRIER_COOKIE, session.refreshCarrier, cookieOptions);
+  try {
+    mutate(store);
+  } catch {
+    // Best-effort only — see comment above.
   }
 }
 
-export async function clearSession(): Promise<void> {
-  const store = await cookies();
+export async function setSession(session: Session): Promise<void> {
+  await trySetCookies((store) => {
+    store.set(ACCESS_TOKEN_COOKIE, session.accessToken, cookieOptions);
 
-  store.delete(ACCESS_TOKEN_COOKIE);
-  store.delete(REFRESH_CARRIER_COOKIE);
+    if (session.refreshCarrier) {
+      store.set(REFRESH_CARRIER_COOKIE, session.refreshCarrier, cookieOptions);
+    }
+  });
+}
+
+export async function clearSession(): Promise<void> {
+  await trySetCookies((store) => {
+    store.delete(ACCESS_TOKEN_COOKIE);
+    store.delete(REFRESH_CARRIER_COOKIE);
+  });
 }

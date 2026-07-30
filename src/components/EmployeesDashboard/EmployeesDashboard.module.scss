@@ -17,6 +17,7 @@ styles specific to the EmployeesDashboard component
 .content {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
 
   flex: 1;
   min-height: 0;
@@ -28,20 +29,6 @@ styles specific to the EmployeesDashboard component
   border-radius: 1.5rem;
 
   overflow: hidden;
-}
-
-.header {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 1rem;
-
-  margin-bottom: 1.5rem;
-  flex-shrink: 0;
-}
-
-.header > :first-child {
-  width: 100%;
 }
 
 .button {
@@ -67,6 +54,20 @@ styles specific to the EmployeesDashboard component
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  background: var(--color-violet-600-40);
+  color: var(--color-violet-600);
 }
 
 .actionIcon {
