@@ -21,8 +21,15 @@ export interface GetEmployeeColumnsResponse {
 }
 
 export interface EmployeeFilter {
-  field: string;
-  value: string;
+  /**
+   * The filter group's `id` from `/filters/employee`.
+   */
+  key: string;
+
+  /**
+   * Every selected option value for that group — the backend ORs them.
+   */
+  values: string[];
 }
 
 export type EmployeeSortOrder = 'asc' | 'desc';

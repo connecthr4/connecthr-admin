@@ -27,12 +27,27 @@ import { getEmployees } from '@/src/lib/actions/employees';
 import { NOTIFICATION_TYPES, STRINGS } from '@/src/constants/strings';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { useDebounce } from '@/src/hooks/useDebounce';
-import type { Employee, EmployeeColumn, EmployeeListMeta } from '@/src/lib/types/employees';
+import type { Employee, EmployeeColumn, EmployeeFilter, EmployeeListMeta } from '@/src/lib/types/employees';
+import type { FilterOptions } from '@/src/lib/types/filters';
+import type { FilterSelection } from '../FilterPopover';
 
 export type { Employee };
 
 const DEFAULT_SORT_BY = 'createdAt';
-const DEFAULT_SORT_ORDER = 'desc' as const;
+const DEFAULT_SORT_ORDER = 'asc' as const;
+
+const EMPTY_SELECTION: FilterSelection = {};
+
+/**
+ * Turns the popover's selection into the request's `filters` array. Groups
+ * the user emptied are dropped rather than sent as `values: []`, which the
+ * backend would read as "match nothing".
+ */
+function toEmployeeFilters(selection: FilterSelection): EmployeeFilter[] {
+  return Object.entries(selection)
+    .filter(([, values]) => values.length > 0)
+    .map(([key, values]) => ({ key, values }));
+}
 
 /**
  * `name` and `status` are rendered with custom cells (avatar, badge) and are
@@ -131,9 +146,20 @@ interface EmployeesDashboardProps {
   initialColumns: EmployeeColumn[];
   initialEmployees: Employee[];
   initialMeta: EmployeeListMeta;
+
+  /**
+   * Selectable filter values keyed by employee field, as returned by
+   * `/filters/employee`. Drives the accordion sections in the filter popover.
+   */
+  filterOptions: FilterOptions;
 }
 
-export default function EmployeesDashboard({ initialColumns, initialEmployees, initialMeta }: EmployeesDashboardProps) {
+export default function EmployeesDashboard({
+  initialColumns,
+  initialEmployees,
+  initialMeta,
+  filterOptions,
+}: EmployeesDashboardProps) {
   const { showNotification } = useNotification();
 
   const employeeColumns = useMemo(() => buildEmployeeColumns(initialColumns), [initialColumns]);
@@ -147,6 +173,7 @@ export default function EmployeesDashboard({ initialColumns, initialEmployees, i
     pageSize: initialMeta.pageSize,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [filterSelection, setFilterSelection] = useState<FilterSelection>(EMPTY_SELECTION);
 
   const [appliedSearch, setAppliedSearch] = useState(debouncedSearch);
   const isFirstFetch = useRef(true);
@@ -170,6 +197,17 @@ export default function EmployeesDashboard({ initialColumns, initialEmployees, i
     }
   }
 
+  const employeeFilters = useMemo(() => toEmployeeFilters(filterSelection), [filterSelection]);
+
+  /**
+   * Applying filters narrows the result set, so the page the user was on may
+   * no longer exist — go back to the first page along with the new criteria.
+   */
+  const handleFilterChange = (selection: FilterSelection) => {
+    setFilterSelection(selection);
+    setPagination((prev) => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }));
+  };
+
   useEffect(() => {
     // Initial page is already provided by the server-rendered page, so skip
     // the redundant fetch on mount.
@@ -186,6 +224,7 @@ export default function EmployeesDashboard({ initialColumns, initialEmployees, i
       page: pagination.pageIndex + 1,
       limit: pagination.pageSize,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(employeeFilters.length > 0 ? { filters: employeeFilters } : {}),
       sortBy: DEFAULT_SORT_BY,
       sortOrder: DEFAULT_SORT_ORDER,
     })
@@ -223,16 +262,22 @@ export default function EmployeesDashboard({ initialColumns, initialEmployees, i
         }
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.pageIndex, pagination.pageSize, debouncedSearch]);
+  }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, employeeFilters]);
 
   return (
     <div className={styles.container}>
-      <AppHeader title="All Employees" subtitle="All Employee Information" />
+      <AppHeader title={STRINGS.ALL_EMPLOYEES} subtitle={STRINGS.ALL_EMPLOYEE_INFORMATION} />
 
       <div className={styles.content}>
-        <TableToolbar searchValue={search} onSearchChange={setSearch} searchPlaceholder="Search employee...">
+        <TableToolbar
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder={STRINGS.SEARCH_EMPLOYEE}
+          filterOptions={filterOptions}
+          onFilterChange={handleFilterChange}
+        >
           <Button startIcon={CirclePlus} className={styles.button}>
-            Add New Employee
+            {STRINGS.ADD_NEW_EMPLOYEE}
           </Button>
         </TableToolbar>
 

@@ -1,0 +1,145 @@
+/**
+------------------------------------------------------
+styles specific to the FilterPopover component
+------------------------------------------------------
+**/
+
+.filterButton {
+  flex-shrink: 0;
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-sm);
+
+  &:hover {
+    background: var(--color-gray-50);
+  }
+}
+
+/* Keeps the trigger visibly "pressed" for as long as the panel is open. */
+.filterButtonOpen {
+  border-color: var(--color-violet-600-40);
+  background: var(--color-violet-50);
+
+  &:hover {
+    background: var(--color-violet-50);
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+
+  /* Wide enough for the two footer actions to sit at equal halves. */
+  width: 18.5rem;
+  /* Long lists scroll inside `.groups`; the footer stays pinned below them. */
+  max-height: min(70vh, 26rem);
+  padding: var(--spacing-2);
+}
+
+.groups {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  /*
+  The panel is narrow, so a scrollbar gutter eats into the option labels —
+  hide the indicator but keep the area scrollable by wheel, touch and
+  keyboard. Firefox / legacy Edge first, then WebKit.
+  */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.group {
+  /* Dividers sit *between* sections only — the last one closes with nothing. */
+  &:not(:last-of-type) {
+    border-bottom: 1px solid var(--color-border);
+  }
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+
+  padding: var(--spacing-3);
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+  list-style: none;
+  transition: background 0.15s ease;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:hover {
+    background: var(--color-gray-50);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-violet-600);
+    outline-offset: -2px;
+  }
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--color-gray-400);
+  transition: transform 0.15s ease;
+}
+
+.group[open] > .groupHeader .chevron {
+  transform: rotate(180deg);
+}
+
+.groupOptions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+
+  padding: var(--spacing-1) var(--spacing-3) var(--spacing-4);
+}
+
+.option {
+  padding: var(--spacing-1) 0;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+
+  /* No rule above the actions — the last section ends the list cleanly. */
+  padding-top: var(--spacing-4);
+}
+
+.clearButton,
+.applyButton {
+  /* Equal halves of the footer — neither action outsizes the other. */
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 2.5rem;
+
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-violet-600);
+    outline-offset: 2px;
+  }
+}
+
+.clearButton:hover {
+  background: var(--color-gray-50);
+}
+
+.applyButton:hover {
+  background-color: var(--color-violet-700);
+}

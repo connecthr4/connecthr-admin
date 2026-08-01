@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import EmployeesDashboard from './EmployeesDashboard';
 import type { Employee, EmployeeColumn, EmployeeListMeta } from '@/src/lib/types/employees';
+import type { FilterOptions } from '@/src/lib/types/filters';
 
 const columns: EmployeeColumn[] = [
   { accessorKey: 'employeeId', header: 'Employee ID' },
@@ -41,6 +42,27 @@ const meta_: EmployeeListMeta = {
   hasPreviousPage: false,
 };
 
+const filterOptions: FilterOptions = [
+  {
+    id: 'department',
+    label: 'Department',
+    isMulti: true,
+    options: [
+      { label: 'Design', value: 'Design' },
+      { label: 'Development', value: 'Development' },
+    ],
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    isMulti: true,
+    options: [
+      { label: 'Permanent', value: 'PERMANENT' },
+      { label: 'Contract', value: 'CONTRACT' },
+    ],
+  },
+];
+
 const meta = {
   title: 'components/EmployeesDashboard',
   component: EmployeesDashboard,
@@ -53,6 +75,7 @@ const meta = {
     initialColumns: columns,
     initialEmployees: employees,
     initialMeta: meta_,
+    filterOptions,
   },
 } satisfies Meta<typeof EmployeesDashboard>;
 

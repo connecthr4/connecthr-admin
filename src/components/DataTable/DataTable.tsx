@@ -21,8 +21,8 @@ import {
   PaginationState,
   useReactTable,
 } from '@tanstack/react-table';
-import { Inbox } from 'lucide-react';
 import Dropdown from '../Dropdown';
+import { Inbox } from 'lucide-react';
 import Pagination from '../Pagination';
 import { Text2 } from '../Typography/Typography';
 import { STRINGS } from '@/src/constants/strings';
@@ -35,7 +35,7 @@ const PAGE_SIZE_OPTIONS = [
   { label: '100', value: '100' },
 ];
 
-const SKELETON_ROW_COUNT = 8;
+const SKELETON_ROW_COUNT = 10;
 const SKELETON_BONE_WIDTHS = ['85%', '65%', '75%', '55%', '90%', '60%'];
 
 function SkeletonRow({ columnCount, rowIndex }: { columnCount: number; rowIndex: number }) {

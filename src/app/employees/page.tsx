@@ -9,6 +9,7 @@ import { EmployeesApi } from '@/src/lib/api/employees';
 import { UnauthorizedError } from '@/src/lib/api/errors';
 import { ROUTES } from '@/src/constants/strings';
 import type { Employee, EmployeeColumn, EmployeeListMeta } from '@/src/lib/types/employees';
+import type { FilterOptions } from '@/src/lib/types/filters';
 import { logger } from '@/src/lib/logger';
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -39,23 +40,26 @@ export default async function EmployeesPage() {
     hasNextPage: false,
     hasPreviousPage: false,
   };
+  let filterOptions: FilterOptions = [];
 
   try {
     const client = getServerApiClient();
 
-    const [columnsResponse, employeesResponse] = await Promise.all([
+    const [columnsResponse, filterOptionsResponse, employeesResponse] = await Promise.all([
       EmployeesApi.getColumns(client),
+      EmployeesApi.getFilterOptions(client),
       EmployeesApi.getEmployees(client, {
         page: 1,
         limit: DEFAULT_PAGE_SIZE,
         sortBy: 'createdAt',
-        sortOrder: 'desc',
+        sortOrder: 'asc',
       }),
     ]);
 
     initialColumns = columnsResponse?.data ?? [];
     initialEmployees = employeesResponse?.data ?? [];
     initialMeta = employeesResponse?.meta ?? initialMeta;
+    filterOptions = filterOptionsResponse?.data ?? [];
   } catch (error) {
     logger.error('Error fetching initial data for EmployeesPage:', error);
     if (error instanceof UnauthorizedError) {
@@ -66,6 +70,11 @@ export default async function EmployeesPage() {
   }
 
   return (
-    <EmployeesDashboard initialColumns={initialColumns} initialEmployees={initialEmployees} initialMeta={initialMeta} />
+    <EmployeesDashboard
+      initialColumns={initialColumns}
+      initialEmployees={initialEmployees}
+      initialMeta={initialMeta}
+      filterOptions={filterOptions}
+    />
   );
 }

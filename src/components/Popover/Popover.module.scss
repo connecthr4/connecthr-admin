@@ -1,0 +1,56 @@
+/**
+------------------------------------------------------
+styles specific to the Popover component
+------------------------------------------------------
+**/
+
+.anchor {
+  display: inline-block;
+}
+
+.panel {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  max-width: min(320px, calc(100vw - 16px));
+  padding: var(--spacing-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--spacing-3);
+  background: var(--color-white);
+  color: var(--color-gray-900);
+
+  box-shadow:
+    0 10px 25px var(--color-overlay-dark-10),
+    0 4px 10px var(--color-overlay-dark-5);
+
+  opacity: 0;
+  transform: scale(0.96);
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    overlay 0.15s ease allow-discrete,
+    display 0.15s ease allow-discrete;
+
+  &:popover-open {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @starting-style {
+    &:popover-open {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+}
+
+.panel::backdrop {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    transition: none;
+  }
+}
