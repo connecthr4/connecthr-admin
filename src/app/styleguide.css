@@ -28,16 +28,23 @@
   ========================== */
   --color-gray-50: rgba(243, 242, 246, 0.9);
   --color-gray-100: #f5f5f5;
+  --color-gray-150: #fafafa;
+  --color-gray-175: #f1f1f1;
   --color-gray-200: #ebebeb;
+  --color-gray-225: #ececec;
+  --color-gray-300: #d1d5db;
   --color-gray-400-30: #a2a1a84d;
   --color-gray-400-80: #a2a1a8cc;
   --color-gray-500: #6b7280;
+  --color-gray-600: #8c8c8c;
   --color-violet-600-5: #7152f30d;
   --color-violet-600-40: #7152f366;
   --color-gray-400: #a2a1a8;
   --color-gray-900: #16151c;
 
   --color-overlay-dark-15: rgba(0, 0, 0, 0.15);
+  --color-overlay-dark-10: rgba(0, 0, 0, 0.1);
+  --color-overlay-dark-5: rgba(0, 0, 0, 0.05);
 
   /* Spacing */
   --spacing-1: 0.25rem; /* 4px */

@@ -14,6 +14,12 @@ export const API_ENDPOINTS = {
   EMPLOYEE: {
     GET_ALL: '/employees',
 
+    LIST: '/employees',
+
+    GET_COLUMNS: '/employees/columns',
+
+    FILTER_OPTIONS: '/employees/filter-options',
+
     CREATE: '/employees',
 
     GET_BY_ID: (id: string) => `/employees/${id}`,
@@ -35,5 +41,9 @@ export const API_ENDPOINTS = {
     CREATE_HOLIDAY: '/holidays',
 
     DELETE_HOLIDAY: (id: string) => `/holidays/${id}`,
+  },
+
+  COMMON: {
+    GET_FILTERS: (module: string) => `/filters/${module}`,
   },
 } as const;

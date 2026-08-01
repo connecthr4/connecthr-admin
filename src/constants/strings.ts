@@ -50,6 +50,16 @@ export const STRINGS = {
   CANCEL: 'Cancel',
   ADD: 'Add',
   NO_HOLIDAYS_ADDED: 'No holidays added yet',
+  NO_DATA_FOUND: 'No data found',
+  SHOWING: 'Showing',
+  EMPLOYEES_FETCH_FAILED: 'Failed to load employees',
+  FILTER: 'Filter',
+  APPLY_FILTER: 'Apply Filter',
+  CLEAR: 'Clear',
+  ALL_EMPLOYEES: 'All Employees',
+  ALL_EMPLOYEE_INFORMATION: 'All Employee Information',
+  ADD_NEW_EMPLOYEE: 'Add New Employee',
+  SEARCH_EMPLOYEE: 'Search employee...',
 };
 
 export const STEPS = [

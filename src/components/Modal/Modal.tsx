@@ -33,6 +33,7 @@
 'use client';
 
 import { useEffect, useRef, type ReactNode } from 'react';
+import clsx from 'clsx';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Heading4 } from '@/src/components/Typography';
@@ -103,7 +104,10 @@ interface ModalProps {
   zIndex?: number;
 
   /**
+   * Maximum width of the modal container.
+   * Accepts any valid CSS width value (e.g. px, rem, %).
    *
+   * @default '37.5rem'
    */
   maxWidth?: string;
 }
@@ -200,10 +204,7 @@ export default function Modal({
         aria-modal="true"
         aria-label={title || 'Modal'}
         tabIndex={-1}
-        className={`
-          ${styles.modal}
-          ${className}
-        `}
+        className={clsx(styles.modal, className)}
         style={{ maxWidth }}
         onClick={handleModalClick}
       >

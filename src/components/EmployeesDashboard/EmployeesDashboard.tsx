@@ -12,37 +12,74 @@
  */
 'use client';
 
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AppHeader from '../AppHeader';
 import Button from '../Button';
-import SearchInput from '../SearchInput';
-import { CirclePlus, SlidersHorizontal } from 'lucide-react';
+import TableToolbar from '../TableToolbar';
+import { CirclePlus } from 'lucide-react';
 import styles from './EmployeesDashboard.module.scss';
 import DataTable from '../DataTable';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
-import Pagination from '../Pagination';
+import { logger } from '@/src/lib/logger';
+import { getEmployees } from '@/src/lib/actions/employees';
+import { NOTIFICATION_TYPES, STRINGS } from '@/src/constants/strings';
+import { useNotification } from '@/src/providers/NotificationProvider';
+import { useDebounce } from '@/src/hooks/useDebounce';
+import type { Employee, EmployeeColumn, EmployeeFilter, EmployeeListMeta } from '@/src/lib/types/employees';
+import type { FilterOptions } from '@/src/lib/types/filters';
+import type { FilterSelection } from '../FilterPopover';
 
-export interface Employee {
-  id: string;
-  avatar: string;
-  name: string;
-  employeeId: string;
-  department: string;
-  designation: string;
-  type: 'Office' | 'Remote';
-  status: 'Permanent' | 'Contract' | 'Probation';
+export type { Employee };
+
+const DEFAULT_SORT_BY = 'createdAt';
+const DEFAULT_SORT_ORDER = 'asc' as const;
+
+const EMPTY_SELECTION: FilterSelection = {};
+
+/**
+ * Turns the popover's selection into the request's `filters` array. Groups
+ * the user emptied are dropped rather than sent as `values: []`, which the
+ * backend would read as "match nothing".
+ */
+function toEmployeeFilters(selection: FilterSelection): EmployeeFilter[] {
+  return Object.entries(selection)
+    .filter(([, values]) => values.length > 0)
+    .map(([key, values]) => ({ key, values }));
 }
 
 /**
- * Define the props available for the EmployeesDashboard component.
+ * `name` and `status` are rendered with custom cells (avatar, badge) and are
+ * always shown regardless of what the columns API returns; every other
+ * column is driven entirely by the API response so the backend controls
+ * which employee fields appear in the table.
  */
-interface EmployeesDashboardProps {
-  label?: string;
-}
+const FIXED_COLUMN_KEYS = new Set(['name', 'status']);
 
-export default function EmployeesDashboard({ label = 'label' }: EmployeesDashboardProps) {
-  const employeeColumns: ColumnDef<Employee>[] = [
+/**
+ * `DataTable` is generic and wrapped in `memo()`, which TypeScript can't
+ * instantiate per call site — cast once here so this file stays typed for `Employee`.
+ */
+const EmployeesTable = DataTable as unknown as (props: {
+  data: Employee[];
+  columns: ColumnDef<Employee>[];
+  manualPagination?: boolean;
+  pagination?: PaginationState;
+  onPaginationChange?: (pagination: PaginationState) => void;
+  totalItems?: number;
+  isLoading?: boolean;
+}) => React.JSX.Element;
+
+function buildEmployeeColumns(apiColumns: EmployeeColumn[]): ColumnDef<Employee>[] {
+  const dynamicColumns: ColumnDef<Employee>[] = apiColumns
+    .filter((column) => !FIXED_COLUMN_KEYS.has(column.accessorKey))
+    .map((column) => ({
+      accessorKey: column.accessorKey,
+      header: column.header,
+    }));
+
+  return [
     {
       accessorKey: 'name',
       header: 'Employee Name',
@@ -64,30 +101,12 @@ export default function EmployeesDashboard({ label = 'label' }: EmployeesDashboa
       ),
     },
 
-    {
-      accessorKey: 'employeeId',
-      header: 'Employee ID',
-    },
-
-    {
-      accessorKey: 'department',
-      header: 'Department',
-    },
-
-    {
-      accessorKey: 'designation',
-      header: 'Designation',
-    },
-
-    {
-      accessorKey: 'type',
-      header: 'Type',
-    },
+    ...dynamicColumns,
 
     {
       accessorKey: 'status',
       header: 'Status',
-      cell: ({ getValue }) => <span className="statusBadge">{getValue() as string}</span>,
+      cell: ({ getValue }) => <span className={styles.statusBadge}>{getValue() as string}</span>,
     },
 
     {
@@ -97,200 +116,182 @@ export default function EmployeesDashboard({ label = 'label' }: EmployeesDashboa
 
       cell: ({ row }) => (
         <div className={styles.actions}>
-          <Eye size={20} className={clsx(styles.actionIcon)} onClick={() => console.log('View', row.original.id)} />
+          <Eye
+            size={20}
+            className={clsx(styles.actionIcon)}
+            onClick={() => logger.info('View employee', { id: row.original.id })}
+          />
 
-          <Pencil size={20} className={clsx(styles.actionIcon)} onClick={() => console.log('Edit', row.original.id)} />
+          <Pencil
+            size={20}
+            className={clsx(styles.actionIcon)}
+            onClick={() => logger.info('Edit employee', { id: row.original.id })}
+          />
 
           <Trash2
             size={20}
             className={clsx(styles.actionIcon)}
-            onClick={() => console.log('Delete', row.original.id)}
+            onClick={() => logger.info('Delete employee', { id: row.original.id })}
           />
         </div>
       ),
     },
   ];
+}
 
-  const employees = [
-    {
-      id: '1',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      name: 'Darlene Robertson',
-      employeeId: '345321231',
-      department: 'Design',
-      designation: 'UI/UX Designer',
-      type: 'Office',
-      status: 'Permanent',
-    },
-    {
-      id: '2',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      name: 'Floyd Miles',
-      employeeId: '987890345',
-      department: 'Development',
-      designation: 'PHP Developer',
-      type: 'Office',
-      status: 'Permanent',
-    },
-    {
-      id: '3',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-      name: 'Cody Fisher',
-      employeeId: '453367122',
-      department: 'Sales',
-      designation: 'Sales Manager',
-      type: 'Office',
-      status: 'Permanent',
-    },
-    {
-      id: '4',
-      avatar: 'https://i.pravatar.cc/150?img=4',
-      name: 'Dianne Russell',
-      employeeId: '345321232',
-      department: 'Sales',
-      designation: 'BDM',
-      type: 'Remote',
-      status: 'Permanent',
-    },
-    {
-      id: '5',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-      name: 'Savannah Nguyen',
-      employeeId: '453677881',
-      department: 'Design',
-      designation: 'Design Lead',
-      type: 'Office',
-      status: 'Permanent',
-    },
-    {
-      id: '6',
-      avatar: 'https://i.pravatar.cc/150?img=6',
-      name: 'Jacob Jones',
-      employeeId: '009918765',
-      department: 'Development',
-      designation: 'Python Developer',
-      type: 'Remote',
-      status: 'Permanent',
-    },
-    {
-      id: '7',
-      avatar: 'https://i.pravatar.cc/150?img=7',
-      name: 'Marvin McKinney',
-      employeeId: '238870122',
-      department: 'Development',
-      designation: 'Sr. UI Developer',
-      type: 'Remote',
-      status: 'Permanent',
-    },
-    {
-      id: '8',
-      avatar: 'https://i.pravatar.cc/150?img=8',
-      name: 'Brooklyn Simmons',
-      employeeId: '124335111',
-      department: 'PM',
-      designation: 'Project Manager',
-      type: 'Office',
-      status: 'Permanent',
-    },
-    {
-      id: '9',
-      avatar: 'https://i.pravatar.cc/150?img=9',
-      name: 'Kristin Watson',
-      employeeId: '435540099',
-      department: 'HR',
-      designation: 'HR Executive',
-      type: 'Office',
-      status: 'Permanent',
-    },
-    {
-      id: '10',
-      avatar: 'https://i.pravatar.cc/150?img=10',
-      name: 'Kathryn Murphy',
-      employeeId: '009812890',
-      department: 'Development',
-      designation: 'React JS Developer',
-      type: 'Office',
-      status: 'Permanent',
-    },
-    {
-      id: '11',
-      avatar: 'https://i.pravatar.cc/150?img=11',
-      name: 'Arlene McCoy',
-      employeeId: '671190345',
-      department: 'Development',
-      designation: 'Node JS Developer',
-      type: 'Office',
-      status: 'Permanent',
-    },
-    {
-      id: '12',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-      name: 'Devon Lane',
-      employeeId: '091233412',
-      department: 'Business Analysis',
-      designation: 'Business Analyst',
-      type: 'Remote',
-      status: 'Permanent',
-    },
-    {
-      id: '13',
-      avatar: 'https://i.pravatar.cc/150?img=13',
-      name: 'Jenny Wilson',
-      employeeId: '982341245',
-      department: 'HR',
-      designation: 'HR Manager',
-      type: 'Office',
-      status: 'Contract',
-    },
-    {
-      id: '14',
-      avatar: 'https://i.pravatar.cc/150?img=14',
-      name: 'Ronald Richards',
-      employeeId: '345982111',
-      department: 'Finance',
-      designation: 'Finance Executive',
-      type: 'Office',
-      status: 'Probation',
-    },
-    {
-      id: '15',
-      avatar: 'https://i.pravatar.cc/150?img=15',
-      name: 'Courtney Henry',
-      employeeId: '772341890',
-      department: 'QA',
-      designation: 'QA Engineer',
-      type: 'Remote',
-      status: 'Permanent',
-    },
-  ];
+/**
+ * Define the props available for the EmployeesDashboard component.
+ */
+interface EmployeesDashboardProps {
+  initialColumns: EmployeeColumn[];
+  initialEmployees: Employee[];
+  initialMeta: EmployeeListMeta;
+
+  /**
+   * Selectable filter values keyed by employee field, as returned by
+   * `/filters/employee`. Drives the accordion sections in the filter popover.
+   */
+  filterOptions: FilterOptions;
+}
+
+export default function EmployeesDashboard({
+  initialColumns,
+  initialEmployees,
+  initialMeta,
+  filterOptions,
+}: EmployeesDashboardProps) {
+  const { showNotification } = useNotification();
+
+  const employeeColumns = useMemo(() => buildEmployeeColumns(initialColumns), [initialColumns]);
+
+  const [employees, setEmployees] = useState(initialEmployees);
+  const [meta, setMeta] = useState(initialMeta);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: initialMeta.currentPage - 1,
+    pageSize: initialMeta.pageSize,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [filterSelection, setFilterSelection] = useState<FilterSelection>(EMPTY_SELECTION);
+
+  const [appliedSearch, setAppliedSearch] = useState(debouncedSearch);
+  const isFirstFetch = useRef(true);
+  /**
+   * Server Functions don't expose `fetch`'s `AbortController`/`signal`, so
+   * stale responses (e.g. from rapid pagination or search edits) are
+   * discarded by sequence number instead of being cancelled outright.
+   */
+  const latestRequestIdRef = useRef(0);
+
+  /**
+   * A new search query always restarts browsing at page 1. Adjusted during
+   * render (React's recommended pattern for derived state) rather than in an
+   * effect, so it doesn't trigger an extra render pass.
+   */
+  if (appliedSearch !== debouncedSearch) {
+    setAppliedSearch(debouncedSearch);
+
+    if (pagination.pageIndex !== 0) {
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    }
+  }
+
+  const employeeFilters = useMemo(() => toEmployeeFilters(filterSelection), [filterSelection]);
+
+  /**
+   * Applying filters narrows the result set, so the page the user was on may
+   * no longer exist — go back to the first page along with the new criteria.
+   */
+  const handleFilterChange = (selection: FilterSelection) => {
+    setFilterSelection(selection);
+    setPagination((prev) => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }));
+  };
+
+  useEffect(() => {
+    // Initial page is already provided by the server-rendered page, so skip
+    // the redundant fetch on mount.
+    if (isFirstFetch.current) {
+      isFirstFetch.current = false;
+      return;
+    }
+
+    const requestId = ++latestRequestIdRef.current;
+
+    setIsLoading(true);
+
+    getEmployees({
+      page: pagination.pageIndex + 1,
+      limit: pagination.pageSize,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+      ...(employeeFilters.length > 0 ? { filters: employeeFilters } : {}),
+      sortBy: DEFAULT_SORT_BY,
+      sortOrder: DEFAULT_SORT_ORDER,
+    })
+      .then((result) => {
+        // A newer request has since been kicked off — ignore this stale response.
+        if (latestRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        if (result.success) {
+          setEmployees(result.data);
+          setMeta(result.meta);
+        } else {
+          showNotification(
+            STRINGS.EMPLOYEES_FETCH_FAILED,
+            result.message,
+            NOTIFICATION_TYPES.ERROR,
+            5000,
+            'top-right',
+            false
+          );
+        }
+      })
+      .catch((error) => {
+        if (latestRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        logger.error('Unexpected error fetching employees:', error);
+        showNotification(STRINGS.EMPLOYEES_FETCH_FAILED, '', NOTIFICATION_TYPES.ERROR, 5000, 'top-right', false);
+      })
+      .finally(() => {
+        if (latestRequestIdRef.current === requestId) {
+          setIsLoading(false);
+        }
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.pageIndex, pagination.pageSize, debouncedSearch, employeeFilters]);
 
   return (
     <div className={styles.container}>
-      <AppHeader title="All Employees" subtitle="All Employee Information" />
+      <AppHeader title={STRINGS.ALL_EMPLOYEES} subtitle={STRINGS.ALL_EMPLOYEE_INFORMATION} />
 
       <div className={styles.content}>
-        <div className={styles.header}>
-          <SearchInput placeholder="Search employee..." />
-
-          <Button startIcon={CirclePlus} onChange={() => {}} className={styles.button}>
-            Add New Employee
+        <TableToolbar
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder={STRINGS.SEARCH_EMPLOYEE}
+          filterOptions={filterOptions}
+          onFilterChange={handleFilterChange}
+        >
+          <Button startIcon={CirclePlus} className={styles.button}>
+            {STRINGS.ADD_NEW_EMPLOYEE}
           </Button>
-
-          <Button
-            startIcon={SlidersHorizontal}
-            variant="secondary"
-            onChange={() => {}}
-            className={styles.button}
-            startIconColor="var(--color-black)"
-          >
-            Filter
-          </Button>
-        </div>
+        </TableToolbar>
 
         <div className={styles.tableContainer}>
-          <DataTable data={employees} columns={employeeColumns} />
+          <EmployeesTable
+            data={employees}
+            columns={employeeColumns}
+            manualPagination
+            pagination={pagination}
+            onPaginationChange={setPagination}
+            totalItems={meta.totalItems}
+            isLoading={isLoading}
+          />
         </div>
-        <Pagination />
       </div>
     </div>
   );

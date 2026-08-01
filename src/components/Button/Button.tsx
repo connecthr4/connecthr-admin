@@ -86,12 +86,14 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   variant?: 'primary' | 'secondary' | 'text';
 
   /**
-   *
+   * Color applied to the start icon.
+   * Overrides the icon's default color.
    */
   startIconColor?: string;
 
   /**
-   *
+   * Color applied to the end icon.
+   * Overrides the icon's default color.
    */
   endIconColor?: string;
 }

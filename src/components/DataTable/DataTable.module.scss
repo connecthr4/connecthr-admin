@@ -5,8 +5,53 @@ styles specific to the DataTable component
 **/
 
 .wrapper {
+  display: flex;
+  flex-direction: column;
+
   width: 100%;
-  overflow-x: auto;
+  height: 100%;
+  min-height: 0;
+}
+
+.scrollArea {
+  flex: 1;
+  min-height: 0;
+
+  overflow: auto;
+
+  /* Scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.bone {
+  height: 0.875rem;
+  border-radius: var(--radius-md);
+  background: var(--color-gray-200);
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 
 .table {
@@ -18,16 +63,67 @@ styles specific to the DataTable component
   text-align: left;
   font-size: 16px;
   font-weight: 500;
-  padding: 20px 24px;
-  border-bottom: 1px solid #ececec;
-  color: #8c8c8c;
+  padding: var(--spacing-7) var(--spacing-8);
+  border-bottom: 1px solid var(--color-gray-225);
+  color: var(--color-gray-600);
 }
 
 .table tbody td {
-  padding: 18px 24px;
-  border-bottom: 1px solid #f1f1f1;
+  padding: 18px var(--spacing-8);
+  border-bottom: 1px solid var(--color-gray-175);
 }
 
 .table tbody tr:hover {
-  background: #fafafa;
+  background: var(--color-gray-150);
+}
+
+.footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-5);
+  padding: var(--spacing-7) var(--spacing-8) var(--spacing-1);
+}
+
+.pageSizeControl {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.pageSizeDropdown {
+  width: 5.5rem;
+}
+
+.footerLabel {
+  color: var(--color-gray-500);
+  white-space: nowrap;
+}
+
+.table tbody td.emptyCell {
+  padding: 4rem var(--spacing-8);
+  border-bottom: none;
+  text-align: center;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-5);
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-400);
+}
+
+.emptyText {
+  color: var(--color-gray-500);
+  text-align: center;
 }

@@ -39,19 +39,6 @@ export const DefaultChecked: Story = {
   },
 };
 
-export const Indeterminate: Story = {
-  args: {
-    indeterminate: true,
-  },
-};
-
-export const Required: Story = {
-  args: {
-    label: 'I agree to the privacy policy',
-    required: true,
-  },
-};
-
 export const Disabled: Story = {
   args: {
     disabled: true,

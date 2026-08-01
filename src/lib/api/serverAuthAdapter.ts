@@ -18,7 +18,19 @@ import type { RefreshTokenResponse } from './types';
 export class ServerAuthAdapter implements ApiAuthAdapter {
   private refreshPromise: Promise<string> | null = null;
 
+  /**
+   * Set after a successful refresh, in case `setSession` couldn't persist
+   * the cookie (see `trySetCookies` in `session.ts`). Scoped to this
+   * request — `getServerApiClient()` creates a fresh adapter per request —
+   * so it only needs to outlive the current request's retries.
+   */
+  private inMemoryAccessToken: string | null = null;
+
   async getAuthHeaderValue(): Promise<string | null> {
+    if (this.inMemoryAccessToken) {
+      return `Bearer ${this.inMemoryAccessToken}`;
+    }
+
     const session = await getSession();
 
     return session ? `Bearer ${session.accessToken}` : null;
@@ -61,6 +73,11 @@ export class ServerAuthAdapter implements ApiAuthAdapter {
 
     const relayedCookies = response.headers.getSetCookie();
     const refreshCarrier = relayedCookies.length > 0 ? buildCookieCarrier(relayedCookies) : session.refreshCarrier;
+
+    // Cache immediately so this request's retry (and any concurrent calls
+    // sharing this adapter instance) pick up the fresh token even when the
+    // cookie write below is a no-op.
+    this.inMemoryAccessToken = data.accessToken;
 
     await setSession({ accessToken: data.accessToken, refreshCarrier });
 

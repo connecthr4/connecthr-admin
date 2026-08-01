@@ -13,7 +13,7 @@
 'use client';
 
 import AppHeader from '@/src/components/AppHeader';
-import { getGreeting } from '@/src/utils/date';
+import { useGreeting } from '@/src/hooks/useGreeting';
 import styles from './Dashboard.module.scss';
 import StatsSummaryCard from '../StatsSummaryCard';
 import { Users, CalendarCheck, CalendarMinus } from 'lucide-react';
@@ -27,6 +27,8 @@ import { useAuthStore } from '@/src/store/auth/useAuthStore';
  */
 export default function Dashboard() {
   const userDetails = useAuthStore((state) => state.user);
+  const greeting = useGreeting();
+
   const dashboardStats = [
     {
       id: 1,
@@ -59,7 +61,7 @@ export default function Dashboard() {
   ];
   return (
     <div className={styles.container}>
-      <AppHeader title={`Hello, ${userDetails?.name || 'User'}`} subtitle={getGreeting()} userDetails={userDetails} />
+      <AppHeader title={`Hello, ${userDetails?.name || 'User'}`} subtitle={greeting} userDetails={userDetails} />
 
       <div className={styles.statsSummaryGrid}>
         {dashboardStats.map((item) => (
