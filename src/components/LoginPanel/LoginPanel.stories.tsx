@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { NotificationProvider } from '@/src/providers/NotificationProvider';
 import LoginPanel from './LoginPanel';
 
 const meta = {
@@ -10,13 +9,6 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  decorators: [
-    (Story) => (
-      <NotificationProvider>
-        <Story />
-      </NotificationProvider>
-    ),
-  ],
   argTypes: {
     step: {
       control: 'select',
