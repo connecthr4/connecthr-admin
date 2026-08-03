@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/nextjs-vite';
 import { Lexend } from 'next/font/google';
+import { NotificationProvider } from '../src/providers/NotificationProvider';
 import '../src/app/globals.css';
 import '../src/app/styleguide.css';
 
@@ -10,6 +11,13 @@ const lexend = Lexend({
 
 const preview: Preview = {
   parameters: {
+    // This app is App Router only. Without `appDirectory`, the framework mounts the
+    // Pages Router context instead, so any component calling a `next/navigation` hook
+    // throws while rendering (which fails Chromatic snapshots as "component errors").
+    nextjs: {
+      appDirectory: true,
+    },
+
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -25,10 +33,14 @@ const preview: Preview = {
     },
   },
   decorators: [
+    // Components that call `useNotification` throw without a provider above them,
+    // so mount it globally rather than per story.
     (Story) => (
-      <div className={lexend.variable}>
-        <Story />
-      </div>
+      <NotificationProvider>
+        <div className={lexend.variable}>
+          <Story />
+        </div>
+      </NotificationProvider>
     ),
   ],
 };
