@@ -30,11 +30,18 @@ import { useDebounce } from '@/src/hooks/useDebounce';
 import type { Employee, EmployeeColumn, EmployeeFilter, EmployeeListMeta } from '@/src/lib/types/employees';
 import type { FilterOptions } from '@/src/lib/types/filters';
 import type { FilterSelection } from '../FilterPopover';
+import { useRouter } from 'next/navigation';
 
 export type { Employee };
 
-const DEFAULT_SORT_BY = 'createdAt';
-const DEFAULT_SORT_ORDER = 'asc' as const;
+/**
+ * Newest first: an employee who was just added through the wizard is the one the user is
+ * most likely looking for, and with server-side pagination they would otherwise land on
+ * the last page. Exported so the server-rendered first page is ordered the same way — the
+ * two would silently disagree if each kept its own default.
+ */
+export const DEFAULT_SORT_BY = 'createdAt';
+export const DEFAULT_SORT_ORDER = 'desc' as const;
 
 const EMPTY_SELECTION: FilterSelection = {};
 
@@ -104,7 +111,7 @@ function buildEmployeeColumns(apiColumns: EmployeeColumn[]): ColumnDef<Employee>
     ...dynamicColumns,
 
     {
-      accessorKey: 'status',
+      accessorKey: 'employmentStatus',
       header: 'Status',
       cell: ({ getValue }) => <span className={styles.statusBadge}>{getValue() as string}</span>,
     },
@@ -161,7 +168,7 @@ export default function EmployeesDashboard({
   filterOptions,
 }: EmployeesDashboardProps) {
   const { showNotification } = useNotification();
-
+  const router = useRouter();
   const employeeColumns = useMemo(() => buildEmployeeColumns(initialColumns), [initialColumns]);
 
   const [employees, setEmployees] = useState(initialEmployees);
@@ -276,7 +283,7 @@ export default function EmployeesDashboard({
           filterOptions={filterOptions}
           onFilterChange={handleFilterChange}
         >
-          <Button startIcon={CirclePlus} className={styles.button}>
+          <Button startIcon={CirclePlus} className={styles.button} onClick={() => router.push('/employees/new')}>
             {STRINGS.ADD_NEW_EMPLOYEE}
           </Button>
         </TableToolbar>

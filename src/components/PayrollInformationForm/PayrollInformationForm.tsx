@@ -15,8 +15,7 @@ import { useEmployeeStore } from '@/src/store/employeeStore';
 import DynamicForm from '../DynamicForm';
 import { FieldConfig, FieldWidth } from '../DynamicForm/DynamicForm';
 import { Text1 } from '../Typography';
-import styles from './PayrollInformationForm.module.scss';
-import { payrollInformationSchema } from './PayrollInformationForm.schema';
+import { payrollInformationSchema, PayrollInformationFormValues } from './PayrollInformationForm.schema';
 
 /**
  * Define the props available for the PayrollInformationForm component.
@@ -26,7 +25,7 @@ interface PayrollInformationFormProps {
   footer?: React.ReactNode;
 }
 
-export const payrollInformationFormConfig: FieldConfig[] = [
+export const payrollInformationFormConfig: FieldConfig<PayrollInformationFormValues>[] = [
   {
     name: 'bankAccountDetailsLabel',
     label: 'Bank Account Details',

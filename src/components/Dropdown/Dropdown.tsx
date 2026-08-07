@@ -13,9 +13,8 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Label, Text3 } from '../Typography/Typography';
+import { ErrorText, Label, Text3 } from '../Typography/Typography';
 import { ChevronDown, Loader2, Search } from 'lucide-react';
-
 import styles from './Dropdown.module.scss';
 
 export interface DropdownOption {
@@ -110,8 +109,7 @@ export default function Dropdown({
     <div className={styles.container}>
       {label && (
         <Label>
-          {label}
-          {required && <Text3 className={styles.asterisk}>*</Text3>}
+          {label} {required && <Text3 className={styles.asterisk}>*</Text3>}
         </Label>
       )}
 
@@ -175,7 +173,7 @@ export default function Dropdown({
         )}
       </div>
 
-      {error && <Text3 className={styles.errorText}>{error}</Text3>}
+      {error && <ErrorText>{error}</ErrorText>}
     </div>
   );
 }

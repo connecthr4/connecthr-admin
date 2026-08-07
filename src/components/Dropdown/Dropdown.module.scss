@@ -38,6 +38,16 @@ styles specific to the Dropdown component
   &:focus {
     border-color: var(--color-violet-600);
   }
+
+  &:disabled {
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-500);
+    cursor: not-allowed;
+
+    &:hover {
+      border-color: var(--color-border);
+    }
+  }
 }
 
 .triggerError {
@@ -133,11 +143,6 @@ styles specific to the Dropdown component
   padding: 16px;
   text-align: center;
   color: var(--color-gray-500);
-}
-
-.errorText {
-  margin-top: 4px;
-  color: var(--color-red-500);
 }
 
 .asterisk {

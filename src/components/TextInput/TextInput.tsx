@@ -16,7 +16,7 @@ import { ReactNode, useState } from 'react';
 import { EyeOff, Eye } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './TextInput.module.scss';
-import { Label, Text3 } from '../Typography/Typography';
+import { ErrorText, Label, Text3 } from '../Typography/Typography';
 
 /**
  * Define the props available for the TextInput component.
@@ -207,7 +207,7 @@ export default function TextInput({
         )}
       </div>
 
-      {error && <p className={styles.errorText}>{error}</p>}
+      {error && <ErrorText>{error}</ErrorText>}
     </div>
   );
 }

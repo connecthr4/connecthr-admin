@@ -20,7 +20,7 @@ export const API_ENDPOINTS = {
 
     FILTER_OPTIONS: '/employees/filter-options',
 
-    CREATE: '/employees',
+    CREATE: '/employees/create',
 
     GET_BY_ID: (id: string) => `/employees/${id}`,
 
@@ -41,6 +41,12 @@ export const API_ENDPOINTS = {
     CREATE_HOLIDAY: '/holidays',
 
     DELETE_HOLIDAY: (id: string) => `/holidays/${id}`,
+  },
+
+  LOCATIONS: {
+    GET_STATES: '/locations/states',
+
+    GET_DISTRICTS: (stateCode: string) => `/locations/states/${encodeURIComponent(stateCode)}/districts`,
   },
 
   COMMON: {

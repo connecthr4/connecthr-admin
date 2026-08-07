@@ -1,0 +1,24 @@
+/**
+------------------------------------------------------
+styles specific to the DocumentUpload component
+------------------------------------------------------
+**/
+
+.form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Placeholder for the upload fields, so the actions stay pinned below them. */
+.content {
+  flex: 1;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 24px;
+}

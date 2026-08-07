@@ -13,10 +13,9 @@
 
 import { useEmployeeStore } from '@/src/store/employeeStore';
 import DynamicForm from '../DynamicForm';
-import { FieldWidth } from '../DynamicForm/DynamicForm';
+import { FieldConfig, FieldWidth } from '../DynamicForm/DynamicForm';
 import { Text1 } from '../Typography';
-import styles from './ProfessionalInformationForm.module.scss';
-import { professionalInformationSchema } from './ProfessionalInformationForm.schema';
+import { professionalInformationSchema, ProfessionalInformationFormValues } from './ProfessionalInformationForm.schema';
 
 /**
  * Define the props available for the ProfessionalInformationForm component.
@@ -26,7 +25,15 @@ interface ProfessionalInformationFormProps {
   footer?: React.ReactNode;
 }
 
-export const professionalInformationFormConfig: FieldConfig[] = [
+/**
+ * A joining date can be back-dated for employees onboarded after the fact, but never set in
+ * the future. Both bounds are evaluated when this module is first imported, so a tab left
+ * open across midnight keeps the previous day's ceiling until it is reloaded.
+ */
+const EARLIEST_JOINING_DATE = new Date(1990, 0, 1);
+const LATEST_JOINING_DATE = new Date();
+
+export const professionalInformationFormConfig: FieldConfig<ProfessionalInformationFormValues>[] = [
   {
     name: 'employmentDetailsLabel',
     label: 'Employment Details',
@@ -49,14 +56,24 @@ export const professionalInformationFormConfig: FieldConfig[] = [
     type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
+    // Values are the labels themselves: the create endpoint takes the display text
+    // ("Full Time", "Part Time", ...) and rejects anything outside that set.
     options: [
       {
-        label: 'Full-Time',
-        value: 'full_time',
+        label: 'Full Time',
+        value: 'Full Time',
+      },
+      {
+        label: 'Part Time',
+        value: 'Part Time',
       },
       {
         label: 'Contract',
-        value: 'contract',
+        value: 'Contract',
+      },
+      {
+        label: 'Intern',
+        value: 'Intern',
       },
     ],
   },
@@ -64,17 +81,28 @@ export const professionalInformationFormConfig: FieldConfig[] = [
     name: 'employmentStatus',
     label: 'Employment Status',
     placeholder: 'Select Employment Status',
-    type: 'input',
+    type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
+    // A new employee always starts as Active, so the field is seeded from the store
+    // and locked rather than left for the user to pick.
+    disabled: true,
     options: [
       {
         label: 'Active',
-        value: 'active',
+        value: 'Active',
       },
       {
-        label: 'In Active',
-        value: 'inActive',
+        label: 'Inactive',
+        value: 'Inactive',
+      },
+      {
+        label: 'On Notice',
+        value: 'On Notice',
+      },
+      {
+        label: 'Exited',
+        value: 'Exited',
       },
     ],
   },
@@ -85,26 +113,28 @@ export const professionalInformationFormConfig: FieldConfig[] = [
     type: 'datePicker',
     width: FieldWidth.HALF,
     required: true,
+    minDate: EARLIEST_JOINING_DATE,
+    maxDate: LATEST_JOINING_DATE,
   },
   {
     name: 'department',
     label: 'Department',
     placeholder: 'Select Department',
-    type: 'input',
+    type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
     options: [
       {
         label: 'Engineering',
-        value: 'engineering',
+        value: 'Engineering',
       },
       {
         label: 'Finance',
-        value: 'finance',
+        value: 'Finance',
       },
       {
         label: 'Quality Assurance',
-        value: 'quality_assurance',
+        value: 'Quality Assurance',
       },
     ],
   },

@@ -1,6 +1,12 @@
 import { ApiClient } from './client';
 import { API_ENDPOINTS } from './endpoints';
-import { GetEmployeeColumnsResponse, GetEmployeesRequest, GetEmployeesResponse } from '../types/employees';
+import {
+  CreateEmployeeRequest,
+  CreateEmployeeResponse,
+  GetEmployeeColumnsResponse,
+  GetEmployeesRequest,
+  GetEmployeesResponse,
+} from '../types/employees';
 import { GetFiltersResponse } from '../types/filters';
 
 const FILTER_MODULE = 'employee';
@@ -15,6 +21,10 @@ export const EmployeesApi = {
 
   getEmployees(client: ApiClient, data: GetEmployeesRequest) {
     return client.post<GetEmployeesResponse>(API_ENDPOINTS.EMPLOYEE.LIST, data);
+  },
+
+  createEmployee(client: ApiClient, data: CreateEmployeeRequest) {
+    return client.post<CreateEmployeeResponse>(API_ENDPOINTS.EMPLOYEE.CREATE, data);
   },
 
   getFilterOptions(client: ApiClient) {

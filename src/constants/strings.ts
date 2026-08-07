@@ -60,6 +60,14 @@ export const STRINGS = {
   ALL_EMPLOYEE_INFORMATION: 'All Employee Information',
   ADD_NEW_EMPLOYEE: 'Add New Employee',
   SEARCH_EMPLOYEE: 'Search employee...',
+  EMPLOYEE_CREATED_SUCCESSFULLY: 'Employee created successfully',
+  EMPLOYEE_CREATION_FAILED: 'Employee creation failed',
+  EMPLOYEE_ID: 'Employee ID',
+  DEPARTMENT: 'Department',
+  DESIGNATION: 'Designation',
+  EMPLOYEE_TYPE: 'Employee Type',
+  EMPLOYMENT_STATUS: 'Employment Status',
+  BACK_TO_ALL_EMPLOYEES: 'Back to All Employees',
 };
 
 export const STEPS = [
@@ -90,6 +98,7 @@ export const ROUTES = {
   LOGIN: '/login',
   RESET_PASSWORD: '/reset-password',
   DASHBOARD: '/dashboard',
+  EMPLOYEES: '/employees',
 } as const;
 
 export const NOTIFICATION_TYPES: Record<string, NotificationType> = {
