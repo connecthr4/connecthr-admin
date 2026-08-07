@@ -30,7 +30,8 @@ export type TypographyVariant =
   | 'text4'
   | 'label'
   | 'caption'
-  | 'navLabel';
+  | 'navLabel'
+  | 'errorText';
 
 export type TextAlign = 'left' | 'center' | 'right' | 'justify' | 'start' | 'end' | 'match-parent';
 
@@ -81,6 +82,12 @@ export type TypographyProps = {
    * Custom text color.
    */
   color?: string;
+
+  /**
+   * Associates the text with a form control. Only meaningful when rendering as a label,
+   * which HTMLAttributes alone does not cover.
+   */
+  htmlFor?: string;
 } & React.HTMLAttributes<HTMLElement>;
 
 function Typography({
@@ -138,3 +145,9 @@ export const Label = (props: Props) => <Typography as="label" variant="label" {.
 export const Caption = (props: Props) => <Typography as="span" variant="caption" {...props} />;
 
 export const NavLabel = (props: Props) => <Typography as="span" variant="navLabel" {...props} />;
+
+/**
+ * Validation message rendered beneath a form control. Block level like the paragraph it
+ * replaces, so the offset above it applies.
+ */
+export const ErrorText = (props: Props) => <Typography as="p" variant="errorText" {...props} />;

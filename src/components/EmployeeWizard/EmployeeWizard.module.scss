@@ -56,3 +56,59 @@ styles specific to the EmployeeWizard component
   display: flex;
   gap: 12px;
 }
+
+/* Confirmation modal shown once the employee has been created. */
+
+.createdModal {
+  min-width: 450px;
+}
+
+.createdContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  margin-top: var(--spacing-7);
+}
+
+.createdName {
+  font-weight: 600;
+}
+
+.createdDetails {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1.5rem;
+
+  margin: 0;
+  padding: 1rem;
+
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.createdDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  min-width: 0;
+}
+
+.createdLabel {
+  color: var(--color-gray-500);
+}
+
+.createdValue {
+  margin: 0;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.createdActions {
+  display: flex;
+  justify-content: flex-end;
+}

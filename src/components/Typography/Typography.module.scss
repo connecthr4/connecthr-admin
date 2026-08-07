@@ -70,6 +70,16 @@ styles specific to the Typography component
     font-weight: 400;
   }
 
+  // Validation message shown beneath a form control. Carries its own offset so every
+  // control renders the message identically without repeating the rule.
+  &.errorText {
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 400;
+    color: var(--color-red-500);
+    margin-top: var(--spacing-1);
+  }
+
   &.NavLabel {
     font-size: 16px;
     line-height: 24px;

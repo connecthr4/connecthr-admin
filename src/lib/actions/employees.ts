@@ -7,7 +7,12 @@ import { UnauthorizedError } from '../api/errors';
 import { getApiErrorInfo } from '../api/helpers';
 import { logger } from '../logger';
 import { ROUTES } from '../../constants/strings';
-import type { GetEmployeesRequest, GetEmployeesResult } from '../types/employees';
+import type {
+  CreateEmployeeRequest,
+  CreateEmployeeResult,
+  GetEmployeesRequest,
+  GetEmployeesResult,
+} from '../types/employees';
 
 /**
  * Server Function — called directly from `EmployeesDashboard` (a Client
@@ -27,6 +32,29 @@ export async function getEmployees(request: GetEmployeesRequest): Promise<GetEmp
     }
 
     logger.error('Error occurred while fetching employees:', error);
+    const { message } = getApiErrorInfo(error);
+
+    return { success: false, message };
+  }
+}
+
+/**
+ * Server Function — called from the wizard's final step. Going through a Server Function
+ * rather than a Route Handler keeps this a single round trip with an end-to-end typed
+ * payload, and no backend URL or token is ever exposed to the browser.
+ */
+export async function createEmployee(request: CreateEmployeeRequest): Promise<CreateEmployeeResult> {
+  try {
+    const client = getServerApiClient();
+    const response = await EmployeesApi.createEmployee(client, request);
+
+    return { success: true, message: response.message, data: response.data };
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(ROUTES.LOGIN);
+    }
+
+    logger.error('Error occurred while creating employee:', error);
     const { message } = getApiErrorInfo(error);
 
     return { success: false, message };
