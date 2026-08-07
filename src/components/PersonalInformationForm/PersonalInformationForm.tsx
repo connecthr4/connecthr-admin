@@ -11,21 +11,45 @@
  * ```
  */
 
-import DynamicForm, { FieldConfig, FieldWidth } from '../DynamicForm/DynamicForm';
+import { useMemo } from 'react';
 import { Text1 } from '../Typography';
-import { personalInformationSchema } from './PersonalInformationForm.schema';
-import styles from './PersonalInformationForm.module.scss';
 import { useEmployeeStore } from '@/src/store/employeeStore';
+import DynamicForm, { FieldConfig, FieldWidth } from '../DynamicForm/DynamicForm';
+import { LocationsClient } from '@/src/lib/api/locationsClient';
+import { personalInformationSchema, PersonalInformationFormValues } from './PersonalInformationForm.schema';
+import type { DropdownOption } from '../Dropdown/Dropdown';
+
+/**
+ * Resolves the address dropdowns. Both lists come from the backend, and both are taken as
+ * props so Storybook and tests can render the form without one — the defaults go through
+ * `LocationsClient`, which caches each list for the lifetime of the page.
+ */
+export interface LocationOptionLoaders {
+  loadStateOptions?: () => Promise<DropdownOption[]>;
+  loadDistrictOptions?: (stateCode: string) => Promise<DropdownOption[]>;
+}
 
 /**
  * Define the props available for the PersonalInformationForm component.
  */
-interface PersonalInformationFormProps {
-  onSubmit: (data: PersonalInformationFormData) => void;
+interface PersonalInformationFormProps extends LocationOptionLoaders {
+  onSubmit: (data: PersonalInformationFormValues) => void;
   footer?: React.ReactNode;
 }
 
-export const personalInformationFormConfig: FieldConfig[] = [
+const today = new Date();
+
+/**
+ * DatePicker can only navigate between startMonth and endMonth, which fall back to
+ * 2024-2035, so a date of birth needs an explicit range to be reachable at all.
+ */
+const EARLIEST_DATE_OF_BIRTH = new Date(today.getFullYear() - 100, 0, 1);
+const LATEST_DATE_OF_BIRTH = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+export const createPersonalInformationFormConfig = ({
+  loadStateOptions = LocationsClient.getStateOptions,
+  loadDistrictOptions = LocationsClient.getDistrictOptions,
+}: LocationOptionLoaders = {}): FieldConfig<PersonalInformationFormValues>[] => [
   {
     name: 'personalDetailsLabel',
     label: 'Personal Details',
@@ -70,6 +94,8 @@ export const personalInformationFormConfig: FieldConfig[] = [
     type: 'datePicker',
     width: FieldWidth.HALF,
     required: true,
+    minDate: EARLIEST_DATE_OF_BIRTH,
+    maxDate: LATEST_DATE_OF_BIRTH,
   },
   {
     name: 'gender',
@@ -81,11 +107,15 @@ export const personalInformationFormConfig: FieldConfig[] = [
     options: [
       {
         label: 'Male',
-        value: 'male',
+        value: 'Male',
       },
       {
         label: 'Female',
-        value: 'female',
+        value: 'Female',
+      },
+      {
+        label: 'Other',
+        value: 'Other',
       },
     ],
   },
@@ -101,9 +131,27 @@ export const personalInformationFormConfig: FieldConfig[] = [
     name: 'maritalStatus',
     label: 'Marital Status',
     placeholder: 'Select Marital Status',
-    type: 'input',
+    type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
+    options: [
+      {
+        label: 'Single',
+        value: 'Single',
+      },
+      {
+        label: 'Married',
+        value: 'Married',
+      },
+      {
+        label: 'Divorced',
+        value: 'Divorced',
+      },
+      {
+        label: 'Widowed',
+        value: 'Widowed',
+      },
+    ],
   },
   {
     name: 'aadhaarNumber',
@@ -128,19 +176,31 @@ export const personalInformationFormConfig: FieldConfig[] = [
     required: true,
   },
   {
+    name: 'currentState',
+    label: 'Current State',
+    placeholder: 'Select Current State',
+    type: 'dropdown',
+    width: FieldWidth.HALF,
+    required: true,
+    searchable: true,
+    asyncOptions: { load: loadStateOptions },
+  },
+  {
+    name: 'currentDistrictCode',
+    label: 'Current District',
+    placeholder: 'Select Current District',
+    type: 'dropdown',
+    width: FieldWidth.HALF,
+    required: true,
+    searchable: true,
+    asyncOptions: { dependsOn: 'currentState', load: loadDistrictOptions },
+  },
+  {
     name: 'currentCity',
     label: 'Current City',
     placeholder: 'Enter Current City',
     type: 'input',
-    width: FieldWidth.THIRD,
-    required: true,
-  },
-  {
-    name: 'currentState',
-    label: 'Current State',
-    placeholder: 'Enter Current State',
-    type: 'input',
-    width: FieldWidth.THIRD,
+    width: FieldWidth.HALF,
     required: true,
   },
   {
@@ -148,7 +208,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     label: 'Current PIN Code',
     placeholder: 'Enter Current PIN Code',
     type: 'input',
-    width: FieldWidth.THIRD,
+    width: FieldWidth.HALF,
     required: true,
   },
   {
@@ -164,6 +224,10 @@ export const personalInformationFormConfig: FieldConfig[] = [
       {
         source: 'currentCity',
         target: 'permanentCity',
+      },
+      {
+        source: 'currentDistrictCode',
+        target: 'permanentDistrictCode',
       },
       {
         source: 'currentState',
@@ -185,20 +249,33 @@ export const personalInformationFormConfig: FieldConfig[] = [
     disabledWhen: 'sameAsCurrentAddress',
   },
   {
+    name: 'permanentState',
+    label: 'Permanent State',
+    placeholder: 'Select Permanent State',
+    type: 'dropdown',
+    width: FieldWidth.HALF,
+    required: true,
+    searchable: true,
+    disabledWhen: 'sameAsCurrentAddress',
+    asyncOptions: { load: loadStateOptions },
+  },
+  {
+    name: 'permanentDistrictCode',
+    label: 'Permanent District',
+    placeholder: 'Select Permanent District',
+    type: 'dropdown',
+    width: FieldWidth.HALF,
+    required: true,
+    searchable: true,
+    disabledWhen: 'sameAsCurrentAddress',
+    asyncOptions: { dependsOn: 'permanentState', load: loadDistrictOptions },
+  },
+  {
     name: 'permanentCity',
     label: 'Permanent City',
     placeholder: 'Enter Permanent City',
     type: 'input',
-    width: FieldWidth.THIRD,
-    required: true,
-    disabledWhen: 'sameAsCurrentAddress',
-  },
-  {
-    name: 'permanentState',
-    label: 'Permanent State',
-    placeholder: 'Enter Permanent State',
-    type: 'input',
-    width: FieldWidth.THIRD,
+    width: FieldWidth.HALF,
     required: true,
     disabledWhen: 'sameAsCurrentAddress',
   },
@@ -207,7 +284,7 @@ export const personalInformationFormConfig: FieldConfig[] = [
     label: 'Permanent PIN Code',
     placeholder: 'Enter Permanent PIN Code',
     type: 'input',
-    width: FieldWidth.THIRD,
+    width: FieldWidth.HALF,
     required: true,
     disabledWhen: 'sameAsCurrentAddress',
   },
@@ -251,12 +328,27 @@ export const personalInformationFormConfig: FieldConfig[] = [
   },
 ];
 
-export default function PersonalInformationForm({ onSubmit, footer }: PersonalInformationFormProps) {
+export default function PersonalInformationForm({
+  onSubmit,
+  footer,
+  loadStateOptions,
+  loadDistrictOptions,
+}: PersonalInformationFormProps) {
   const personalInformation = useEmployeeStore((state) => state.personalInformation);
+
+  /*
+    The config carries the option loaders, so it has to be rebuilt whenever they change —
+    and kept stable otherwise, since DynamicForm reloads the address dropdowns whenever the
+    field list changes identity.
+  */
+  const fields = useMemo(
+    () => createPersonalInformationFormConfig({ loadStateOptions, loadDistrictOptions }),
+    [loadStateOptions, loadDistrictOptions]
+  );
 
   return (
     <DynamicForm
-      fields={personalInformationFormConfig}
+      fields={fields}
       schema={personalInformationSchema}
       defaultValues={personalInformation}
       onSubmit={onSubmit}

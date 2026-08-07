@@ -1,3 +1,3 @@
-import PersonalInformationForm from './PersonalInformationForm'
+import PersonalInformationForm from './PersonalInformationForm';
 
-export default PersonalInformationForm
+export default PersonalInformationForm;

@@ -4,6 +4,7 @@
 
 import { redirect } from 'next/navigation';
 import EmployeesDashboard from '@/src/components/EmployeesDashboard';
+import { DEFAULT_SORT_BY, DEFAULT_SORT_ORDER } from '@/src/components/EmployeesDashboard/EmployeesDashboard';
 import { getServerApiClient } from '@/src/lib/api/getServerApiClient';
 import { EmployeesApi } from '@/src/lib/api/employees';
 import { UnauthorizedError } from '@/src/lib/api/errors';
@@ -51,8 +52,8 @@ export default async function EmployeesPage() {
       EmployeesApi.getEmployees(client, {
         page: 1,
         limit: DEFAULT_PAGE_SIZE,
-        sortBy: 'createdAt',
-        sortOrder: 'asc',
+        sortBy: DEFAULT_SORT_BY,
+        sortOrder: DEFAULT_SORT_ORDER,
       }),
     ]);
 

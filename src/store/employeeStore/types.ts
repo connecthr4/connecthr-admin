@@ -1,54 +1,27 @@
-export interface PersonalInformation {
-  firstName: string;
-  lastName: string;
-  mobileNumber: string;
-  email: string;
-  dateOfBirth: string;
-  gender: string;
-  nationality: string;
-  maritalStatus: string;
-  aadhaarNumber: string;
-  currentAddress: string;
-  currentCity: string;
-  currentState: string;
-  currentPinCode: string;
-  permanentAddress: string;
-  permanentCity: string;
-  permanentState: string;
-  permanentPinCode: string;
-  emergencyContactName: string;
-  emergencyRelationship: string;
-  emergencyPhoneNumber: string;
-  emergencyAddress: string;
-}
+/**
+ * The three section shapes live with the API contract, since they are what the create
+ * endpoint accepts — the store just holds one of each while the wizard is in progress.
+ */
+export type { PersonalInformation, ProfessionalInformation, PayrollInformation } from '@/src/lib/types/employees';
 
-export interface ProfessionalInformation {
+import type { PersonalInformation, ProfessionalInformation, PayrollInformation } from '@/src/lib/types/employees';
+
+/**
+ * The professional step also shows the backend-assigned Employee ID as a read-only field.
+ * It is held here so the form can render it, but it is not part of the create payload —
+ * `EmployeeWizard` picks the contract fields out of this when it submits.
+ */
+export interface ProfessionalInformationDraft extends ProfessionalInformation {
   employeeID: string;
-  employeeType: string;
-  employmentStatus: string;
-  dateOfJoining: string;
-  department: string;
-}
-
-export interface PayrollInformation {
-  accountHolderName: string;
-  bankName: string;
-  accountNumber: string;
-  confirmAccountNumber: string;
-  ifscCode: string;
-  branchName: string;
-  panNumber: string;
-  uanNumber: string;
-  esicNumber: string;
 }
 
 export interface EmployeeStoreState {
   personalInformation: PersonalInformation;
-  professionalInformation: ProfessionalInformation;
+  professionalInformation: ProfessionalInformationDraft;
   payrollInformation: PayrollInformation;
 
   setPersonalInformation: (data: Partial<PersonalInformation>) => void;
-  setProfessionalInformation: (data: Partial<ProfessionalInformation>) => void;
+  setProfessionalInformation: (data: Partial<ProfessionalInformationDraft>) => void;
   setPayrollInformation: (data: Partial<PayrollInformation>) => void;
 
   resetEmployeeData: () => void;

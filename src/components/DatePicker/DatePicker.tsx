@@ -15,7 +15,7 @@
 import { useMemo, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import TextInput from '@/src/components/TextInput';
-import { DayPicker, DateRange } from '@daypicker/react';
+import { DayPicker, DateRange, Matcher } from '@daypicker/react';
 import '@daypicker/react/style.css';
 import { formatDisplayDate, parseLocalDate } from '@/src/utils/date';
 import styles from './DatePicker.module.scss';
@@ -168,6 +168,24 @@ export default function DatePicker({
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(currentSelectedDate);
 
+  /*
+    minDate/maxDate only feed startMonth/endMonth, which caps how far the calendar can be
+    navigated — the days either side of the bound inside a reachable month stay clickable.
+    Turning them into matchers as well is what actually makes the bounds unselectable.
+    Both { before } and { after } are exclusive, so minDate and maxDate remain valid picks.
+  */
+  const disabledDates = useMemo(() => {
+    const matchers: Matcher[] = [];
+
+    if (minDate) matchers.push({ before: minDate });
+
+    if (maxDate) matchers.push({ after: maxDate });
+
+    if (disabled?.length) matchers.push(...disabled);
+
+    return matchers;
+  }, [minDate, maxDate, disabled]);
+
   const [selectedMultiple, setSelectedMultiple] = useState<Date[] | undefined>(initialSelectedMultipleDates);
 
   const [range, setRange] = useState<DateRange | undefined>(initialRange);
@@ -228,7 +246,7 @@ export default function DatePicker({
       disableNavigation,
       pagedNavigation: true,
       fixedWeeks: true,
-      disabled,
+      disabled: disabledDates,
       className: styles.dayPicker,
       onSelect: handleSelect,
     };

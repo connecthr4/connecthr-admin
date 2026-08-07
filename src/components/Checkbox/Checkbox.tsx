@@ -13,7 +13,7 @@
 
 import React, { useEffect, useRef, ReactNode } from 'react';
 import { clsx } from 'clsx';
-import { Text4 } from '../Typography/Typography';
+import { ErrorText, Text4 } from '../Typography/Typography';
 import styles from './Checkbox.module.scss';
 
 /**
@@ -158,7 +158,7 @@ export default function Checkbox({
         />
         {label && <Text4>{getLabelContent()}</Text4>}
       </label>
-      {error && <p className={styles.errorText}>{error}</p>}
+      {error && <ErrorText>{error}</ErrorText>}
     </>
   );
 }
