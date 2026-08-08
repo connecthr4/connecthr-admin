@@ -22,7 +22,7 @@ export const API_ENDPOINTS = {
 
     CREATE: '/employees/create',
 
-    GET_BY_ID: (id: string) => `/employees/${id}`,
+    GET_BY_ID: (id: string) => `/employees/${encodeURIComponent(id)}`,
 
     UPDATE: (id: string) => `/employees/${id}`,
 

@@ -162,3 +162,10 @@ styles specific to the EmployeeDetails component
 .infoHeader {
   margin-top: 8px;
 }
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

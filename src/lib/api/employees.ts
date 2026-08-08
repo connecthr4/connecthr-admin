@@ -4,6 +4,7 @@ import {
   CreateEmployeeRequest,
   CreateEmployeeResponse,
   GetEmployeeColumnsResponse,
+  GetEmployeeResponse,
   GetEmployeesRequest,
   GetEmployeesResponse,
 } from '../types/employees';
@@ -17,6 +18,10 @@ const FILTER_MODULE = 'employee';
 export const EmployeesApi = {
   getColumns(client: ApiClient) {
     return client.get<GetEmployeeColumnsResponse>(API_ENDPOINTS.EMPLOYEE.GET_COLUMNS);
+  },
+
+  getEmployee(client: ApiClient, employeeId: string) {
+    return client.get<GetEmployeeResponse>(API_ENDPOINTS.EMPLOYEE.GET_BY_ID(employeeId));
   },
 
   getEmployees(client: ApiClient, data: GetEmployeesRequest) {

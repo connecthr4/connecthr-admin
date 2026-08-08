@@ -12,7 +12,7 @@
  */
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AppHeader from '../AppHeader';
 import Button from '../Button';
 import TableToolbar from '../TableToolbar';
@@ -24,7 +24,7 @@ import { Eye, Pencil, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
 import { logger } from '@/src/lib/logger';
 import { getEmployees } from '@/src/lib/actions/employees';
-import { NOTIFICATION_TYPES, STRINGS } from '@/src/constants/strings';
+import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { useDebounce } from '@/src/hooks/useDebounce';
 import type { Employee, EmployeeColumn, EmployeeFilter, EmployeeListMeta } from '@/src/lib/types/employees';
@@ -78,7 +78,15 @@ const EmployeesTable = DataTable as unknown as (props: {
   isLoading?: boolean;
 }) => React.JSX.Element;
 
-function buildEmployeeColumns(apiColumns: EmployeeColumn[]): ColumnDef<Employee>[] {
+/**
+ * Row actions are handed in rather than closed over: the column definitions are built
+ * outside the component, and `router` is only available inside it.
+ */
+interface EmployeeRowActions {
+  onView: (employee: Employee) => void;
+}
+
+function buildEmployeeColumns(apiColumns: EmployeeColumn[], { onView }: EmployeeRowActions): ColumnDef<Employee>[] {
   const dynamicColumns: ColumnDef<Employee>[] = apiColumns
     .filter((column) => !FIXED_COLUMN_KEYS.has(column.accessorKey))
     .map((column) => ({
@@ -123,11 +131,7 @@ function buildEmployeeColumns(apiColumns: EmployeeColumn[]): ColumnDef<Employee>
 
       cell: ({ row }) => (
         <div className={styles.actions}>
-          <Eye
-            size={20}
-            className={clsx(styles.actionIcon)}
-            onClick={() => logger.info('View employee', { id: row.original.id })}
-          />
+          <Eye size={20} className={clsx(styles.actionIcon)} onClick={() => onView(row.original)} />
 
           <Pencil
             size={20}
@@ -169,7 +173,21 @@ export default function EmployeesDashboard({
 }: EmployeesDashboardProps) {
   const { showNotification } = useNotification();
   const router = useRouter();
-  const employeeColumns = useMemo(() => buildEmployeeColumns(initialColumns), [initialColumns]);
+  /**
+   * `router` is referentially stable, so the column definitions are built once per
+   * columns payload rather than on every render.
+   */
+  const handleViewEmployee = useCallback(
+    (employee: Employee) => {
+      router.push(`${ROUTES.EMPLOYEES}/${employee.id}`);
+    },
+    [router]
+  );
+
+  const employeeColumns = useMemo(
+    () => buildEmployeeColumns(initialColumns, { onView: handleViewEmployee }),
+    [initialColumns, handleViewEmployee]
+  );
 
   const [employees, setEmployees] = useState(initialEmployees);
   const [meta, setMeta] = useState(initialMeta);
