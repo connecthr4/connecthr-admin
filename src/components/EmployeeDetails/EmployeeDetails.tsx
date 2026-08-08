@@ -5,189 +5,191 @@
  * ```tsx
  * import EmployeeDetails from '@src/components/EmployeeDetails'
  *
- * export default function EmployeeDetails() {
- *   return <EmployeeDetails label="Hello" />;
+ * export default function EmployeeDetails({ employee }) {
+ *   return <EmployeeDetails employee={employee} />;
  * }
  * ```
  */
 'use client';
 
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import clsx from 'clsx';
+import { BriefcaseBusiness, Phone, PencilLine, UserRound, LogOut } from 'lucide-react';
 import AppHeader from '../AppHeader';
 import Button from '../Button';
-import { Heading5, Text1, Text2, Text3, Text4 } from '../Typography/Typography';
-import { BriefcaseBusiness, Phone, PencilLine, UserRound, LogOut, ClipboardList } from 'lucide-react';
-import styles from './EmployeeDetails.module.scss';
-import { useState } from 'react';
-import clsx from 'clsx';
 import Stepper from '../Stepper';
-import { STEPS } from '@/src/constants/strings';
-import { useRouter } from 'next/navigation';
+import { Heading5, Text1, Text2, Text4 } from '../Typography/Typography';
+import { ROUTES, STEPS, STRINGS } from '@/src/constants/strings';
+import { formatLongDate } from '@/src/utils/date';
+import type { EmployeeDetail } from '@/src/lib/types/employees';
+import styles from './EmployeeDetails.module.scss';
 
 /**
  * Define the props available for the EmployeeDetails component.
  */
 interface EmployeeDetailsProps {
-  label?: string;
+  employee: EmployeeDetail;
 }
 
-const personalInfo = [
+const EMPTY_VALUE = '-';
+
+interface FieldConfig {
+  label: string;
+
+  /**
+   * Reads the field off the whole record rather than off one of its sub-objects: a few
+   * displayed fields (e.g. Employee ID) live at the root, next to the section they belong to.
+   */
+  get: (employee: EmployeeDetail) => string | undefined;
+
+  fullWidth?: boolean;
+}
+
+interface SectionConfig {
+  title: string;
+  fields: FieldConfig[];
+}
+
+const personalSections: SectionConfig[] = [
   {
     title: 'Personal Details',
     fields: [
-      { label: 'First Name', value: 'Brooklyn' },
-      { label: 'Last Name', value: 'Simmons' },
-      { label: 'Mobile Number', value: '9876543210' },
-      { label: 'Email Address', value: 'brooklyn.s@example.com' },
-      { label: 'Date of Birth', value: 'July 10, 1992' },
-      { label: 'Gender', value: 'Female' },
-      { label: 'Nationality', value: 'American' },
-      { label: 'Marital Status', value: 'Single' },
-      { label: 'Aadhaar Number', value: '123456789012' },
+      { label: 'First Name', get: (e) => e.personalInformation.firstName },
+      { label: 'Last Name', get: (e) => e.personalInformation.lastName },
+      { label: 'Mobile Number', get: (e) => e.personalInformation.mobileNumber },
+      { label: 'Email Address', get: (e) => e.personalInformation.email },
+      { label: 'Date of Birth', get: (e) => formatLongDate(e.personalInformation.dateOfBirth) },
+      { label: 'Gender', get: (e) => e.personalInformation.gender },
+      { label: 'Nationality', get: (e) => e.personalInformation.nationality },
+      { label: 'Marital Status', get: (e) => e.personalInformation.maritalStatus },
+      { label: 'Aadhaar Number', get: (e) => e.personalInformation.aadhaarNumber },
     ],
   },
   {
     title: 'Address Information',
     fields: [
-      { label: 'Current Address', value: '2464 Royal Ln.' },
-      { label: 'Current City', value: 'Mesa' },
-      { label: 'Current State', value: 'New Jersey' },
-      { label: 'Current PIN Code', value: '560001' },
-      { label: 'Permanent Address', value: '2464 Royal Ln.' },
-      { label: 'Permanent City', value: 'Mesa' },
-      { label: 'Permanent State', value: 'New Jersey' },
-      { label: 'Permanent PIN Code', value: '560001' },
+      { label: 'Current Address', get: (e) => e.personalInformation.currentAddress },
+      { label: 'Current City', get: (e) => e.personalInformation.currentCity },
+      { label: 'Current District', get: (e) => e.personalInformation.currentDistrict },
+      { label: 'Current State', get: (e) => e.personalInformation.currentState },
+      { label: 'Current PIN Code', get: (e) => e.personalInformation.currentPinCode },
+      { label: 'Permanent Address', get: (e) => e.personalInformation.permanentAddress },
+      { label: 'Permanent City', get: (e) => e.personalInformation.permanentCity },
+      { label: 'Permanent District', get: (e) => e.personalInformation.permanentDistrict },
+      { label: 'Permanent State', get: (e) => e.personalInformation.permanentState },
+      { label: 'Permanent PIN Code', get: (e) => e.personalInformation.permanentPinCode },
     ],
   },
   {
     title: 'Emergency Contact Details',
     fields: [
-      { label: 'Emergency Contact Name', value: 'Robert Simmons' },
-      { label: 'Relationship', value: 'Father' },
-      { label: 'Emergency Phone Number', value: '9123456789' },
-      {
-        label: 'Emergency Address',
-        value: '123 Main Street, Mesa, New Jersey',
-        fullWidth: true,
-      },
+      { label: 'Emergency Contact Name', get: (e) => e.personalInformation.emergencyContactName },
+      { label: 'Relationship', get: (e) => e.personalInformation.emergencyRelationship },
+      { label: 'Emergency Phone Number', get: (e) => e.personalInformation.emergencyPhoneNumber },
+      { label: 'Emergency Address', get: (e) => e.personalInformation.emergencyAddress, fullWidth: true },
     ],
   },
 ];
 
-const professionalInfo = [
+const professionalSections: SectionConfig[] = [
   {
     title: 'Employment Details',
     fields: [
-      {
-        label: 'Employee ID',
-        value: 'EMP001',
-      },
-      {
-        label: 'Employee Type',
-        value: 'Full Time',
-      },
-      {
-        label: 'Employment Status',
-        value: 'Active',
-      },
-      {
-        label: 'Date of Joining',
-        value: '15 Jan 2024',
-      },
-      {
-        label: 'Department',
-        value: 'Engineering',
-      },
+      { label: STRINGS.EMPLOYEE_ID, get: (e) => e.employeeId },
+      { label: STRINGS.EMPLOYEE_TYPE, get: (e) => e.professionalInformation.employeeType },
+      { label: STRINGS.EMPLOYMENT_STATUS, get: (e) => e.professionalInformation.employmentStatus },
+      { label: 'Date of Joining', get: (e) => formatLongDate(e.professionalInformation.dateOfJoining) },
+      { label: STRINGS.DEPARTMENT, get: (e) => e.professionalInformation.department },
+      { label: STRINGS.DESIGNATION, get: (e) => e.professionalInformation.designation },
+      { label: 'Work Mode', get: (e) => e.professionalInformation.workMode },
     ],
   },
 ];
 
-const payrollInfo = [
+const payrollSections: SectionConfig[] = [
   {
     title: 'Bank Account Details',
     fields: [
-      {
-        label: 'Account Holder Name',
-        value: 'Brooklyn Simmons',
-      },
-      {
-        label: 'Bank Name',
-        value: 'HDFC Bank',
-      },
-      {
-        label: 'Account Number',
-        value: '1234567890123456',
-      },
-      {
-        label: 'Confirm Account Number',
-        value: '1234567890123456',
-      },
-      {
-        label: 'IFSC Code',
-        value: 'HDFC0001234',
-      },
-      {
-        label: 'Branch Name',
-        value: 'Koramangala Branch',
-      },
+      { label: 'Account Holder Name', get: (e) => e.payrollInformation.accountHolderName },
+      { label: 'Bank Name', get: (e) => e.payrollInformation.bankName },
+      { label: 'Account Number', get: (e) => e.payrollInformation.accountNumber },
+      { label: 'IFSC Code', get: (e) => e.payrollInformation.ifscCode },
+      { label: 'Branch Name', get: (e) => e.payrollInformation.branchName },
     ],
   },
   {
     title: 'Statutory Details',
     fields: [
-      {
-        label: 'PAN Number',
-        value: 'ABCDE1234F',
-      },
-      {
-        label: 'UAN Number',
-        value: '100200300400',
-      },
-      {
-        label: 'ESIC Number',
-        value: '1234567890',
-      },
+      { label: 'PAN Number', get: (e) => e.payrollInformation.panNumber },
+      { label: 'UAN Number', get: (e) => e.payrollInformation.uanNumber },
+      { label: 'ESIC Number', get: (e) => e.payrollInformation.esicNumber },
     ],
   },
 ];
-const documentInfo = [];
 
-const employeeSections = [
-  {
-    title: 'Personal Information',
-    data: personalInfo,
-  },
-  {
-    title: 'Professional Information',
-    data: professionalInfo,
-  },
-  {
-    title: 'Payroll Information',
-    data: payrollInfo,
-  },
-  {
-    title: 'Documents',
-    data: documentInfo,
-  },
-];
+/**
+ * Keyed by step id rather than by index so the two stay in sync if `STEPS` is reordered.
+ * Documents have no read endpoint yet, hence the empty section list and its empty state.
+ */
+const SECTIONS_BY_STEP: Record<(typeof STEPS)[number]['id'], SectionConfig[]> = {
+  'personal-information': personalSections,
+  'professional-information': professionalSections,
+  'payroll-information': payrollSections,
+  'documents': [],
+};
 
-export default function EmployeeDetails({ label = 'label' }: EmployeeDetailsProps) {
+interface DetailItem {
+  label: string;
+  value: string;
+  fullWidth?: boolean;
+}
+
+interface DetailSection {
+  title: string;
+  fields: DetailItem[];
+}
+
+/**
+ * Resolves a step's configured fields against the record. Only the visible step is
+ * resolved, so switching steps costs one pass over that step's fields and nothing more.
+ */
+function buildSections(sections: SectionConfig[], employee: EmployeeDetail): DetailSection[] {
+  return sections.map((section) => ({
+    title: section.title,
+    fields: section.fields.map((field) => ({
+      label: field.label,
+      value: field.get(employee) || EMPTY_VALUE,
+      fullWidth: field.fullWidth,
+    })),
+  }));
+}
+
+export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const activeSection = employeeSections[currentStep];
+
+  const sections = useMemo(
+    () => buildSections(SECTIONS_BY_STEP[STEPS[currentStep].id], employee),
+    [currentStep, employee]
+  );
+
   return (
     <div className={styles.container}>
       <AppHeader
-        title="Brooklyn Simmons"
-        breadcrumbs={[{ label: 'All Employees', href: '/employees' }, { label: 'Brooklyn Simmons' }]}
+        title={employee.name}
+        breadcrumbs={[{ label: STRINGS.ALL_EMPLOYEES, href: ROUTES.EMPLOYEES }, { label: employee.name }]}
       />
 
       <div className={styles.content}>
-        <EmployeeProfileHeader />
+        <EmployeeProfileHeader employee={employee} />
+
         <div className={styles.subContent}>
-          <EmployeeProfileSidebar items={profileItems} />
+          <EmployeeProfileSidebar />
+
           <div className={styles.detailsContent}>
             <Stepper currentStep={currentStep} steps={STEPS} onStepChange={setCurrentStep} />
 
-            <EmployeeInfoSection data={activeSection.data} />
+            <EmployeeInfoSection data={sections} />
           </div>
         </div>
       </div>
@@ -196,71 +198,59 @@ export default function EmployeeDetails({ label = 'label' }: EmployeeDetailsProp
 }
 
 interface EmployeeProfileHeaderProps {
-  employeeInfo: {
-    name: string;
-    designation: string;
-    phone: string;
-    avatar: string;
-  };
+  employee: EmployeeDetail;
 }
 
-function EmployeeProfileHeader({ employeeInfo }: EmployeeProfileHeaderProps) {
+function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) {
   const router = useRouter();
 
   const handleEdit = () => {
-    router.push('/employees/EMP001/edit');
+    router.push(`${ROUTES.EMPLOYEES}/${employee.id}/edit`);
   };
 
   return (
     <div className={styles.profileHeader}>
       <div className={styles.employeeInfo}>
-        <img src={employeeInfo?.avatar} alt={employeeInfo?.name} className={styles.avatar} />
+        <img src={employee.avatar} alt={employee.name} className={styles.avatar} />
+
         <div className={styles.details}>
-          <Heading5>Brooklyn Simmons</Heading5>
+          <Heading5>{employee.name}</Heading5>
+
           <div className={styles.columnContainer}>
             <div className={styles.metaItem}>
               <BriefcaseBusiness size={24} />
-              <Text4>Project Manager</Text4>
+              <Text4>{employee.professionalInformation.designation}</Text4>
             </div>
+
             <div className={styles.metaItem}>
               <Phone size={24} />
-              <Text4>3875496397</Text4>
+              <Text4>{employee.personalInformation.mobileNumber}</Text4>
             </div>
           </div>
         </div>
       </div>
+
       <Button startIcon={PencilLine} onClick={handleEdit}>
-        Edit Profile
+        {STRINGS.EDIT_PROFILE}
       </Button>
     </div>
   );
 }
 
-interface SidebarItem {
-  label: string;
-  icon: React.ElementType;
-  href?: string;
-}
-
-interface EmployeeProfileSidebarProps {
-  items: SidebarItem[];
-}
-
 export const profileItems = [
   {
-    label: 'Profile',
+    label: STRINGS.PROFILE,
     icon: UserRound,
-    href: '/attendance',
   },
   {
-    label: 'Separation',
+    label: STRINGS.SEPARATION,
     icon: LogOut,
-    href: '/projects',
   },
 ];
 
-function EmployeeProfileSidebar({}: EmployeeProfileSidebarProps) {
+function EmployeeProfileSidebar() {
   const [selectedItem, setSelectedItem] = useState(profileItems[0].label);
+
   return (
     <div className={styles.sidebar}>
       <div className={styles.itemContainer}>
@@ -285,22 +275,19 @@ function EmployeeProfileSidebar({}: EmployeeProfileSidebarProps) {
   );
 }
 
-interface DetailItem {
-  label: string;
-  value: string;
-  fullWidth?: boolean;
-}
-
-interface DetailSection {
-  title: string;
-  fields: DetailItem[];
-}
-
 interface EmployeeInfoSectionProps {
   data: DetailSection[];
 }
 
 function EmployeeInfoSection({ data }: EmployeeInfoSectionProps) {
+  if (data.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <Text2>{STRINGS.NO_DOCUMENTS_UPLOADED}</Text2>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.sectionContainer}>
       {data.map((section) => (

@@ -54,3 +54,27 @@ export const parseLocalDate = (value: string): Date | undefined => {
 
   return Number.isNaN(date.getTime()) ? undefined : date;
 };
+
+/**
+ * Fixed locale rather than the viewer's: the same string has to be produced on the server
+ * and on the client, and a locale-dependent one would hydrate as a mismatch.
+ */
+const LONG_DATE_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
+
+/**
+ * Formats an API date ("YYYY-MM-DD") for display, e.g. "01 Jun 1985".
+ * Unparseable values are passed through untouched rather than shown as "Invalid Date".
+ */
+export const formatLongDate = (value?: string): string => {
+  if (!value) {
+    return '';
+  }
+
+  const date = parseLocalDate(value);
+
+  return date ? LONG_DATE_FORMATTER.format(date) : value;
+};

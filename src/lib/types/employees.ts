@@ -104,6 +104,53 @@ export interface Employee {
   status: string;
 }
 
+/**
+ * What `/employees/:id` returns for the address lookups. Unlike the create payload it
+ * carries the resolved district *names* alongside the codes, so the details screen can
+ * render them without a second round trip to `/locations`.
+ */
+export interface EmployeePersonalDetails extends Omit<PersonalInformation, 'sameAsCurrentAddress'> {
+  currentDistrict: string;
+  permanentDistrict: string;
+}
+
+/**
+ * The read model is richer than the create payload: `designation` and `workMode` are
+ * derived by the backend and only ever come back on a read.
+ */
+export interface EmployeeProfessionalDetails extends ProfessionalInformation {
+  designation: string;
+  workMode: string;
+}
+
+/**
+ * `confirmAccountNumber` only exists to validate the form — it is never stored, so it
+ * never comes back.
+ */
+export type EmployeePayrollDetails = Omit<PayrollInformation, 'confirmAccountNumber'>;
+
+/**
+ * A single employee's full record, as returned by `/employees/:id`. Kept separate from the
+ * flat list `Employee`: that one is shaped for table columns, this one for the details screen.
+ */
+export interface EmployeeDetail {
+  id: string;
+  employeeId: string;
+  avatar: string;
+  name: string;
+  personalInformation: EmployeePersonalDetails;
+  professionalInformation: EmployeeProfessionalDetails;
+  payrollInformation: EmployeePayrollDetails;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetEmployeeResponse {
+  success: boolean;
+  message: string;
+  data: EmployeeDetail;
+}
+
 export interface EmployeeColumn {
   accessorKey: string;
   header: string;
