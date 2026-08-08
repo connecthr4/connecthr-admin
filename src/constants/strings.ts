@@ -68,6 +68,11 @@ export const STRINGS = {
   EMPLOYEE_TYPE: 'Employee Type',
   EMPLOYMENT_STATUS: 'Employment Status',
   BACK_TO_ALL_EMPLOYEES: 'Back to All Employees',
+  EMPLOYEE_FETCH_FAILED: 'Failed to load employee',
+  EDIT_PROFILE: 'Edit Profile',
+  PROFILE: 'Profile',
+  SEPARATION: 'Separation',
+  NO_DOCUMENTS_UPLOADED: 'No documents uploaded yet',
 };
 
 export const STEPS = [
