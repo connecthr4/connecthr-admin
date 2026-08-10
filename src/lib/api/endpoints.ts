@@ -24,7 +24,7 @@ export const API_ENDPOINTS = {
 
     GET_BY_ID: (id: string) => `/employees/${encodeURIComponent(id)}`,
 
-    UPDATE: (id: string) => `/employees/${id}`,
+    UPDATE: (id: string) => `/employees/${encodeURIComponent(id)}`,
 
     DELETE: (id: string) => `/employees/${id}`,
   },

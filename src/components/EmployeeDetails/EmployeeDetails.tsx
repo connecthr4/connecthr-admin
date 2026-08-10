@@ -204,8 +204,19 @@ interface EmployeeProfileHeaderProps {
 function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) {
   const router = useRouter();
 
+  const editHref = `${ROUTES.EMPLOYEES}/${employee.id}/edit`;
+
   const handleEdit = () => {
-    router.push(`${ROUTES.EMPLOYEES}/${employee.id}/edit`);
+    router.push(editHref);
+  };
+
+  /**
+   * The edit route is dynamic, so it is never prefetched on its own — only its loading
+   * boundary can be, and only when asked. Warming it on hover means the click lands on a
+   * shell that is already in the browser, with just the record still streaming in.
+   */
+  const handleEditIntent = () => {
+    router.prefetch(editHref);
   };
 
   return (
@@ -230,7 +241,7 @@ function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) {
         </div>
       </div>
 
-      <Button startIcon={PencilLine} onClick={handleEdit}>
+      <Button startIcon={PencilLine} onClick={handleEdit} onMouseEnter={handleEditIntent} onFocus={handleEditIntent}>
         {STRINGS.EDIT_PROFILE}
       </Button>
     </div>

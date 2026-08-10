@@ -7,6 +7,8 @@ import {
   GetEmployeeResponse,
   GetEmployeesRequest,
   GetEmployeesResponse,
+  UpdateEmployeeRequest,
+  UpdateEmployeeResponse,
 } from '../types/employees';
 import { GetFiltersResponse } from '../types/filters';
 
@@ -30,6 +32,13 @@ export const EmployeesApi = {
 
   createEmployee(client: ApiClient, data: CreateEmployeeRequest) {
     return client.post<CreateEmployeeResponse>(API_ENDPOINTS.EMPLOYEE.CREATE, data);
+  },
+
+  /**
+   * A PATCH, so `data` only has to carry the sections and fields that changed.
+   */
+  updateEmployee(client: ApiClient, employeeId: string, data: UpdateEmployeeRequest) {
+    return client.patch<UpdateEmployeeResponse>(API_ENDPOINTS.EMPLOYEE.UPDATE(employeeId), data);
   },
 
   getFilterOptions(client: ApiClient) {

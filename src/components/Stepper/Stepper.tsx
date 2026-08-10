@@ -28,6 +28,11 @@ interface Step {
 interface StepperProps {
   currentStep: number;
   steps: readonly Step[];
+
+  /**
+   * Makes the steps clickable. Omitted, the stepper is purely a progress indicator — which is
+   * also what lets it render from a Server Component (see below).
+   */
   onStepChange?: (step: number) => void;
 }
 
@@ -42,7 +47,13 @@ export default function Stepper({ currentStep, steps, onStepChange }: StepperPro
         return (
           <div
             key={step.id}
-            onClick={() => onStepChange?.(index)}
+            /*
+              Only wired up when a handler was actually passed: this component carries no
+              `'use client'`, so it renders on the server for callers like the wizard's loading
+              skeleton — and a Server Component cannot hand an event handler to a DOM element.
+              Attaching one unconditionally made every such render fail.
+            */
+            onClick={onStepChange && (() => onStepChange(index))}
             className={clsx(styles.step, {
               [styles.active]: isActive,
             })}
