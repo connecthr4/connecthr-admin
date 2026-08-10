@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { getServerApiClient } from '../api/getServerApiClient';
 import { EmployeesApi } from '../api/employees';
 import { UnauthorizedError } from '../api/errors';
@@ -12,6 +13,8 @@ import type {
   CreateEmployeeResult,
   GetEmployeesRequest,
   GetEmployeesResult,
+  UpdateEmployeeRequest,
+  UpdateEmployeeResult,
 } from '../types/employees';
 
 /**
@@ -55,6 +58,40 @@ export async function createEmployee(request: CreateEmployeeRequest): Promise<Cr
     }
 
     logger.error('Error occurred while creating employee:', error);
+    const { message } = getApiErrorInfo(error);
+
+    return { success: false, message };
+  }
+}
+
+/**
+ * Server Function — called from the wizard's final step in edit mode. `request` is a PATCH
+ * body holding only the fields the user changed, so an untouched section is never sent.
+ *
+ * @param employeeId - The employee's `id`, the same value the edit route is keyed on.
+ */
+export async function updateEmployee(
+  employeeId: string,
+  request: UpdateEmployeeRequest
+): Promise<UpdateEmployeeResult> {
+  try {
+    const client = getServerApiClient();
+    const response = await EmployeesApi.updateEmployee(client, employeeId, request);
+
+    /*
+      The details screen and the list are both server-rendered, so without this the user
+      would be handed back to a cached render of the record they just changed.
+    */
+    revalidatePath(`${ROUTES.EMPLOYEES}/${employeeId}`);
+    revalidatePath(ROUTES.EMPLOYEES);
+
+    return { success: true, message: response.message, data: response.data };
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(ROUTES.LOGIN);
+    }
+
+    logger.error('Error occurred while updating employee:', error);
     const { message } = getApiErrorInfo(error);
 
     return { success: false, message };
