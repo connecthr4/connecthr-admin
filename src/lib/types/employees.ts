@@ -65,18 +65,26 @@ export interface CreateEmployeeRequest {
 }
 
 /**
- * The record the backend echoes back on creation. Deliberately not the list `Employee`:
- * that one flattens these to `type`/`status`, and the two shapes are free to diverge.
+ * The handful of fields the wizard's confirmation modal lists back. Both the create and the
+ * update response carry them, in different shapes, so the modal is written against this and
+ * each response is mapped onto it.
  */
-export interface CreatedEmployee {
-  id: string;
-  avatar: string;
+export interface EmployeeSummary {
   name: string;
   employeeId: string;
   department: string;
   designation: string;
   employeeType: string;
   employmentStatus: string;
+}
+
+/**
+ * The record the backend echoes back on creation. Deliberately not the list `Employee`:
+ * that one flattens these to `type`/`status`, and the two shapes are free to diverge.
+ */
+export interface CreatedEmployee extends EmployeeSummary {
+  id: string;
+  avatar: string;
 }
 
 export interface CreateEmployeeResponse {
@@ -150,6 +158,39 @@ export interface GetEmployeeResponse {
   message: string;
   data: EmployeeDetail;
 }
+
+/**
+ * The PATCH payload for `/employees/:id`. Every section is optional, and so is every field
+ * inside it: only what the user actually changed is sent, so an untouched section never
+ * reaches the backend at all.
+ *
+ * The fields the wizard carries purely for the UI — the "same as current address" toggle,
+ * the confirm-account-number field, and the read-only Employee ID — are not part of this
+ * shape; `toUpdateEmployeeRequest` is what leaves them out.
+ */
+export interface UpdateEmployeeRequest {
+  personalInformation?: Partial<Omit<PersonalInformation, 'sameAsCurrentAddress'>>;
+  professionalInformation?: Partial<EmployeeProfessionalDetails>;
+  payrollInformation?: Partial<EmployeePayrollDetails>;
+}
+
+/**
+ * Unlike create, the update endpoint echoes back the *full* record — the same shape
+ * `/employees/:id` returns.
+ */
+export interface UpdateEmployeeResponse {
+  success: boolean;
+  message: string;
+  data: EmployeeDetail;
+}
+
+/**
+ * Mirrors `CreateEmployeeResult` — a plain, serializable outcome, since a Server Function
+ * cannot carry `ApiError` across the client/server boundary intact.
+ */
+export type UpdateEmployeeResult =
+  | { success: true; message: string; data: EmployeeDetail }
+  | { success: false; message: string };
 
 export interface EmployeeColumn {
   accessorKey: string;

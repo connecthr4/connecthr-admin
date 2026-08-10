@@ -57,6 +57,61 @@ styles specific to the EmployeeWizard component
   gap: 12px;
 }
 
+/**
+------------------------------------------------------
+skeleton styles (loading state, see EmployeeWizardSkeleton)
+------------------------------------------------------
+**/
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.bone {
+  border-radius: var(--radius-md);
+  background: var(--color-gray-200);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* Mirrors DynamicForm's grid, so the bones sit where the real fields will. */
+.skeletonForm {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+.skeletonSectionTitle {
+  grid-column: span 12;
+
+  width: 9rem;
+  height: 1.25rem;
+}
+
+.skeletonField {
+  grid-column: span 6;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeletonLabel {
+  width: 6rem;
+  height: 0.875rem;
+}
+
+.skeletonInput {
+  height: 2.75rem;
+}
+
 /* Confirmation modal shown once the employee has been created. */
 
 .createdModal {

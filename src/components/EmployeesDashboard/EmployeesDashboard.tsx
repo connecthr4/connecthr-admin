@@ -84,9 +84,13 @@ const EmployeesTable = DataTable as unknown as (props: {
  */
 interface EmployeeRowActions {
   onView: (employee: Employee) => void;
+  onEdit: (employee: Employee) => void;
 }
 
-function buildEmployeeColumns(apiColumns: EmployeeColumn[], { onView }: EmployeeRowActions): ColumnDef<Employee>[] {
+function buildEmployeeColumns(
+  apiColumns: EmployeeColumn[],
+  { onView, onEdit }: EmployeeRowActions
+): ColumnDef<Employee>[] {
   const dynamicColumns: ColumnDef<Employee>[] = apiColumns
     .filter((column) => !FIXED_COLUMN_KEYS.has(column.accessorKey))
     .map((column) => ({
@@ -133,11 +137,7 @@ function buildEmployeeColumns(apiColumns: EmployeeColumn[], { onView }: Employee
         <div className={styles.actions}>
           <Eye size={20} className={clsx(styles.actionIcon)} onClick={() => onView(row.original)} />
 
-          <Pencil
-            size={20}
-            className={clsx(styles.actionIcon)}
-            onClick={() => logger.info('Edit employee', { id: row.original.id })}
-          />
+          <Pencil size={20} className={clsx(styles.actionIcon)} onClick={() => onEdit(row.original)} />
 
           <Trash2
             size={20}
@@ -184,9 +184,20 @@ export default function EmployeesDashboard({
     [router]
   );
 
+  /**
+   * The edit route fetches the record itself and renders the wizard already populated, so
+   * the row action only has to navigate — nothing is fetched from the table.
+   */
+  const handleEditEmployee = useCallback(
+    (employee: Employee) => {
+      router.push(`${ROUTES.EMPLOYEES}/${employee.id}/edit`);
+    },
+    [router]
+  );
+
   const employeeColumns = useMemo(
-    () => buildEmployeeColumns(initialColumns, { onView: handleViewEmployee }),
-    [initialColumns, handleViewEmployee]
+    () => buildEmployeeColumns(initialColumns, { onView: handleViewEmployee, onEdit: handleEditEmployee }),
+    [initialColumns, handleViewEmployee, handleEditEmployee]
   );
 
   const [employees, setEmployees] = useState(initialEmployees);

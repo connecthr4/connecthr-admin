@@ -82,6 +82,8 @@ export const useEmployeeStore = create<EmployeeStoreState>((set) => ({
       },
     })),
 
+  setEmployeeData: (data) => set(data),
+
   resetEmployeeData: () =>
     set({
       ...initialState,
