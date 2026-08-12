@@ -78,3 +78,29 @@ export const formatLongDate = (value?: string): string => {
 
   return date ? LONG_DATE_FORMATTER.format(date) : value;
 };
+
+/**
+ * Pinned to UTC as well as to a fixed locale: an ISO timestamp rendered in the
+ * server's zone and re-rendered in the viewer's can land on different calendar
+ * days, which hydrates as a mismatch.
+ */
+const TIMESTAMP_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+/**
+ * Formats an ISO timestamp ("2026-08-07T04:03:45.574Z") for display, e.g. "August 7, 2026".
+ * Missing or unparseable values yield an empty string so callers can pick their own placeholder.
+ */
+export const formatTimestampDate = (value?: string | null): string => {
+  if (!value) {
+    return '';
+  }
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime()) ? '' : TIMESTAMP_FORMATTER.format(date);
+};
