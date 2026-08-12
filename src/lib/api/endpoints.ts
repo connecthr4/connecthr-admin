@@ -11,6 +11,10 @@ export const API_ENDPOINTS = {
     PROFILE: '/auth/profile',
   },
 
+  DASHBOARD: {
+    GET_SUMMARY: '/dashboard/summary',
+  },
+
   EMPLOYEE: {
     GET_ALL: '/employees',
 

@@ -6,7 +6,7 @@
  * import Dashboard from '@src/components/Dashboard'
  *
  * export default function Dashboard() {
- *   return <Dashboard label="Hello" />;
+ *   return <Dashboard summary={summary} />;
  * }
  * ```
  */
@@ -16,72 +16,71 @@ import AppHeader from '@/src/components/AppHeader';
 import { useGreeting } from '@/src/hooks/useGreeting';
 import styles from './Dashboard.module.scss';
 import StatsSummaryCard from '../StatsSummaryCard';
-import { Users, CalendarCheck, CalendarMinus } from 'lucide-react';
 import { Heading3 } from '../Typography';
 import BasePieChart from '../BasePieChart';
 import UpcomingHolidaysCard from '../UpcomingHolidaysCard';
 import { useAuthStore } from '@/src/store/auth/useAuthStore';
+import { STRINGS } from '@/src/constants/strings';
+import { formatTimestampDate } from '@/src/utils/date';
+import {
+  DASHBOARD_ICON_COLOR,
+  DASHBOARD_ICON_SIZE,
+  DASHBOARD_STAT_CARDS,
+  DEPARTMENT_DISTRIBUTION,
+} from '@/src/constants/dashboard';
+import type { DashboardSummary } from '@/src/lib/types/dashboard';
 
 /**
  * Define the props available for the Dashboard component.
  */
-export default function Dashboard() {
+interface DashboardProps {
+  /**
+   * Counts and upcoming holidays resolved on the server by the dashboard route.
+   */
+  summary: DashboardSummary;
+}
+
+export default function Dashboard({ summary }: DashboardProps) {
   const userDetails = useAuthStore((state) => state.user);
   const greeting = useGreeting();
 
-  const dashboardStats = [
-    {
-      id: 1,
-      title: 'Total Employee',
-      value: 560,
-      updatedDate: 'July 16, 2023',
-      icon: <Users height={20} width={20} color="#7152F3" />,
-    },
-    {
-      id: 2,
-      title: 'Today Attendance',
-      value: 500,
-      updatedDate: 'July 14, 2023',
-      icon: <CalendarCheck height={20} width={20} color="#7152F3" />,
-    },
-    {
-      id: 3,
-      title: 'Today On Leave',
-      value: 60,
-      updatedDate: 'July 15, 2023',
-      icon: <CalendarMinus height={20} width={20} color="#7152F3" />,
-    },
-  ];
+  const { stats, upcomingHolidays } = summary;
 
-  const data = [
-    { name: 'Engineering', value: 35, color: '#3B82F6' },
-    { name: 'Marketing', value: 20, color: '#10B981' },
-    { name: 'Sales', value: 15, color: '#F59E0B' },
-    { name: 'HR', value: 12, color: '#EF4444' },
-  ];
   return (
     <div className={styles.container}>
       <AppHeader title={`Hello, ${userDetails?.name || 'User'}`} subtitle={greeting} userDetails={userDetails} />
 
       <div className={styles.statsSummaryGrid}>
-        {dashboardStats.map((item) => (
-          <StatsSummaryCard
-            key={item.id}
-            title={item.title}
-            value={item.value}
-            updatedDate={item.updatedDate}
-            icon={item.icon}
-          />
-        ))}
+        {DASHBOARD_STAT_CARDS.map(({ key, title, icon: Icon }) => {
+          const stat = stats?.[key];
+
+          return (
+            <StatsSummaryCard
+              key={key}
+              title={title}
+              /* A metric the backend has no figure for yet comes back as null, not 0. */
+              value={stat?.value ?? STRINGS.NOT_AVAILABLE}
+              updatedDate={formatTimestampDate(stat?.updatedAt) || STRINGS.NOT_AVAILABLE}
+              icon={<Icon height={DASHBOARD_ICON_SIZE} width={DASHBOARD_ICON_SIZE} color={DASHBOARD_ICON_COLOR} />}
+            />
+          );
+        })}
       </div>
 
       <div className={styles.wrapper}>
         <div className={styles.chartWrapper}>
-          <Heading3>Department Distribution</Heading3>
-          <BasePieChart data={data} height={320} centerValue="560" centerLabel="Employees" />
+          <Heading3>{STRINGS.DEPARTMENT_DISTRIBUTION}</Heading3>
+
+          <BasePieChart
+            data={DEPARTMENT_DISTRIBUTION}
+            height={320}
+            centerValue={String(stats?.totalEmployees?.value ?? STRINGS.NOT_AVAILABLE)}
+            centerLabel={STRINGS.EMPLOYEES}
+          />
         </div>
+
         <div className={styles.holidays}>
-          <UpcomingHolidaysCard />
+          <UpcomingHolidaysCard holidays={upcomingHolidays} />
         </div>
       </div>
     </div>

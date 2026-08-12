@@ -14,58 +14,21 @@
 import { ArrowRight, CalendarDays } from 'lucide-react';
 import { STRINGS } from '@/src/constants/strings';
 import { Heading3, Text2, Text3 } from '../Typography/Typography';
+import type { UpcomingHoliday } from '@/src/lib/types/dashboard';
 import styles from './UpcomingHolidaysCard.module.scss';
 
 /**
  * Define the props available for the UpcomingHolidaysCard component.
  */
 interface UpcomingHolidaysCardProps {
-  label?: string;
+  /**
+   * Holidays to list, already formatted for display by the API
+   * (day, short month, weekday and title).
+   */
+  holidays?: UpcomingHoliday[];
 }
 
-export default function UpcomingHolidaysCard({ label = 'label' }: UpcomingHolidaysCardProps) {
-  const holidays = [
-    {
-      id: 1,
-      day: '10',
-      month: 'JUL',
-      weekday: 'Monday',
-      title: 'Eid-ul-Adha',
-      duration: '1 Day',
-    },
-    {
-      id: 2,
-      day: '15',
-      month: 'AUG',
-      weekday: 'Tuesday',
-      title: 'Independence Day',
-      duration: '1 Day',
-    },
-    {
-      id: 3,
-      day: '07',
-      month: 'SEP',
-      weekday: 'Thursday',
-      title: 'Janmashtami',
-      duration: '1 Day',
-    },
-    {
-      id: 4,
-      day: '02',
-      month: 'OCT',
-      weekday: 'Monday',
-      title: 'Gandhi Jayanti',
-      duration: '1 Day',
-    },
-    {
-      id: 5,
-      day: '12',
-      month: 'NOV',
-      weekday: 'Sunday',
-      title: 'Diwali',
-      duration: '1 Day',
-    },
-  ];
+export default function UpcomingHolidaysCard({ holidays = [] }: UpcomingHolidaysCardProps) {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
@@ -77,6 +40,8 @@ export default function UpcomingHolidaysCard({ label = 'label' }: UpcomingHolida
       </div>
 
       <div className={styles.list}>
+        {holidays.length === 0 && <Text2 className={styles.emptyState}>{STRINGS.NO_UPCOMING_HOLIDAYS}</Text2>}
+
         {holidays.map((holiday) => (
           <div key={holiday.id} className={styles.holidayItem}>
             <div className={styles.dateBox}>
