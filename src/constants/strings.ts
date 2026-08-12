@@ -79,6 +79,13 @@ export const STRINGS = {
   PROFILE: 'Profile',
   SEPARATION: 'Separation',
   NO_DOCUMENTS_UPLOADED: 'No documents uploaded yet',
+  NOT_AVAILABLE: '--',
+  TOTAL_EMPLOYEE: 'Total Employee',
+  TODAY_ATTENDANCE: 'Today Attendance',
+  TODAY_ON_LEAVE: 'Today On Leave',
+  DEPARTMENT_DISTRIBUTION: 'Department Distribution',
+  EMPLOYEES: 'Employees',
+  NO_UPCOMING_HOLIDAYS: 'No upcoming holidays',
 };
 
 export const STEPS = [

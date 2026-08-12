@@ -40,6 +40,13 @@ styles specific to the UpcomingHolidaysCard component
   min-height: 0;
 }
 
+.emptyState {
+  display: block;
+  padding: var(--spacing-8);
+  text-align: center;
+  color: var(--color-gray-500);
+}
+
 .holidayItem {
   display: flex;
   align-items: center;
