@@ -33,4 +33,4 @@ export const CHART_SURFACE_COLOR = '#ffffff';
 /**
  * Width of that gap, in pixels.
  */
-export const CHART_SLICE_GAP = 2;
+export const CHART_SLICE_GAP = 0;

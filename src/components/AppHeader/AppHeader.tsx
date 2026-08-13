@@ -13,8 +13,9 @@
 
 import type { User } from '@/src/lib/types/auth';
 import Breadcrumbs from '../Breadcrumbs';
-import { Bell, ChevronDown, CircleUserRound } from 'lucide-react';
-import { Heading3, Text1, Text2 } from '../Typography';
+import UserMenu from '../UserMenu';
+import { Bell } from 'lucide-react';
+import { Heading3, Text1 } from '../Typography';
 import styles from './AppHeader.module.scss';
 
 interface BreadcrumbItem {
@@ -64,21 +65,7 @@ export default function AppHeader({ title, subtitle, userDetails, breadcrumbs }:
           <Bell size={22} />
         </button> */}
 
-        <div className={styles.profileContainer}>
-          <CircleUserRound width={48} height={48} className={styles.profileAvatar} />
-
-          <div className={styles.profileInfo}>
-            <Text1 className={styles.profileName} truncation="ellipsis">
-              {userDetails?.name || 'User'}
-            </Text1>
-
-            <Text2 className={styles.profileRole} truncation="ellipsis">
-              {userDetails?.role || 'Admin'}
-            </Text2>
-          </div>
-
-          <ChevronDown className={styles.profileDropdownIcon} />
-        </div>
+        <UserMenu userDetails={userDetails} />
       </div>
     </header>
   );
