@@ -24,11 +24,11 @@ vi.mock('../Typography', () => ({
   ),
 }));
 
-vi.mock('lucide-react', () => ({
-  Bell: () => <div data-testid="bell-icon" />,
-  ChevronDown: () => <div data-testid="chevron-icon" />,
-  CircleUserRound: () => <div data-testid="user-icon" />,
-}));
+// vi.mock('lucide-react', () => ({
+//   Bell: () => <div data-testid="bell-icon" />,
+//   ChevronDown: () => <div data-testid="chevron-icon" />,
+//   CircleUserRound: () => <div data-testid="user-icon" />,
+// }));
 
 import AppHeader from './AppHeader';
 
@@ -39,7 +39,6 @@ describe('AppHeader', () => {
     email: 'john.doe@example.com',
     role: 'Manager',
     status: 'active',
-    tempPassword: '',
     mustChangePassword: false,
   };
 
@@ -63,22 +62,23 @@ describe('AppHeader', () => {
       expect(heading).toBeInTheDocument();
     });
 
-    it('should always render the notification button icon', () => {
-      render(<AppHeader title="Test" />);
+    /* The notification button is commented out in the component for now. */
+    it('should not render the notification button while notifications are disabled', () => {
+      const { container } = render(<AppHeader title="Test" />);
 
-      expect(screen.getByTestId('bell-icon')).toBeInTheDocument();
+      expect(container.querySelector(`.${styles.notificationButton}`)).not.toBeInTheDocument();
     });
 
     it('should render user avatar icon', () => {
-      render(<AppHeader title="Test" />);
+      const { container } = render(<AppHeader title="Test" />);
 
-      expect(screen.getByTestId('user-icon')).toBeInTheDocument();
+      expect(container.querySelector(`.${styles.profileAvatar}`)).toBeInTheDocument();
     });
 
     it('should render profile chevron dropdown icon', () => {
-      render(<AppHeader title="Test" />);
+      const { container } = render(<AppHeader title="Test" />);
 
-      expect(screen.getByTestId('chevron-icon')).toBeInTheDocument();
+      expect(container.querySelector(`.${styles.profileDropdownIcon}`)).toBeInTheDocument();
     });
   });
 
@@ -222,9 +222,9 @@ describe('AppHeader', () => {
 
   describe('Profile Section', () => {
     it('should render profile avatar', () => {
-      render(<AppHeader title="Test" />);
+      const { container } = render(<AppHeader title="Test" />);
 
-      expect(screen.getByTestId('user-icon')).toBeInTheDocument();
+      expect(container.querySelector(`.${styles.profileAvatar}`)).toBeInTheDocument();
     });
 
     it('should render profile info section with user details', () => {
@@ -235,9 +235,9 @@ describe('AppHeader', () => {
     });
 
     it('should render profile dropdown icon', () => {
-      render(<AppHeader title="Test" />);
+      const { container } = render(<AppHeader title="Test" />);
 
-      expect(screen.getByTestId('chevron-icon')).toBeInTheDocument();
+      expect(container.querySelector(`.${styles.profileDropdownIcon}`)).toBeInTheDocument();
     });
   });
 
