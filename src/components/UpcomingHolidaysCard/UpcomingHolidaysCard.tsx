@@ -11,10 +11,11 @@
  * ```
  */
 
+import { ROUTES, STRINGS } from '@/src/constants/strings';
 import { ArrowRight, CalendarDays } from 'lucide-react';
-import { STRINGS } from '@/src/constants/strings';
-import { Heading3, Text2, Text3 } from '../Typography/Typography';
 import type { UpcomingHoliday } from '@/src/lib/types/dashboard';
+import AppLink from '../AppLink';
+import { Heading3, Text2, Text3 } from '../Typography/Typography';
 import styles from './UpcomingHolidaysCard.module.scss';
 
 /**
@@ -33,10 +34,10 @@ export default function UpcomingHolidaysCard({ holidays = [] }: UpcomingHolidays
     <div className={styles.card}>
       <div className={styles.header}>
         <Heading3>{STRINGS.UPCOMING_HOLIDAYS}</Heading3>
-        <button className={styles.viewAll}>
+        <AppLink href={ROUTES.HOLIDAYS} className={styles.viewAll}>
           {STRINGS.VIEW_ALL}
           <ArrowRight size={22} />
-        </button>
+        </AppLink>
       </div>
 
       <div className={styles.list}>

@@ -37,16 +37,6 @@ export const EMPTY_DASHBOARD_SUMMARY: DashboardSummary = {
     todayAttendance: { value: null, updatedAt: null },
     todayOnLeave: { value: null, updatedAt: null },
   },
+  departmentDistribution: [],
   upcomingHolidays: [],
 };
-
-/**
- * Placeholder distribution — the summary endpoint does not expose chart data yet,
- * so the pie chart is still driven by static values.
- */
-export const DEPARTMENT_DISTRIBUTION = [
-  { name: 'Engineering', value: 35, color: '#3B82F6' },
-  { name: 'Marketing', value: 20, color: '#10B981' },
-  { name: 'Sales', value: 15, color: '#F59E0B' },
-  { name: 'HR', value: 12, color: '#EF4444' },
-];
