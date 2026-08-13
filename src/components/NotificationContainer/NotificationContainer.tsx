@@ -31,7 +31,7 @@
  */
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { CircleCheck, CircleX, Info, TriangleAlert, X } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './NotificationContainer.module.scss';
@@ -86,12 +86,6 @@ interface ClassNames {
 }
 
 export default function NotificationContainer({ notifications, removeNotification }: NotificationContainerProps) {
-  const [activeNotifications, setActiveNotifications] = useState<Notification[]>([]);
-
-  useEffect(() => {
-    setActiveNotifications(notifications);
-  }, [notifications]);
-
   useEffect(() => {
     const timers = notifications.map((n) => {
       if (n.duration) {
@@ -142,7 +136,7 @@ export default function NotificationContainer({ notifications, removeNotificatio
     <div data-testid="NotificationContainerTest">
       {positions.map((pos) => (
         <div key={pos} className={clsx(styles.notificationWrapper, styles[pos])}>
-          {activeNotifications
+          {notifications
             .filter((n) => (n.position || 'top-right') === pos)
             .map((n) => {
               const classNames = getNotificationClassNames(n.type);
@@ -155,14 +149,13 @@ export default function NotificationContainer({ notifications, removeNotificatio
                       {n.message}
                     </Text4>
                   </div>
-
-                  <button
+                  <X
+                    height={24}
+                    width={24}
+                    color="var(--notification-close-icon)"
                     className={styles.notificationClose}
-                    data-testid="notification-close-btn"
                     onClick={() => removeNotification(n.id)}
-                  >
-                    <X height={24} width={24} color="var(--notification-close-icon)" />
-                  </button>
+                  />
                   {n.showProgress && n.duration && (
                     <div className={styles.notificationProgress}>
                       <div

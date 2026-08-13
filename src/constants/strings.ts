@@ -86,6 +86,8 @@ export const STRINGS = {
   DEPARTMENT_DISTRIBUTION: 'Department Distribution',
   EMPLOYEES: 'Employees',
   NO_UPCOMING_HOLIDAYS: 'No upcoming holidays',
+  LOGOUT: 'Logout',
+  ACCOUNT_MENU: 'Account menu',
 };
 
 export const STEPS = [

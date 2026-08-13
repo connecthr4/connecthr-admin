@@ -1,0 +1,119 @@
+/**
+------------------------------------------------------
+styles specific to the UserMenu component
+------------------------------------------------------
+**/
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  width: 15rem;
+  min-width: 15rem;
+  max-width: 15rem;
+  padding: 0.375rem var(--spacing-4);
+  border: 1px solid var(--color-gray-200);
+  border-radius: 14px;
+  background: var(--color-white);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-50);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-violet-600);
+    outline-offset: 2px;
+  }
+}
+
+/* Keeps the trigger visibly "pressed" for as long as the panel is open. */
+.triggerOpen {
+  border-color: var(--color-violet-600-40);
+  background: var(--color-violet-50);
+
+  &:hover {
+    background: var(--color-violet-50);
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  width: 100%;
+}
+
+.role {
+  color: var(--color-gray-400);
+  width: 100%;
+}
+
+.chevron {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+
+  .triggerOpen & {
+    transform: rotate(180deg);
+  }
+}
+
+.panel {
+  /* Matches the trigger so the panel reads as an extension of the chip. */
+  width: 15rem;
+  padding: var(--spacing-2);
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+
+  padding: var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-red-500);
+
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-red-400-10);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-red-500);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.logoutIcon {
+  flex-shrink: 0;
+}
+
+/* Two classes deep so it outranks Typography's own base `color`. */
+.logoutButton .logoutLabel {
+  color: var(--color-red-500);
+}

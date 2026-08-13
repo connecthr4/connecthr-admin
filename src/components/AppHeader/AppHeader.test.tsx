@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import type { User } from '@/src/lib/types/auth';
 import styles from './AppHeader.module.scss';
+import userMenuStyles from '../UserMenu/UserMenu.module.scss';
 
 // Mock the child components using relative paths
 vi.mock('../Breadcrumbs', () => ({
@@ -14,10 +15,19 @@ vi.mock('../Breadcrumbs', () => ({
   ),
 }));
 
+/*
+The profile chip lives in UserMenu, which is rendered for real here — only
+its Server Action dependency is stubbed, since `src/lib/actions/auth` pulls
+in `server-only` and `next/headers`, neither of which resolve under jsdom.
+*/
+vi.mock('@/src/lib/actions/auth', () => ({
+  logoutAction: vi.fn(),
+}));
+
 vi.mock('../Typography', () => ({
   Heading3: ({ children }: { children: React.ReactNode }) => <h3>{children}</h3>,
   Text1: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <p className={className}>{children}</p>
+    <span className={className}>{children}</span>
   ),
   Text2: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <span className={className}>{children}</span>
@@ -72,13 +82,13 @@ describe('AppHeader', () => {
     it('should render user avatar icon', () => {
       const { container } = render(<AppHeader title="Test" />);
 
-      expect(container.querySelector(`.${styles.profileAvatar}`)).toBeInTheDocument();
+      expect(container.querySelector(`.${userMenuStyles.avatar}`)).toBeInTheDocument();
     });
 
     it('should render profile chevron dropdown icon', () => {
       const { container } = render(<AppHeader title="Test" />);
 
-      expect(container.querySelector(`.${styles.profileDropdownIcon}`)).toBeInTheDocument();
+      expect(container.querySelector(`.${userMenuStyles.chevron}`)).toBeInTheDocument();
     });
   });
 
@@ -107,7 +117,7 @@ describe('AppHeader', () => {
     it('should display user name from userDetails', () => {
       render(<AppHeader title="Dashboard" userDetails={mockUser} />);
 
-      expect(screen.getByText('John Doe', { selector: `.${styles.profileName}` })).toBeInTheDocument();
+      expect(screen.getByText('John Doe', { selector: `.${userMenuStyles.name}` })).toBeInTheDocument();
     });
 
     it('should display user role from userDetails', () => {
@@ -206,7 +216,7 @@ describe('AppHeader', () => {
 
       expect(screen.getByText('Employee Directory')).toBeInTheDocument();
       expect(screen.getByText('Manage all employees')).toBeInTheDocument();
-      expect(screen.getByText('John Doe', { selector: `.${styles.profileName}` })).toBeInTheDocument();
+      expect(screen.getByText('John Doe', { selector: `.${userMenuStyles.name}` })).toBeInTheDocument();
       expect(screen.getByText('Manager')).toBeInTheDocument();
       expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument();
     });
@@ -224,20 +234,20 @@ describe('AppHeader', () => {
     it('should render profile avatar', () => {
       const { container } = render(<AppHeader title="Test" />);
 
-      expect(container.querySelector(`.${styles.profileAvatar}`)).toBeInTheDocument();
+      expect(container.querySelector(`.${userMenuStyles.avatar}`)).toBeInTheDocument();
     });
 
     it('should render profile info section with user details', () => {
       render(<AppHeader title="Test" userDetails={mockUser} />);
 
-      expect(screen.getByText('John Doe', { selector: `.${styles.profileName}` })).toBeInTheDocument();
+      expect(screen.getByText('John Doe', { selector: `.${userMenuStyles.name}` })).toBeInTheDocument();
       expect(screen.getByText('Manager')).toBeInTheDocument();
     });
 
     it('should render profile dropdown icon', () => {
       const { container } = render(<AppHeader title="Test" />);
 
-      expect(container.querySelector(`.${styles.profileDropdownIcon}`)).toBeInTheDocument();
+      expect(container.querySelector(`.${userMenuStyles.chevron}`)).toBeInTheDocument();
     });
   });
 

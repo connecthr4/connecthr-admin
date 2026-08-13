@@ -1,6 +1,6 @@
 'use server';
 
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 import { apiConfig } from '../config/api';
 import { API_ENDPOINTS } from '../api/endpoints';
 import { getApiErrorInfo } from '../api/helpers';
@@ -61,6 +61,11 @@ export async function changePasswordAction(data: ChangePasswordRequest): Promise
   }
 }
 
+/**
+ * Ends the session everywhere it exists: the backend revokes the refresh
+ * token, then both session cookies are dropped. `redirect` throws, so it
+ * stays outside the try block per this fork's guide.
+ */
 export async function logoutAction(): Promise<void> {
   try {
     const client = getServerApiClient();
@@ -72,5 +77,10 @@ export async function logoutAction(): Promise<void> {
     await clearSession();
   }
 
-  redirect(ROUTES.LOGIN);
+  /*
+  Server Actions default to `push`, which would leave the signed-out app in
+  the history stack — Back would land on a page the proxy has to bounce.
+  Replacing the entry keeps the back button pointing outside the app.
+  */
+  redirect(ROUTES.LOGIN, RedirectType.replace);
 }
