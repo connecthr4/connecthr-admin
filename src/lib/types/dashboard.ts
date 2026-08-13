@@ -19,8 +19,18 @@ export interface UpcomingHoliday {
   title: string;
 }
 
+/**
+ * One slice of the department pie chart. The API sends no colour — the chart
+ * assigns one from the shared categorical palette.
+ */
+export interface DepartmentDistribution {
+  name: string;
+  value: number;
+}
+
 export interface DashboardSummary {
   stats: DashboardStats;
+  departmentDistribution: DepartmentDistribution[];
   upcomingHolidays: UpcomingHoliday[];
 }
 

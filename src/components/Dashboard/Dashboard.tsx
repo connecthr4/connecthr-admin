@@ -22,12 +22,7 @@ import UpcomingHolidaysCard from '../UpcomingHolidaysCard';
 import { useAuthStore } from '@/src/store/auth/useAuthStore';
 import { STRINGS } from '@/src/constants/strings';
 import { formatTimestampDate } from '@/src/utils/date';
-import {
-  DASHBOARD_ICON_COLOR,
-  DASHBOARD_ICON_SIZE,
-  DASHBOARD_STAT_CARDS,
-  DEPARTMENT_DISTRIBUTION,
-} from '@/src/constants/dashboard';
+import { DASHBOARD_ICON_COLOR, DASHBOARD_ICON_SIZE, DASHBOARD_STAT_CARDS } from '@/src/constants/dashboard';
 import type { DashboardSummary } from '@/src/lib/types/dashboard';
 
 /**
@@ -44,7 +39,7 @@ export default function Dashboard({ summary }: DashboardProps) {
   const userDetails = useAuthStore((state) => state.user);
   const greeting = useGreeting();
 
-  const { stats, upcomingHolidays } = summary;
+  const { stats, departmentDistribution, upcomingHolidays } = summary;
 
   return (
     <div className={styles.container}>
@@ -72,7 +67,7 @@ export default function Dashboard({ summary }: DashboardProps) {
           <Heading3>{STRINGS.DEPARTMENT_DISTRIBUTION}</Heading3>
 
           <BasePieChart
-            data={DEPARTMENT_DISTRIBUTION}
+            data={departmentDistribution}
             height={320}
             centerValue={String(stats?.totalEmployees?.value ?? STRINGS.NOT_AVAILABLE)}
             centerLabel={STRINGS.EMPLOYEES}

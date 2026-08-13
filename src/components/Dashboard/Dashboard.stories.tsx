@@ -17,6 +17,18 @@ const meta = {
         todayAttendance: { value: 20, updatedAt: '2026-08-07T04:03:45.574Z' },
         todayOnLeave: { value: 3, updatedAt: '2026-08-07T04:03:45.574Z' },
       },
+      departmentDistribution: [
+        { name: 'HR', value: 4 },
+        { name: 'Finance', value: 3 },
+        { name: 'PM', value: 3 },
+        { name: 'Business Analysis', value: 2 },
+        { name: 'Design', value: 2 },
+        { name: 'Development', value: 2 },
+        { name: 'Engineering', value: 2 },
+        { name: 'QA', value: 2 },
+        { name: 'Sales', value: 2 },
+        { name: 'Marketing', value: 1 },
+      ],
       upcomingHolidays: [
         { id: '1', day: '15', month: 'AUG', weekday: 'Saturday', title: 'Independence Day' },
         { id: '2', day: '02', month: 'OCT', weekday: 'Friday', title: 'Gandhi Jayanti' },

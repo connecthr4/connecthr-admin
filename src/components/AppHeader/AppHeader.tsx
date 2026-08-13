@@ -60,9 +60,9 @@ export default function AppHeader({ title, subtitle, userDetails, breadcrumbs }:
       </div>
 
       <div className={styles.rightSection}>
-        <button className={styles.notificationButton}>
+        {/* <button className={styles.notificationButton}>
           <Bell size={22} />
-        </button>
+        </button> */}
 
         <div className={styles.profileContainer}>
           <CircleUserRound width={48} height={48} className={styles.profileAvatar} />

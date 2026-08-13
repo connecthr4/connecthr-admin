@@ -117,6 +117,7 @@ export const ROUTES = {
   RESET_PASSWORD: '/reset-password',
   DASHBOARD: '/dashboard',
   EMPLOYEES: '/employees',
+  HOLIDAYS: '/holidays',
 } as const;
 
 export const NOTIFICATION_TYPES: Record<string, NotificationType> = {
