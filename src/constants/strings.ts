@@ -88,6 +88,37 @@ export const STRINGS = {
   NO_UPCOMING_HOLIDAYS: 'No upcoming holidays',
   LOGOUT: 'Logout',
   ACCOUNT_MENU: 'Account menu',
+  CREATE_USER: 'Create User',
+  ADD_NEW_USER: 'Add New User',
+  USERS: 'Users',
+  ALL_USER_ACCOUNTS: 'All user accounts',
+  USER_NAME: 'Name',
+  USER_EMAIL: 'Email',
+  USER_ROLE: 'Role',
+  USER_STATUS: 'Status',
+  USER_LAST_LOGIN: 'Last Login',
+  USER_CREATED_BY: 'Created By',
+  NEVER: 'Never',
+  USERS_FETCH_FAILED: 'Failed to load users',
+  FULL_NAME: 'Full Name',
+  FULL_NAME_PLACEHOLDER: 'Enter full name',
+  NAME_REQUIRED: 'Name is required',
+  ROLE_REQUIRED: 'Role is required',
+  SELECT_ROLE: 'Select a role',
+  ROLES_FETCH_FAILED: 'Failed to load assignable roles',
+  NO_ASSIGNABLE_ROLES: 'Your account cannot assign any roles.',
+  USER_CREATED_SUCCESSFULLY: 'User created successfully',
+  USER_CREATION_FAILED: 'User creation failed',
+  EMAIL_ALREADY_EXISTS: 'An account with this email already exists',
+  TEMPORARY_PASSWORD: 'Temporary Password',
+  TEMPORARY_PASSWORD_WARNING:
+    'This password is shown once and cannot be retrieved again. Copy it now and share it with the user securely.',
+  COPY: 'Copy',
+  COPIED: 'Copied',
+  COPY_FAILED: 'Could not copy — select the password and copy it manually.',
+  CREATE_ANOTHER_USER: 'Create Another User',
+  BACK_TO_USERS: 'Back to Users',
+  CREATE: 'Create',
 };
 
 export const STEPS = [
@@ -120,7 +151,24 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   EMPLOYEES: '/employees',
   HOLIDAYS: '/holidays',
+  USERS: '/users',
+  CREATE_USER: '/create-user',
 } as const;
+
+/**
+ * Marks a login redirect issued by a server render that found the session
+ * unusable. `proxy.ts` gates only on the presence of the access-token cookie,
+ * which such a render cannot always clear — cookies are only writable from a
+ * Server Action or Route Handler, not mid-render. Without this marker the
+ * proxy would see the stale cookie, bounce the request back to the dashboard,
+ * and the two would redirect at each other indefinitely.
+ */
+export const SESSION_EXPIRED_QUERY = {
+  KEY: 'session',
+  VALUE: 'expired',
+} as const;
+
+export const LOGIN_SESSION_EXPIRED_URL = `${ROUTES.LOGIN}?${SESSION_EXPIRED_QUERY.KEY}=${SESSION_EXPIRED_QUERY.VALUE}`;
 
 export const NOTIFICATION_TYPES: Record<string, NotificationType> = {
   SUCCESS: 'success',

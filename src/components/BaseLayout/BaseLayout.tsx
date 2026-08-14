@@ -12,7 +12,12 @@
  */
 
 import { ReactNode } from 'react';
+import { redirect } from 'next/navigation';
 import LeftNavBar from '../LeftNavBar';
+import AuthHydrator from '../AuthHydrator';
+import { getCurrentUser } from '@/src/lib/server/currentUser';
+import { canManageUsers } from '@/src/lib/auth/roles';
+import { ROUTES } from '@/src/constants/strings';
 import styles from './BaseLayout.module.scss';
 
 /**
@@ -37,10 +42,29 @@ interface BaseLayoutProps {
   children: ReactNode;
 }
 
-export default function BaseLayout({ children }: BaseLayoutProps) {
+export default async function BaseLayout({ children }: BaseLayoutProps) {
+  const user = await getCurrentUser();
+
+  /*
+  Sent to the change-password screen before anything else — users created
+  through the admin UI always arrive holding a temporary password. `redirect`
+  throws, so it stays outside any try block. The reset-password route renders
+  outside this layout, so this cannot bounce against itself.
+
+  Only when a user was actually resolved: redirecting on a null user would
+  fight `proxy.ts`, which sends anyone still holding a session cookie back to
+  the dashboard.
+  */
+  if (user?.mustChangePassword) {
+    redirect(ROUTES.RESET_PASSWORD);
+  }
+
   return (
     <div className={styles.container}>
-      <LeftNavBar />
+      <AuthHydrator user={user} />
+
+      <LeftNavBar showUserManagement={canManageUsers(user?.role)} />
+
       <main className={styles.mainContent}>{children}</main>
     </div>
   );

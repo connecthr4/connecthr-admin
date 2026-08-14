@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { ACCESS_TOKEN_COOKIE } from './lib/auth/cookies';
-import { ROUTES } from './constants/strings';
+import { ROUTES, SESSION_EXPIRED_QUERY } from './constants/strings';
 
 const PUBLIC_ROUTES: string[] = [ROUTES.HOME, ROUTES.LOGIN, ROUTES.RESET_PASSWORD];
 
@@ -26,7 +26,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuthenticated && (pathname === ROUTES.LOGIN || pathname === ROUTES.HOME)) {
+  /*
+  A server render that found the session unusable says so explicitly, because
+  it often cannot clear the cookie this gate reads — cookies are only writable
+  from a Server Action or Route Handler. Bouncing that request back to the
+  dashboard would send it straight to the render that just rejected it.
+  */
+  const isExpiredSessionRedirect =
+    request.nextUrl.searchParams.get(SESSION_EXPIRED_QUERY.KEY) === SESSION_EXPIRED_QUERY.VALUE;
+
+  if (isAuthenticated && !isExpiredSessionRedirect && (pathname === ROUTES.LOGIN || pathname === ROUTES.HOME)) {
     return NextResponse.redirect(new URL(ROUTES.DASHBOARD, request.url));
   }
 

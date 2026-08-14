@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation';
 import { apiConfig } from '../config/api';
 import { API_ENDPOINTS } from './endpoints';
 import type { ApiRequestOptions, RequestBody } from './types';
@@ -206,6 +207,16 @@ export class ApiClient {
       return (await response.text()) as T;
     } catch (error) {
       clearTimeout(timeoutId);
+
+      /*
+      Next signals some of its own control flow by throwing — `redirect()`,
+      `notFound()`, and a request-time API like `cookies()` reached while a
+      route is being prerendered. Those are not API failures, and wrapping one
+      in `UnknownApiError` below would strand it: the redirect never happens,
+      or the route silently prerenders with no session instead of bailing out
+      to dynamic rendering. Hand them straight back to the framework.
+      */
+      unstable_rethrow(error);
 
       if (error instanceof DOMException && error.name === 'AbortError') {
         throw new RequestTimeoutError();
