@@ -24,10 +24,24 @@ import styles from './LeftNavBar.module.scss';
 /**
  * Define the props available for the LeftNavBar component.
  */
-// interface LeftNavBarProps {}
+interface LeftNavBarProps {
+  /**
+   * Whether to render the items gated behind user management. Resolved on the
+   * server from the signed-in user's role and passed in, rather than read from
+   * the client store — the store is empty on a fresh page load, which would
+   * blink the items out of existence for anyone entitled to see them.
+   *
+   * Defaults to `false` so an unresolved role hides the items rather than
+   * offering an action that would fail.
+   */
+  showUserManagement?: boolean;
+}
 
-export default function LeftNavBar({}) {
+export default function LeftNavBar({ showUserManagement = false }: LeftNavBarProps) {
   const pathname = usePathname();
+
+  const navItems = NAV_ITEMS.filter((item) => !item.requiresUserManagement || showUserManagement);
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoSection}>
@@ -35,7 +49,7 @@ export default function LeftNavBar({}) {
       </div>
 
       <nav className={styles.navigation}>
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (

@@ -47,7 +47,7 @@ describe('AppHeader', () => {
     id: '1',
     name: 'John Doe',
     email: 'john.doe@example.com',
-    role: 'Manager',
+    role: 'SUPER_ADMIN',
     status: 'active',
     mustChangePassword: false,
   };
@@ -123,7 +123,7 @@ describe('AppHeader', () => {
     it('should display user role from userDetails', () => {
       render(<AppHeader title="Dashboard" userDetails={mockUser} />);
 
-      expect(screen.getByText('Manager')).toBeInTheDocument();
+      expect(screen.getByText('Super Admin')).toBeInTheDocument();
     });
 
     it('should display default user name when userDetails is null', () => {
@@ -156,15 +156,15 @@ describe('AppHeader', () => {
       expect(screen.getByText('User')).toBeInTheDocument();
     });
 
-    it('should handle user with empty role string', () => {
-      const userWithEmptyRole: User = {
+    it('should handle user with no role', () => {
+      const userWithoutRole: User = {
         ...mockUser,
-        role: '',
+        role: undefined,
       };
 
-      render(<AppHeader title="Dashboard" userDetails={userWithEmptyRole} />);
+      render(<AppHeader title="Dashboard" userDetails={userWithoutRole} />);
 
-      // Empty string is falsy, so should show 'Admin'
+      // An unresolved role formats to an empty string, so should show 'Admin'
       expect(screen.getByText('Admin')).toBeInTheDocument();
     });
   });
@@ -217,7 +217,7 @@ describe('AppHeader', () => {
       expect(screen.getByText('Employee Directory')).toBeInTheDocument();
       expect(screen.getByText('Manage all employees')).toBeInTheDocument();
       expect(screen.getByText('John Doe', { selector: `.${userMenuStyles.name}` })).toBeInTheDocument();
-      expect(screen.getByText('Manager')).toBeInTheDocument();
+      expect(screen.getByText('Super Admin')).toBeInTheDocument();
       expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument();
     });
 
@@ -241,7 +241,7 @@ describe('AppHeader', () => {
       render(<AppHeader title="Test" userDetails={mockUser} />);
 
       expect(screen.getByText('John Doe', { selector: `.${userMenuStyles.name}` })).toBeInTheDocument();
-      expect(screen.getByText('Manager')).toBeInTheDocument();
+      expect(screen.getByText('Super Admin')).toBeInTheDocument();
     });
 
     it('should render profile dropdown icon', () => {

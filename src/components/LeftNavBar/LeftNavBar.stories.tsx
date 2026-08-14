@@ -25,3 +25,22 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+/**
+ * An Admin: the user-management items are absent, since every route behind
+ * them would answer 403.
+ */
+export const Default: Story = {
+  args: {
+    showUserManagement: false,
+  },
+};
+
+/**
+ * IT or a Super Admin, who can reach the user-management routes.
+ */
+export const WithUserManagement: Story = {
+  args: {
+    showUserManagement: true,
+  },
+};

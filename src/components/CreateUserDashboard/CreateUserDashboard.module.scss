@@ -1,0 +1,121 @@
+/**
+------------------------------------------------------
+styles specific to the CreateUserDashboard component
+------------------------------------------------------
+**/
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+  background: var(--color-white);
+  flex: 1;
+  min-height: 0;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 40rem;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.emptyRoles {
+  color: var(--color-gray-500);
+}
+
+.successPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 40rem;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summaryRow {
+  color: var(--color-gray-500);
+}
+
+.passwordBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background: var(--color-violet-600-5);
+}
+
+.passwordLabel {
+  font-weight: 600;
+}
+
+.passwordRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.password {
+  flex: 1;
+  min-width: 12rem;
+
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-white);
+
+  font-family: monospace;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  word-break: break-all;
+
+  /* Selectable by hand — the copy button can be refused by the browser. */
+  user-select: all;
+}
+
+.copyButton {
+  padding: 0.75rem 1.25rem;
+}
+
+.warning {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+
+  color: var(--color-red-500);
+}
+
+.copyError {
+  color: var(--color-red-500);
+}

@@ -31,7 +31,7 @@ const mockUser: User = {
   id: '1',
   name: 'John Doe',
   email: 'john.doe@example.com',
-  role: 'Manager',
+  role: 'SUPER_ADMIN',
   status: 'active',
   mustChangePassword: false,
 };
@@ -46,7 +46,7 @@ describe('UserMenu', () => {
       render(<UserMenu userDetails={mockUser} />);
 
       expect(screen.getByText('John Doe')).toBeInTheDocument();
-      expect(screen.getByText('Manager')).toBeInTheDocument();
+      expect(screen.getByText('Super Admin')).toBeInTheDocument();
     });
 
     it('should fall back to placeholder details when the user is unknown', () => {
