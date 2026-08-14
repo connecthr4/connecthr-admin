@@ -9,6 +9,16 @@ export const API_ENDPOINTS = {
     REFRESH: '/auth/refresh',
 
     PROFILE: '/auth/profile',
+
+    ME: '/auth/me',
+  },
+
+  USERS: {
+    CREATE: '/users',
+
+    LIST: '/users',
+
+    ASSIGNABLE_ROLES: '/users/assignable-roles',
   },
 
   DASHBOARD: {

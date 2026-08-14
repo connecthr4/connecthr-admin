@@ -26,6 +26,7 @@ import { Text1, Text2 } from '../Typography';
 import { Text3 } from '../Typography/Typography';
 import { logoutAction } from '@/src/lib/actions/auth';
 import { useAuthStore } from '@/src/store/auth';
+import { formatRole } from '@/src/lib/auth/roles';
 import { STRINGS } from '@/src/constants/strings';
 import styles from './UserMenu.module.scss';
 
@@ -85,8 +86,9 @@ export default function UserMenu({ userDetails, className }: UserMenuProps) {
               {userDetails?.name || 'User'}
             </Text1>
 
+            {/* The API returns the role as an enum value; the chip shows its label. */}
             <Text2 as="span" className={styles.role} truncation="ellipsis">
-              {userDetails?.role || 'Admin'}
+              {formatRole(userDetails?.role) || 'Admin'}
             </Text2>
           </span>
 

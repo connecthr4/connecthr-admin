@@ -27,7 +27,7 @@ const mockUser: User = {
   id: '1',
   name: 'John Doe',
   email: 'john.doe@example.com',
-  role: 'Manager',
+  role: 'SUPER_ADMIN',
   status: 'active',
   mustChangePassword: false,
 };
@@ -59,7 +59,6 @@ export const LongUserName: Story = {
     userDetails: {
       ...mockUser,
       name: 'Bartholomew Featherstonehaugh-Cholmondeley',
-      role: 'Senior Human Resources Business Partner',
     },
   },
 };
