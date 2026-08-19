@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerApiClient } from '@/src/lib/api/getServerApiClient';
 import { EmployeesApi } from '@/src/lib/api/employees';
-import { ApiError } from '@/src/lib/api/errors';
+import { employeesErrorResponse } from '../errorResponse';
 
 /**
  * Proxies the browser to the external backend using the first-party session
@@ -14,17 +14,6 @@ export async function GET() {
 
     return NextResponse.json(response);
   } catch (error) {
-    return errorResponse(error);
+    return employeesErrorResponse(error);
   }
-}
-
-function errorResponse(error: unknown) {
-  if (error instanceof ApiError) {
-    return NextResponse.json(
-      { success: false, message: error.message, details: error.details },
-      { status: error.statusCode || 500 }
-    );
-  }
-
-  return NextResponse.json({ success: false, message: 'Unexpected error' }, { status: 500 });
 }

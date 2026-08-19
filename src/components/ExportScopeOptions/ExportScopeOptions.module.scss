@@ -1,0 +1,58 @@
+/**
+------------------------------------------------------
+styles specific to the ExportScopeOptions component
+------------------------------------------------------
+**/
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-3);
+  cursor: pointer;
+
+  input[type='radio'] {
+    appearance: none;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+
+    &:checked {
+      border-color: var(--color-violet-600);
+    }
+
+    &:checked::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--color-violet-600);
+      transform: translate(-50%, -50%);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: var(--color-gray-50);
+      border-color: var(--color-gray-200);
+      opacity: 0.6;
+    }
+  }
+
+  &:has(input[type='radio']:disabled) {
+    cursor: not-allowed;
+  }
+}

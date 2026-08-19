@@ -1,3 +1,4 @@
+import { downloadFile } from './fileDownload';
 import type {
   CreateHolidayRequest,
   CreateHolidayResponse,
@@ -5,6 +6,11 @@ import type {
   DeleteHolidayResponse,
   GetHolidaysListResponse,
 } from '../types/holidays';
+
+/**
+ * Used when the backend's `Content-Disposition` does not name the file.
+ */
+const FALLBACK_EXPORT_FILENAME = 'holidays.xlsx';
 
 /**
  * Browser-safe calls — same-origin requests to the Next.js Route Handler at
@@ -36,6 +42,13 @@ export const HolidaysClient = {
     });
 
     return handleResponse<DeleteHolidayResponse>(response);
+  },
+
+  /**
+   * Downloads the holidays Excel export and hands it to the browser to save.
+   */
+  exportHolidays(): Promise<void> {
+    return downloadFile('/api/holidays/export', FALLBACK_EXPORT_FILENAME);
   },
 };
 

@@ -16,18 +16,28 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AppHeader from '../AppHeader';
 import Button from '../Button';
 import TableToolbar from '../TableToolbar';
-import { CirclePlus } from 'lucide-react';
+import ExportConfirmationModal from '../ExportConfirmationModal';
+import ExportScopeOptions, { type ExportScope } from '../ExportScopeOptions';
+import { CirclePlus, Download } from 'lucide-react';
 import styles from './EmployeesDashboard.module.scss';
 import DataTable from '../DataTable';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Eye, Pencil } from 'lucide-react';
 import clsx from 'clsx';
 import { logger } from '@/src/lib/logger';
 import { getEmployees } from '@/src/lib/actions/employees';
+import { EmployeesClient } from '@/src/lib/api/employeesClient';
+import { getApiErrorInfo } from '@/src/lib/api/helpers';
 import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { useDebounce } from '@/src/hooks/useDebounce';
-import type { Employee, EmployeeColumn, EmployeeFilter, EmployeeListMeta } from '@/src/lib/types/employees';
+import type {
+  Employee,
+  EmployeeColumn,
+  EmployeeFilter,
+  EmployeeListMeta,
+  ExportEmployeesRequest,
+} from '@/src/lib/types/employees';
 import type { FilterOptions } from '@/src/lib/types/filters';
 import type { FilterSelection } from '../FilterPopover';
 import { useRouter } from 'next/navigation';
@@ -54,6 +64,41 @@ function toEmployeeFilters(selection: FilterSelection): EmployeeFilter[] {
   return Object.entries(selection)
     .filter(([, values]) => values.length > 0)
     .map(([key, values]) => ({ key, values }));
+}
+
+/**
+ * The export scope the modal opens on. Exporting everything is the safer
+ * default: it is what a user reaching for "Export" usually means, and it
+ * cannot silently omit rows they forgot they had filtered out.
+ */
+const DEFAULT_EXPORT_SCOPE: ExportScope = 'all';
+
+/**
+ * Builds the export payload. On `filtered` it reuses the very same criteria
+ * the list request was made with, so the file matches the rows on screen; on
+ * `all` the criteria are left off entirely. The sort is sent either way, so
+ * the file is ordered like the table rather than however the backend
+ * happens to default.
+ */
+function toExportRequest(
+  scope: ExportScope,
+  criteria: { search: string; filters: EmployeeFilter[] }
+): ExportEmployeesRequest {
+  const request: ExportEmployeesRequest = {
+    scope,
+    sortBy: DEFAULT_SORT_BY,
+    sortOrder: DEFAULT_SORT_ORDER,
+  };
+
+  if (scope === 'all') {
+    return request;
+  }
+
+  return {
+    ...request,
+    ...(criteria.search ? { search: criteria.search } : {}),
+    ...(criteria.filters.length > 0 ? { filters: criteria.filters } : {}),
+  };
 }
 
 /**
@@ -136,14 +181,7 @@ function buildEmployeeColumns(
       cell: ({ row }) => (
         <div className={styles.actions}>
           <Eye size={20} className={clsx(styles.actionIcon)} onClick={() => onView(row.original)} />
-
           <Pencil size={20} className={clsx(styles.actionIcon)} onClick={() => onEdit(row.original)} />
-
-          <Trash2
-            size={20}
-            className={clsx(styles.actionIcon)}
-            onClick={() => logger.info('Delete employee', { id: row.original.id })}
-          />
         </div>
       ),
     },
@@ -210,6 +248,9 @@ export default function EmployeesDashboard({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [filterSelection, setFilterSelection] = useState<FilterSelection>(EMPTY_SELECTION);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportScope, setExportScope] = useState<ExportScope>(DEFAULT_EXPORT_SCOPE);
+  const [isExporting, setIsExporting] = useState(false);
 
   const [appliedSearch, setAppliedSearch] = useState(debouncedSearch);
   const isFirstFetch = useRef(true);
@@ -242,6 +283,40 @@ export default function EmployeesDashboard({
   const handleFilterChange = (selection: FilterSelection) => {
     setFilterSelection(selection);
     setPagination((prev) => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }));
+  };
+
+  /**
+   * The scope resets on every open, so a one-off "filtered" export never
+   * carries over into the next one the user reaches for.
+   */
+  const handleOpenExportModal = () => {
+    setExportScope(DEFAULT_EXPORT_SCOPE);
+    setIsExportModalOpen(true);
+  };
+
+  const handleExportEmployees = async () => {
+    setIsExporting(true);
+
+    try {
+      await EmployeesClient.exportEmployees(
+        toExportRequest(exportScope, { search: debouncedSearch, filters: employeeFilters })
+      );
+      setIsExportModalOpen(false);
+      showNotification(
+        STRINGS.EMPLOYEES_EXPORTED_SUCCESSFULLY,
+        '',
+        NOTIFICATION_TYPES.SUCCESS,
+        5000,
+        'top-right',
+        false
+      );
+    } catch (error) {
+      logger.error('Error occurred while exporting employees:', error);
+      const { message } = getApiErrorInfo(error);
+      showNotification(STRINGS.EMPLOYEES_EXPORT_FAILED, message, NOTIFICATION_TYPES.ERROR, 5000, 'top-right', false);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   useEffect(() => {
@@ -312,6 +387,10 @@ export default function EmployeesDashboard({
           filterOptions={filterOptions}
           onFilterChange={handleFilterChange}
         >
+          <Button variant="secondary" startIcon={Download} className={styles.button} onClick={handleOpenExportModal}>
+            {STRINGS.EXPORT}
+          </Button>
+
           <Button startIcon={CirclePlus} className={styles.button} onClick={() => router.push('/employees/new')}>
             {STRINGS.ADD_NEW_EMPLOYEE}
           </Button>
@@ -329,6 +408,23 @@ export default function EmployeesDashboard({
           />
         </div>
       </div>
+
+      {isExportModalOpen && (
+        <ExportConfirmationModal
+          isOpen={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          onConfirm={handleExportEmployees}
+          description={STRINGS.EXPORT_EMPLOYEES_CONFIRMATION}
+          isExporting={isExporting}
+        >
+          <ExportScopeOptions
+            value={exportScope}
+            onChange={setExportScope}
+            allLabel={STRINGS.EXPORT_SCOPE_ALL_EMPLOYEES}
+            disabled={isExporting}
+          />
+        </ExportConfirmationModal>
+      )}
     </div>
   );
 }

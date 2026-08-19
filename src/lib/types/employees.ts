@@ -226,6 +226,26 @@ export interface GetEmployeesRequest {
   sortOrder?: EmployeeSortOrder;
 }
 
+/**
+ * `all` exports every employee and ignores the table's criteria; `filtered`
+ * exports exactly what the table is currently showing.
+ */
+export type EmployeeExportScope = 'all' | 'filtered';
+
+/**
+ * The export payload. On `all` the criteria are left off entirely — sending
+ * a `search` or `filters` alongside it would be contradictory. On `filtered`
+ * they carry the same values the list request uses, so the file matches the
+ * rows on screen.
+ */
+export interface ExportEmployeesRequest {
+  scope: EmployeeExportScope;
+  search?: string;
+  filters?: EmployeeFilter[];
+  sortBy?: string;
+  sortOrder?: EmployeeSortOrder;
+}
+
 export interface EmployeeListMeta {
   currentPage: number;
   pageSize: number;

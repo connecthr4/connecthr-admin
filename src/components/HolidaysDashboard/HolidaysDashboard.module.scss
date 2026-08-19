@@ -30,6 +30,12 @@ styles specific to the HolidaysDashboard component
   // border-bottom: 1px solid var(--color-border);
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .button {
   padding: 20px;
   border-radius: 10px;
