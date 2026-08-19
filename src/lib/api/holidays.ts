@@ -23,4 +23,12 @@ export const HolidaysApi = {
   deleteHoliday(client: ApiClient, data: DeleteHolidayRequest) {
     return client.delete<DeleteHolidayResponse>(API_ENDPOINTS.HOLIDAYS.DELETE_HOLIDAY(data.id));
   },
+
+  /**
+   * Answers with an Excel file, so the raw response is returned unread — the
+   * route handler streams the body straight to the browser.
+   */
+  exportHolidays(client: ApiClient) {
+    return client.getRaw(API_ENDPOINTS.HOLIDAYS.EXPORT_HOLIDAYS);
+  },
 };

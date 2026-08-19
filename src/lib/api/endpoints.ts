@@ -41,6 +41,8 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/employees/${encodeURIComponent(id)}`,
 
     DELETE: (id: string) => `/employees/${id}`,
+
+    EXPORT: '/employees/export',
   },
 
   DEPARTMENT: {
@@ -55,6 +57,8 @@ export const API_ENDPOINTS = {
     CREATE_HOLIDAY: '/holidays',
 
     DELETE_HOLIDAY: (id: string) => `/holidays/${id}`,
+
+    EXPORT_HOLIDAYS: '/holidays/export',
   },
 
   LOCATIONS: {

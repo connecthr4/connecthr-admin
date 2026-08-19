@@ -1,0 +1,64 @@
+/**
+------------------------------------------------------
+styles specific to the ExportConfirmationModal component
+------------------------------------------------------
+**/
+
+.modal {
+  min-width: 450px;
+}
+
+/*
+  The modal renders no header here — the heading sits with the icon — so the
+  block carries its own breathing room above the icon.
+*/
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-8) var(--spacing-5) 0;
+}
+
+/* Tinted disc behind the icon, echoing the primary action colour. */
+.iconBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--color-violet-50);
+  margin-bottom: var(--spacing-2);
+}
+
+.icon {
+  color: var(--color-violet-600);
+}
+
+.title {
+  margin: 0;
+}
+
+.description {
+  max-width: 26rem;
+  color: var(--color-gray-500);
+}
+
+.extras {
+  margin-top: var(--spacing-8);
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  margin-top: var(--spacing-10);
+}
+
+.action {
+  min-width: 8.75rem;
+  padding: 0.875rem var(--spacing-8);
+  border-radius: var(--radius-md);
+}

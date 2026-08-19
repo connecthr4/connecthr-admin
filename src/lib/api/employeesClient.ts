@@ -1,4 +1,10 @@
-import type { GetEmployeeColumnsResponse } from '../types/employees';
+import { downloadFile } from './fileDownload';
+import type { ExportEmployeesRequest, GetEmployeeColumnsResponse } from '../types/employees';
+
+/**
+ * Used when the backend's `Content-Disposition` does not name the file.
+ */
+const FALLBACK_EXPORT_FILENAME = 'employees.xlsx';
 
 /**
  * Browser-safe calls — same-origin requests to the Next.js Route Handler at
@@ -6,13 +12,26 @@ import type { GetEmployeeColumnsResponse } from '../types/employees';
  * needed: the first-party httpOnly session cookie rides along automatically.
  *
  * The employee list itself is fetched via the `getEmployees` Server Function
- * (`src/lib/actions/employees.ts`) instead of a Route Handler.
+ * (`src/lib/actions/employees.ts`) instead of a Route Handler. The export
+ * cannot follow it: a Server Function returns a serialized value, not a
+ * streamable binary response, so it goes through a Route Handler.
  */
 export const EmployeesClient = {
   async getColumns(): Promise<GetEmployeeColumnsResponse> {
     const response = await fetch('/api/employees/columns');
 
     return handleResponse<GetEmployeeColumnsResponse>(response);
+  },
+
+  /**
+   * Downloads the employees Excel export and hands it to the browser to save.
+   */
+  exportEmployees(data: ExportEmployeesRequest): Promise<void> {
+    return downloadFile('/api/employees/export', FALLBACK_EXPORT_FILENAME, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
   },
 };
 

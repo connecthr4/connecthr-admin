@@ -87,6 +87,12 @@ interface ModalProps {
   centered?: boolean;
 
   /**
+   * Accessible name for the dialog when it renders its own heading in the body
+   * instead of passing a `title`, which would draw the header bar.
+   */
+  ariaLabel?: string;
+
+  /**
    * Additional custom class name applied to the modal container.
    */
   className?: string;
@@ -120,6 +126,7 @@ export default function Modal({
   closeOnOverlayClick = true,
   showCloseButton = false,
   centered = true,
+  ariaLabel,
   className = '',
   overlayClassName = '',
   zIndex = 1000,
@@ -202,7 +209,7 @@ export default function Modal({
         ref={modalRef}
         role="dialog"
         aria-modal="true"
-        aria-label={title || 'Modal'}
+        aria-label={title || ariaLabel || 'Modal'}
         tabIndex={-1}
         className={clsx(styles.modal, className)}
         style={{ maxWidth }}

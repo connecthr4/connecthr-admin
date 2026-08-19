@@ -17,8 +17,9 @@ import Button from '../Button';
 import AppHeader from '../AppHeader';
 import { Heading3 } from '../Typography';
 import { logger } from '@/src/lib/logger';
-import { CirclePlus } from 'lucide-react';
+import { CirclePlus, Download } from 'lucide-react';
 import AddHolidayModal from '../AddHolidayModal';
+import ExportConfirmationModal from '../ExportConfirmationModal';
 import HolidayMonthCard from '../HolidayMonthCard';
 import { getApiErrorInfo } from '@/src/lib/api/helpers';
 import { HolidaysClient } from '@/src/lib/api/holidaysClient';
@@ -38,7 +39,9 @@ export default function HolidaysDashboard({ initialHolidaysList }: HolidaysDashb
   const { showNotification } = useNotification();
   const [holidaysList, setHolidaysList] = useState(initialHolidaysList);
   const [isAddHolidayModalOpen, setIsAddHolidayModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleHolidaySubmit = async (data: CreateHolidayRequest) => {
@@ -76,6 +79,29 @@ export default function HolidaysDashboard({ initialHolidaysList }: HolidaysDashb
     }
   };
 
+  const handleExportHolidays = async () => {
+    setIsExporting(true);
+
+    try {
+      await HolidaysClient.exportHolidays();
+      setIsExportModalOpen(false);
+      showNotification(
+        STRINGS.HOLIDAYS_EXPORTED_SUCCESSFULLY,
+        '',
+        NOTIFICATION_TYPES.SUCCESS,
+        5000,
+        'top-right',
+        false
+      );
+    } catch (error) {
+      logger.error('Error occurred while exporting holidays:', error);
+      const { message } = getApiErrorInfo(error);
+      showNotification(STRINGS.HOLIDAYS_EXPORT_FAILED, message, NOTIFICATION_TYPES.ERROR, 5000, 'top-right', false);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <>
       <div className={styles.container}>
@@ -85,14 +111,26 @@ export default function HolidaysDashboard({ initialHolidaysList }: HolidaysDashb
           <div className={styles.topBar}>
             <Heading3>{STRINGS.YEAR}</Heading3>
 
-            <Button
-              startIcon={CirclePlus}
-              iconSize={24}
-              className={styles.button}
-              onClick={() => setIsAddHolidayModalOpen(true)}
-            >
-              {STRINGS.ADD_NEW_HOLIDAY}
-            </Button>
+            <div className={styles.actions}>
+              <Button
+                variant="secondary"
+                startIcon={Download}
+                iconSize={20}
+                className={styles.button}
+                onClick={() => setIsExportModalOpen(true)}
+              >
+                {STRINGS.EXPORT}
+              </Button>
+
+              <Button
+                startIcon={CirclePlus}
+                iconSize={24}
+                className={styles.button}
+                onClick={() => setIsAddHolidayModalOpen(true)}
+              >
+                {STRINGS.ADD_NEW_HOLIDAY}
+              </Button>
+            </div>
           </div>
 
           <div className={styles.cardsGrid}>
@@ -115,6 +153,16 @@ export default function HolidaysDashboard({ initialHolidaysList }: HolidaysDashb
           onclose={() => setIsAddHolidayModalOpen(false)}
           onSubmit={handleHolidaySubmit}
           isSubmitting={isSubmitting}
+        />
+      )}
+
+      {isExportModalOpen && (
+        <ExportConfirmationModal
+          isOpen={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          onConfirm={handleExportHolidays}
+          description={STRINGS.EXPORT_HOLIDAYS_CONFIRMATION}
+          isExporting={isExporting}
         />
       )}
     </>
