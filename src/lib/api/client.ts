@@ -139,9 +139,40 @@ export class ApiClient {
   }
 
   /**
-   * Generic request method
+   * Generic request method. Parses the response into `T` — JSON when the
+   * backend says so, text otherwise. Binary payloads (file exports) must go
+   * through {@link requestRaw} instead, since decoding them as text corrupts
+   * them.
    */
-  private async request<T>(endpoint: string, options: ApiRequestOptions = {}, isRetry = false): Promise<T> {
+  private async request<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
+    const response = await this.requestRaw(endpoint, options);
+
+    try {
+      /**
+       * No Content
+       */
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
+      const contentType = response.headers.get('content-type');
+
+      if (contentType?.includes('application/json')) {
+        return (await response.json()) as T;
+      }
+
+      return (await response.text()) as T;
+    } catch (error) {
+      throw new UnknownApiError(error instanceof Error ? error.message : 'Unexpected API error');
+    }
+  }
+
+  /**
+   * Performs the request and hands back the untouched `Response`, so callers
+   * that need the raw body (streamed downloads) keep the auth header, the
+   * timeout, the 401 refresh-and-retry, and the error mapping.
+   */
+  private async requestRaw(endpoint: string, options: ApiRequestOptions = {}, isRetry = false): Promise<Response> {
     const { query, timeout: requestTimeout, body, ...fetchOptions } = options;
 
     const controller = new AbortController();
@@ -182,7 +213,7 @@ export class ApiClient {
           try {
             await this.refreshAccessToken();
 
-            return await this.request<T>(endpoint, options, true);
+            return await this.requestRaw(endpoint, options, true);
           } catch {
             throw error;
           }
@@ -191,20 +222,7 @@ export class ApiClient {
         throw error;
       }
 
-      /**
-       * No Content
-       */
-      if (response.status === 204) {
-        return undefined as T;
-      }
-
-      const contentType = response.headers.get('content-type');
-
-      if (contentType?.includes('application/json')) {
-        return (await response.json()) as T;
-      }
-
-      return (await response.text()) as T;
+      return response;
     } catch (error) {
       clearTimeout(timeoutId);
 
@@ -295,6 +313,34 @@ export class ApiClient {
     return this.request<T>(endpoint, {
       ...options,
       method: 'GET',
+    });
+  }
+
+  /**
+   * GET returning the raw `Response`, for endpoints that answer with a file
+   * rather than JSON. The body is left unread so it can be streamed straight
+   * through to the browser.
+   */
+  public getRaw(endpoint: string, options?: Omit<ApiRequestOptions, 'method' | 'body'>): Promise<Response> {
+    return this.requestRaw(endpoint, {
+      ...options,
+      method: 'GET',
+    });
+  }
+
+  /**
+   * POST returning the raw `Response`, for endpoints that answer with a file
+   * rather than JSON — an export whose criteria have to travel in a body.
+   */
+  public postRaw<B extends RequestBody = RequestBody>(
+    endpoint: string,
+    body?: B,
+    options?: Omit<ApiRequestOptions, 'method' | 'body'>
+  ): Promise<Response> {
+    return this.requestRaw(endpoint, {
+      ...options,
+      method: 'POST',
+      body,
     });
   }
 

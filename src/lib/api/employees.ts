@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from './endpoints';
 import {
   CreateEmployeeRequest,
   CreateEmployeeResponse,
+  ExportEmployeesRequest,
   GetEmployeeColumnsResponse,
   GetEmployeeResponse,
   GetEmployeesRequest,
@@ -39,6 +40,14 @@ export const EmployeesApi = {
    */
   updateEmployee(client: ApiClient, employeeId: string, data: UpdateEmployeeRequest) {
     return client.patch<UpdateEmployeeResponse>(API_ENDPOINTS.EMPLOYEE.UPDATE(employeeId), data);
+  },
+
+  /**
+   * Answers with an Excel file, so the raw response is returned unread — the
+   * route handler streams the body straight to the browser.
+   */
+  exportEmployees(client: ApiClient, data: ExportEmployeesRequest) {
+    return client.postRaw(API_ENDPOINTS.EMPLOYEE.EXPORT, data);
   },
 
   getFilterOptions(client: ApiClient) {

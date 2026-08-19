@@ -29,6 +29,7 @@ vi.mock('@/src/lib/api/holidaysClient', () => ({
     createHoliday: vi.fn(),
     getHolidaysList: vi.fn(),
     deleteHoliday: vi.fn(),
+    exportHolidays: vi.fn(),
   },
 }));
 
@@ -49,6 +50,30 @@ vi.mock('../AddHolidayModal', () => ({
         <span>{isSubmitting ? 'submitting' : 'idle'}</span>
         <button onClick={() => onSubmit({ name: 'Diwali', date: '2026-08-15' })}>mock-submit</button>
         <button onClick={onclose}>mock-close</button>
+      </div>
+    ) : null,
+}));
+
+vi.mock('../ExportConfirmationModal', () => ({
+  default: ({
+    isOpen,
+    onClose,
+    onConfirm,
+    description,
+    isExporting,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    description: string;
+    isExporting?: boolean;
+  }) =>
+    isOpen ? (
+      <div>
+        <span>{description}</span>
+        <span>{isExporting ? 'exporting' : 'export-idle'}</span>
+        <button onClick={onConfirm}>mock-confirm-export</button>
+        <button onClick={onClose}>mock-cancel-export</button>
       </div>
     ) : null,
 }));
@@ -262,5 +287,93 @@ describe('HolidaysDashboard', () => {
     );
     expect(HolidaysClient.getHolidaysList).not.toHaveBeenCalled();
     expect(await screen.findAllByText('deleting:none')).toHaveLength(2);
+  });
+
+  it('opens the export confirmation modal when clicking "Export"', async () => {
+    const user = userEvent.setup();
+    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+
+    expect(screen.queryByText('mock-confirm-export')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
+
+    expect(screen.getByText('mock-confirm-export')).toBeInTheDocument();
+    expect(screen.getByText(STRINGS.EXPORT_HOLIDAYS_CONFIRMATION)).toBeInTheDocument();
+    expect(HolidaysClient.exportHolidays).not.toHaveBeenCalled();
+  });
+
+  it('closes the export modal without downloading when cancelled', async () => {
+    const user = userEvent.setup();
+    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+
+    await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
+    await user.click(screen.getByText('mock-cancel-export'));
+
+    expect(screen.queryByText('mock-confirm-export')).not.toBeInTheDocument();
+    expect(HolidaysClient.exportHolidays).not.toHaveBeenCalled();
+  });
+
+  it('downloads the export, closes the modal, and shows a success notification', async () => {
+    const user = userEvent.setup();
+    vi.mocked(HolidaysClient.exportHolidays).mockResolvedValue(undefined);
+
+    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
+    await user.click(screen.getByText('mock-confirm-export'));
+
+    expect(HolidaysClient.exportHolidays).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(screen.queryByText('mock-confirm-export')).not.toBeInTheDocument());
+    expect(showNotificationMock).toHaveBeenCalledWith(
+      STRINGS.HOLIDAYS_EXPORTED_SUCCESSFULLY,
+      '',
+      NOTIFICATION_TYPES.SUCCESS,
+      5000,
+      'top-right',
+      false
+    );
+  });
+
+  it('shows the exporting state on the modal while the download is in flight', async () => {
+    const user = userEvent.setup();
+    let resolveExport!: () => void;
+    vi.mocked(HolidaysClient.exportHolidays).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveExport = () => resolve(undefined);
+        })
+    );
+
+    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
+    expect(screen.getByText('export-idle')).toBeInTheDocument();
+
+    await user.click(screen.getByText('mock-confirm-export'));
+    expect(await screen.findByText('exporting')).toBeInTheDocument();
+
+    resolveExport();
+    await waitFor(() => expect(screen.queryByText('mock-confirm-export')).not.toBeInTheDocument());
+  });
+
+  it('shows an error notification and keeps the export modal open when the download fails', async () => {
+    const user = userEvent.setup();
+    const error = new Error('failed') as Error & { details?: unknown };
+    error.details = { message: 'Export unavailable', success: false };
+    vi.mocked(HolidaysClient.exportHolidays).mockRejectedValue(error);
+
+    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
+    await user.click(screen.getByText('mock-confirm-export'));
+
+    await waitFor(() =>
+      expect(showNotificationMock).toHaveBeenCalledWith(
+        STRINGS.HOLIDAYS_EXPORT_FAILED,
+        'Export unavailable',
+        NOTIFICATION_TYPES.ERROR,
+        5000,
+        'top-right',
+        false
+      )
+    );
+    expect(screen.getByText('mock-confirm-export')).toBeInTheDocument();
   });
 });
