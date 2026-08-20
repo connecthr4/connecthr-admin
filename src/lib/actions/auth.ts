@@ -7,7 +7,8 @@ import { getApiErrorInfo } from '../api/helpers';
 import { getServerApiClient } from '../api/getServerApiClient';
 import { buildCookieCarrier } from '../auth/cookieRelay';
 import { clearSession, setSession } from '../auth/session';
-import { ROUTES } from '@/src/constants/strings';
+import { expireIfIdle } from '../auth/idleGate';
+import { LOGIN_SESSION_EXPIRED_URL, ROUTES } from '@/src/constants/strings';
 
 import type { ChangePasswordRequest, ChangePasswordResponse, LoginRequest, LoginResponse, User } from '../types/auth';
 
@@ -48,6 +49,14 @@ export async function loginAction(credentials: LoginRequest): Promise<LoginActio
 type ChangePasswordActionResult = { success: true } | { success: false; message: string };
 
 export async function changePasswordAction(data: ChangePasswordRequest): Promise<ChangePasswordActionResult> {
+  /*
+  `loginAction` above is deliberately not gated — there is no session to
+  expire yet, and the login itself is what stamps the first activity time.
+  */
+  if (await expireIfIdle()) {
+    redirect(LOGIN_SESSION_EXPIRED_URL, RedirectType.replace);
+  }
+
   try {
     const client = getServerApiClient();
 

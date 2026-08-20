@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerApiClient } from '@/src/lib/api/getServerApiClient';
 import { UsersApi } from '@/src/lib/api/users';
 import { getCurrentUser } from '@/src/lib/server/currentUser';
+import { withSession } from '@/src/lib/server/withSession';
 import { canManageUsers } from '@/src/lib/auth/roles';
 import { forbiddenResponse, usersErrorResponse } from './errorResponse';
 import type { CreateUserRequest } from '@/src/lib/types/users';
@@ -15,7 +16,7 @@ import type { CreateUserRequest } from '@/src/lib/types/users';
  * app, so it cannot rely on the page guard having run. The backend enforces
  * the same rule again behind it.
  */
-export async function GET() {
+export const GET = withSession(async () => {
   try {
     const user = await getCurrentUser();
 
@@ -30,9 +31,9 @@ export async function GET() {
   } catch (error) {
     return usersErrorResponse(error);
   }
-}
+});
 
-export async function POST(request: Request) {
+export const POST = withSession(async (request: Request) => {
   try {
     const user = await getCurrentUser();
 
@@ -48,4 +49,4 @@ export async function POST(request: Request) {
   } catch (error) {
     return usersErrorResponse(error);
   }
-}
+});

@@ -25,6 +25,15 @@ styles specific to the LoginPanel component
   gap: 0.625rem;
 }
 
+.sessionExpiredBanner {
+  margin-top: var(--spacing-5);
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 1px solid var(--color-red-400);
+  border-radius: var(--spacing-2);
+  background-color: var(--color-red-400-10);
+  color: var(--color-red-500);
+}
+
 .button {
   margin-top: 1.75rem;
 }

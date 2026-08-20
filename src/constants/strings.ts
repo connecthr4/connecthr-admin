@@ -99,6 +99,7 @@ export const STRINGS = {
   EMPLOYEES: 'Employees',
   NO_UPCOMING_HOLIDAYS: 'No upcoming holidays',
   LOGOUT: 'Logout',
+  SESSION_EXPIRED: 'Your session has expired due to inactivity. Please log in again.',
   ACCOUNT_MENU: 'Account menu',
   CREATE_USER: 'Create User',
   ADD_NEW_USER: 'Add New User',
@@ -181,6 +182,13 @@ export const SESSION_EXPIRED_QUERY = {
 } as const;
 
 export const LOGIN_SESSION_EXPIRED_URL = `${ROUTES.LOGIN}?${SESSION_EXPIRED_QUERY.KEY}=${SESSION_EXPIRED_QUERY.VALUE}`;
+
+/**
+ * How a Route Handler tells the browser that the 401 it just returned was an
+ * idle timeout rather than an ordinary authorization failure — the first calls
+ * for a trip to the login screen, the second for an error message in place.
+ */
+export const SESSION_EXPIRED_CODE = 'SESSION_EXPIRED';
 
 export const NOTIFICATION_TYPES: Record<string, NotificationType> = {
   SUCCESS: 'success',

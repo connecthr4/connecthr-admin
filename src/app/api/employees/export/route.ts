@@ -1,6 +1,7 @@
 import { getServerApiClient } from '@/src/lib/api/getServerApiClient';
 import { EmployeesApi } from '@/src/lib/api/employees';
 import { streamFileResponse } from '@/src/lib/api/fileResponse';
+import { withSession } from '@/src/lib/server/withSession';
 import { employeesErrorResponse } from '../errorResponse';
 import type { ExportEmployeesRequest } from '@/src/lib/types/employees';
 
@@ -11,7 +12,7 @@ const FALLBACK_FILENAME = 'employees.xlsx';
  * because the export criteria — search, filters, sort — travel in the body,
  * exactly as they do for the list itself.
  */
-export async function POST(request: Request) {
+export const POST = withSession(async (request: Request) => {
   try {
     const body = (await request.json()) as ExportEmployeesRequest;
     const client = getServerApiClient();
@@ -21,4 +22,4 @@ export async function POST(request: Request) {
   } catch (error) {
     return employeesErrorResponse(error);
   }
-}
+});

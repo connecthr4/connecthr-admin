@@ -6,8 +6,9 @@ import { getServerApiClient } from '../api/getServerApiClient';
 import { EmployeesApi } from '../api/employees';
 import { UnauthorizedError } from '../api/errors';
 import { getApiErrorInfo } from '../api/helpers';
+import { expireIfIdle } from '../auth/idleGate';
 import { logger } from '../logger';
-import { ROUTES } from '../../constants/strings';
+import { LOGIN_SESSION_EXPIRED_URL, ROUTES } from '../../constants/strings';
 import type {
   CreateEmployeeRequest,
   CreateEmployeeResult,
@@ -24,6 +25,15 @@ import type {
  * refresh triggered here persists normally.
  */
 export async function getEmployees(request: GetEmployeesRequest): Promise<GetEmployeesResult> {
+  /*
+  Outside the try because `redirect` throws — this fork's guide again — and
+  before the client is built because `getServerApiClient` refreshes on a 401,
+  which would revive the session the gate just ended.
+  */
+  if (await expireIfIdle()) {
+    redirect(LOGIN_SESSION_EXPIRED_URL);
+  }
+
   try {
     const client = getServerApiClient();
     const response = await EmployeesApi.getEmployees(client, request);
@@ -47,6 +57,10 @@ export async function getEmployees(request: GetEmployeesRequest): Promise<GetEmp
  * payload, and no backend URL or token is ever exposed to the browser.
  */
 export async function createEmployee(request: CreateEmployeeRequest): Promise<CreateEmployeeResult> {
+  if (await expireIfIdle()) {
+    redirect(LOGIN_SESSION_EXPIRED_URL);
+  }
+
   try {
     const client = getServerApiClient();
     const response = await EmployeesApi.createEmployee(client, request);
@@ -74,6 +88,10 @@ export async function updateEmployee(
   employeeId: string,
   request: UpdateEmployeeRequest
 ): Promise<UpdateEmployeeResult> {
+  if (await expireIfIdle()) {
+    redirect(LOGIN_SESSION_EXPIRED_URL);
+  }
+
   try {
     const client = getServerApiClient();
     const response = await EmployeesApi.updateEmployee(client, employeeId, request);
