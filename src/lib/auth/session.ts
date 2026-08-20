@@ -1,20 +1,7 @@
 import 'server-only';
 import { cookies } from 'next/headers';
-import { ACCESS_TOKEN_COOKIE, REFRESH_CARRIER_COOKIE } from './cookies';
-
-/**
- * The backend's own token expiry is the real security boundary here, so the
- * cookie lifetime just needs to comfortably outlive it between refreshes.
- */
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
-
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
-  path: '/',
-  maxAge: COOKIE_MAX_AGE,
-};
+import { ACCESS_TOKEN_COOKIE, REFRESH_CARRIER_COOKIE, SESSION_COOKIE_OPTIONS } from './cookies';
+import { LAST_ACTIVITY_COOKIE } from './idle';
 
 export interface Session {
   accessToken: string;
@@ -56,11 +43,22 @@ async function trySetCookies(mutate: (store: Awaited<ReturnType<typeof cookies>>
 
 export async function setSession(session: Session): Promise<void> {
   await trySetCookies((store) => {
-    store.set(ACCESS_TOKEN_COOKIE, session.accessToken, cookieOptions);
+    store.set(ACCESS_TOKEN_COOKIE, session.accessToken, SESSION_COOKIE_OPTIONS);
+    store.set(LAST_ACTIVITY_COOKIE, String(Date.now()), SESSION_COOKIE_OPTIONS);
 
     if (session.refreshCarrier) {
-      store.set(REFRESH_CARRIER_COOKIE, session.refreshCarrier, cookieOptions);
+      store.set(REFRESH_CARRIER_COOKIE, session.refreshCarrier, SESSION_COOKIE_OPTIONS);
     }
+  });
+}
+
+/**
+ * Slides the idle window forward. Separate from `setSession` because most
+ * activity — a navigation, a list refresh — does not rotate the token.
+ */
+export async function touchActivity(): Promise<void> {
+  await trySetCookies((store) => {
+    store.set(LAST_ACTIVITY_COOKIE, String(Date.now()), SESSION_COOKIE_OPTIONS);
   });
 }
 
@@ -68,5 +66,6 @@ export async function clearSession(): Promise<void> {
   await trySetCookies((store) => {
     store.delete(ACCESS_TOKEN_COOKIE);
     store.delete(REFRESH_CARRIER_COOKIE);
+    store.delete(LAST_ACTIVITY_COOKIE);
   });
 }

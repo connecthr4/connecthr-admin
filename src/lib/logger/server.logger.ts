@@ -1,6 +1,6 @@
 import pino from 'pino';
 import { REDACT_FIELDS } from './redact';
-import { isDevelopment } from '@/src/config/env';
+import { isDevelopment } from '@/src/lib/config/env';
 
 export const serverLogger = pino({
   level: process.env.LOG_LEVEL ?? 'info',

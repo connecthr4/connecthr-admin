@@ -1,3 +1,4 @@
+import { handleSessionExpiry } from './sessionExpiry';
 import type { DropdownOption } from '@/src/components/Dropdown/Dropdown';
 import type { DistrictLocation, GetDistrictsResponse, GetStatesResponse, StateLocation } from '../types/locations';
 
@@ -72,6 +73,8 @@ async function handleResponse<T>(response: Response): Promise<T> {
   const payload = await response.json();
 
   if (!response.ok) {
+    handleSessionExpiry(response, payload);
+
     const error = new Error((payload as { message?: string })?.message ?? 'Request failed') as Error & {
       details?: unknown;
     };

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { isDevelopment } from '@/src/config/env';
+import { isDevelopment } from '@/src/lib/config/env';
 import type { Logger } from './logger.types';
 
 export const browserLogger: Logger = {

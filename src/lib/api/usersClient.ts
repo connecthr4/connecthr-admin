@@ -1,3 +1,4 @@
+import { handleSessionExpiry } from './sessionExpiry';
 import type {
   CreateUserRequest,
   CreateUserResponse,
@@ -49,6 +50,8 @@ async function handleResponse<T>(response: Response): Promise<T> {
   const payload = await response.json();
 
   if (!response.ok) {
+    handleSessionExpiry(response, payload);
+
     const error = new Error((payload as { message?: string })?.message ?? 'Request failed') as UsersClientError;
 
     error.code = (payload as { code?: string })?.code;
