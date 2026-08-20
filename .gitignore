@@ -42,3 +42,6 @@ yarn-error.log*
 next-env.d.ts
 *storybook.log
 storybook-static
+
+# claude code (personal overrides; shared config belongs in .claude/settings.json)
+.claude/settings.local.json

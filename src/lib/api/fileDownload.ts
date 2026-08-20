@@ -1,4 +1,5 @@
 import { parseContentDispositionFilename, triggerFileDownload } from '@/src/utils/download';
+import { handleSessionExpiry } from './sessionExpiry';
 
 /**
  * Browser-safe: fetches a file from one of the Next.js Route Handlers and
@@ -40,6 +41,8 @@ async function buildDownloadError(response: Response): Promise<Error & { details
   } catch {
     payload = undefined;
   }
+
+  handleSessionExpiry(response, payload);
 
   const message = (payload as { message?: string } | undefined)?.message ?? response.statusText ?? 'Request failed';
 

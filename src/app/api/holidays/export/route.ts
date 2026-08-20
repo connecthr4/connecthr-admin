@@ -1,6 +1,7 @@
 import { getServerApiClient } from '@/src/lib/api/getServerApiClient';
 import { HolidaysApi } from '@/src/lib/api/holidays';
 import { streamFileResponse } from '@/src/lib/api/fileResponse';
+import { withSession } from '@/src/lib/server/withSession';
 import { holidaysErrorResponse } from '../errorResponse';
 
 const FALLBACK_FILENAME = 'holidays.xlsx';
@@ -8,7 +9,7 @@ const FALLBACK_FILENAME = 'holidays.xlsx';
 /**
  * Streams the backend's Excel export to the browser.
  */
-export async function GET() {
+export const GET = withSession(async () => {
   try {
     const client = getServerApiClient();
     const upstream = await HolidaysApi.exportHolidays(client);
@@ -17,4 +18,4 @@ export async function GET() {
   } catch (error) {
     return holidaysErrorResponse(error);
   }
-}
+});

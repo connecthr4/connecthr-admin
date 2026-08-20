@@ -35,9 +35,17 @@ type AuthStep = 'login' | 'reset-password';
  */
 interface LoginPanelProps {
   step: AuthStep;
+
+  /**
+   * Renders the inactivity notice above the form. An inline banner rather
+   * than a toast: the user arrives here mid-navigation, and a notification
+   * that dismisses itself is easy to miss entirely — leaving them wondering
+   * why they were signed out.
+   */
+  sessionExpired?: boolean;
 }
 
-export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
+export default function LoginPanel({ step = 'login', sessionExpired = false }: LoginPanelProps) {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
   const setTempPassword = useAuthStore((state) => state.setTempPassword);
@@ -199,6 +207,11 @@ export default function LoginPanel({ step = 'login' }: LoginPanelProps) {
             <Heading2>{STRINGS.WELCOME}</Heading2>
             <Text2 className={styles.welcomeText}>{STRINGS.PLEASE_LOGIN_HERE}</Text2>
           </div>
+          {sessionExpired && (
+            <div className={styles.sessionExpiredBanner} role="status">
+              <Text2>{STRINGS.SESSION_EXPIRED}</Text2>
+            </div>
+          )}
           <div className={styles.inputSection}>
             <TextInput
               label={STRINGS.EMAIL_ADDRESS}

@@ -1,4 +1,5 @@
 import { downloadFile } from './fileDownload';
+import { handleSessionExpiry } from './sessionExpiry';
 import type { ExportEmployeesRequest, GetEmployeeColumnsResponse } from '../types/employees';
 
 /**
@@ -39,6 +40,8 @@ async function handleResponse<T>(response: Response): Promise<T> {
   const payload = await response.json();
 
   if (!response.ok) {
+    handleSessionExpiry(response, payload);
+
     const error = new Error((payload as { message?: string })?.message ?? 'Request failed') as Error & {
       details?: unknown;
     };
