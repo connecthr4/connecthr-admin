@@ -1,0 +1,20 @@
+/**
+------------------------------------------------------
+styles specific to the SuccessBadge component
+------------------------------------------------------
+**/
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Sits beside a heading, which would otherwise squash it as the text wraps. */
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  background-color: var(--color-green-50);
+
+  /* The mark is drawn with `currentColor`, so the tint is set once here. */
+  color: var(--notification-success-icon);
+}

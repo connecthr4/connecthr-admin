@@ -40,17 +40,10 @@ styles specific to the HolidayMonthCard component
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
+  /* Scrollbar styling is inherited from `html` — see globals.css. */
   overflow-y: auto;
   padding-right: 0.25rem;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-gray-400-30);
-    border-radius: 999px;
-  }
 }
 
 .holidayItem {

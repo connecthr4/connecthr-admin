@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { ACCESS_TOKEN_COOKIE, REFRESH_CARRIER_COOKIE, SESSION_COOKIE_OPTIONS } from './lib/auth/cookies';
 import { isIdleExpired, LAST_ACTIVITY_COOKIE } from './lib/auth/idle';
 import { revokeBackendSession } from './lib/auth/revoke';
-import { ROUTES, SESSION_EXPIRED_QUERY } from './constants/strings';
+import { ROUTES, SESSION_END_QUERY } from './constants/strings';
 
 const PUBLIC_ROUTES: string[] = [ROUTES.HOME, ROUTES.LOGIN, ROUTES.RESET_PASSWORD];
 
@@ -28,7 +28,8 @@ async function endIdleSession(request: NextRequest, accessToken: string): Promis
 
   const loginUrl = new URL(ROUTES.LOGIN, request.url);
 
-  loginUrl.searchParams.set(SESSION_EXPIRED_QUERY.KEY, SESSION_EXPIRED_QUERY.VALUE);
+  /* This gate is the one place that knows for certain the timeout is what ended the session. */
+  loginUrl.searchParams.set(SESSION_END_QUERY.KEY, SESSION_END_QUERY.IDLE);
 
   const response = NextResponse.redirect(loginUrl);
 
@@ -63,8 +64,10 @@ export async function proxy(request: NextRequest) {
   from a Server Action or Route Handler. Bouncing that request back to the
   dashboard would send it straight to the render that just rejected it.
   */
+  const sessionEndMarker = request.nextUrl.searchParams.get(SESSION_END_QUERY.KEY);
+
   const isExpiredSessionRedirect =
-    request.nextUrl.searchParams.get(SESSION_EXPIRED_QUERY.KEY) === SESSION_EXPIRED_QUERY.VALUE;
+    sessionEndMarker === SESSION_END_QUERY.IDLE || sessionEndMarker === SESSION_END_QUERY.ENDED;
 
   if (!accessToken) {
     return NextResponse.next();

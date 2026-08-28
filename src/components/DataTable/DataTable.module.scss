@@ -17,22 +17,8 @@ styles specific to the DataTable component
   flex: 1;
   min-height: 0;
 
+  /* Scrollbar styling is inherited from `html` — see globals.css. */
   overflow: auto;
-
-  /* Scrollbar */
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-gray-300);
-    border-radius: 999px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
 }
 
 @keyframes shimmer {

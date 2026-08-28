@@ -71,6 +71,7 @@ styles specific to the UserMenu component
 .panel {
   /* Matches the trigger so the panel reads as an extension of the chip. */
   width: 15rem;
+
   padding: var(--spacing-2);
 }
 
@@ -85,7 +86,11 @@ styles specific to the UserMenu component
   gap: var(--spacing-3);
   width: 100%;
 
-  padding: var(--spacing-3);
+  /*
+  Horizontal padding is one step down from the vertical: added to the panel's own, it puts
+  the icon at the same inset as the avatar above it rather than a few pixels further in.
+  */
+  padding: var(--spacing-3) var(--spacing-2);
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;

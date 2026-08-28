@@ -15,6 +15,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FieldValues, useFormContext } from 'react-hook-form';
+import { PartyPopper } from 'lucide-react';
+import clsx from 'clsx';
 import styles from './EmployeeWizard.module.scss';
 import AppHeader from '../AppHeader';
 import Stepper from '../Stepper';
@@ -24,7 +26,8 @@ import ProfessionalInformationForm from '../ProfessionalInformationForm';
 import PayrollInformationForm from '../PayrollInformationForm';
 import DocumentUpload from '../DocumentUpload';
 import Modal from '../Modal';
-import { Caption, Text1, Text2 } from '../Typography';
+import SuccessBadge from '../SuccessBadge';
+import { Caption, Heading4, Text1 } from '../Typography';
 import {
   fromEmployeeDetail,
   hasEmployeeUpdates,
@@ -123,6 +126,11 @@ interface EmployeeSavedModalProps {
  */
 function EmployeeSavedModal({ title, employee, onClose }: EmployeeSavedModalProps) {
   const details = [
+    /*
+    Which record was saved leads the panel, so the fields below it read as that person's. It
+    takes the full width because a name has no reason to be clipped to half of one.
+    */
+    { label: STRINGS.EMPLOYEE_NAME, value: employee.name, wide: true },
     { label: STRINGS.EMPLOYEE_ID, value: employee.employeeId },
     { label: STRINGS.DEPARTMENT, value: employee.department },
     { label: STRINGS.DESIGNATION, value: employee.designation },
@@ -134,14 +142,30 @@ function EmployeeSavedModal({ title, employee, onClose }: EmployeeSavedModalProp
     /*
       Dismissing navigates away, so an overlay click is not enough to trigger it — the user
       has to reach for the close button or the action.
+
+      The heading is rendered in the body rather than passed as `title`, so it can lead the
+      confirmation with the success mark under it; `ariaLabel` keeps the dialog named by that
+      same message.
     */
-    <Modal isOpen onClose={onClose} title={title} closeOnOverlayClick={false} centered className={styles.createdModal}>
+    <Modal
+      isOpen
+      onClose={onClose}
+      ariaLabel={title}
+      closeOnOverlayClick={false}
+      centered
+      className={styles.createdModal}
+    >
       <div className={styles.createdContainer}>
-        <Text2 className={styles.createdName}>{employee.name}</Text2>
+        <div className={styles.createdHeader}>
+          <Heading4 className={styles.createdTitle}>{title}</Heading4>
+
+          {/* The celebratory mark, since a new joiner landing is worth more than a tick. */}
+          <SuccessBadge icon={PartyPopper} size={64} />
+        </div>
 
         <dl className={styles.createdDetails}>
-          {details.map(({ label, value }) => (
-            <div key={label} className={styles.createdDetail}>
+          {details.map(({ label, value, wide }) => (
+            <div key={label} className={clsx(styles.createdDetail, wide && styles.createdDetailWide)}>
               <Caption as="dt" className={styles.createdLabel}>
                 {label}
               </Caption>

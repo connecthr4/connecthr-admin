@@ -98,9 +98,19 @@ function getAlignedOffset(anchorStart: number, anchorSize: number, panelSize: nu
   return anchorStart + anchorSize / 2 - panelSize / 2;
 }
 
+/**
+ * The panel's untransformed size. It cannot be read off `getBoundingClientRect()`: the open
+ * transition scales the panel from 0.96, and that rect reports the *scaled* box, which would
+ * place an end-aligned panel a couple of percent of its own width too far along the trigger.
+ */
+interface PanelSize {
+  width: number;
+  height: number;
+}
+
 function resolvePlacement(
   anchorRect: DOMRect,
-  panelRect: DOMRect,
+  panelRect: PanelSize,
   placement: PopoverPlacement,
   offset: number
 ): PopoverPlacement {
@@ -128,7 +138,7 @@ function resolvePlacement(
 
 function computePosition(
   anchorRect: DOMRect,
-  panelRect: DOMRect,
+  panelRect: PanelSize,
   placement: PopoverPlacement,
   align: PopoverAlign,
   offset: number
@@ -192,7 +202,10 @@ export default function Popover({
 
     const updatePosition = () => {
       const anchorRect = anchorEl.getBoundingClientRect();
-      const panelRect = panelEl.getBoundingClientRect();
+
+      /* `offsetWidth`/`offsetHeight` are layout sizes, so the scale transition cannot skew them. */
+      const panelRect = { width: panelEl.offsetWidth, height: panelEl.offsetHeight };
+
       const { top, left } = computePosition(anchorRect, panelRect, placement, align, offset);
 
       panelEl.style.top = `${top}px`;

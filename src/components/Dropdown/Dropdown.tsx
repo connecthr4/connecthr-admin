@@ -120,7 +120,7 @@ export default function Dropdown({
           aria-expanded={isOpen}
           aria-controls="dropdown-menu"
           disabled={disabled || isLoading}
-          className={clsx(styles.trigger, error && styles.triggerError)}
+          className={clsx(styles.trigger)}
           onClick={() => setIsOpen((prev) => !prev)}
         >
           <span className={clsx(styles.triggerLabel, !selectedOption && styles.placeholder)}>

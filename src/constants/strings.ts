@@ -80,6 +80,7 @@ export const STRINGS = {
   EMPLOYEE_UPDATE_FAILED: 'Employee update failed',
   NO_CHANGES_TO_UPDATE: 'No changes to update',
   NOTHING_WAS_CHANGED: 'Edit a field before saving, or go back to the employee.',
+  EMPLOYEE_NAME: 'Employee Name',
   EMPLOYEE_ID: 'Employee ID',
   DEPARTMENT: 'Department',
   DESIGNATION: 'Designation',
@@ -100,6 +101,12 @@ export const STRINGS = {
   NO_UPCOMING_HOLIDAYS: 'No upcoming holidays',
   LOGOUT: 'Logout',
   SESSION_EXPIRED: 'Your session has expired due to inactivity. Please log in again.',
+  /*
+  For a session that ended without the idle timeout being the known cause — a revoked token,
+  or a backend `/auth/me` that could not be reached. Blaming those on inactivity would be a
+  guess, and during an outage it would be the same wrong guess for every user at once.
+  */
+  SESSION_ENDED: 'Please log in again to continue.',
   ACCOUNT_MENU: 'Account menu',
   CREATE_USER: 'Create User',
   ADD_NEW_USER: 'Add New User',
@@ -170,18 +177,32 @@ export const ROUTES = {
 
 /**
  * Marks a login redirect issued by a server render that found the session
- * unusable. `proxy.ts` gates only on the presence of the access-token cookie,
+ * unusable, and says which of the two reasons below sent the user back.
+ *
+ * `proxy.ts` gates only on the presence of the access-token cookie,
  * which such a render cannot always clear — cookies are only writable from a
  * Server Action or Route Handler, not mid-render. Without this marker the
  * proxy would see the stale cookie, bounce the request back to the dashboard,
  * and the two would redirect at each other indefinitely.
  */
-export const SESSION_EXPIRED_QUERY = {
+export const SESSION_END_QUERY = {
   KEY: 'session',
-  VALUE: 'expired',
+
+  /** The idle timeout ran out: the user really was signed out for being away. */
+  IDLE: 'expired',
+
+  /**
+   * The session could not be used, for a reason nothing on the server can pin on inactivity.
+   * Carries the marker — and so the loop guard — but a wording that does not accuse.
+   */
+  ENDED: 'ended',
 } as const;
 
-export const LOGIN_SESSION_EXPIRED_URL = `${ROUTES.LOGIN}?${SESSION_EXPIRED_QUERY.KEY}=${SESSION_EXPIRED_QUERY.VALUE}`;
+export type SessionEndReason = (typeof SESSION_END_QUERY)['IDLE' | 'ENDED'];
+
+export const LOGIN_SESSION_EXPIRED_URL = `${ROUTES.LOGIN}?${SESSION_END_QUERY.KEY}=${SESSION_END_QUERY.IDLE}`;
+
+export const LOGIN_SESSION_ENDED_URL = `${ROUTES.LOGIN}?${SESSION_END_QUERY.KEY}=${SESSION_END_QUERY.ENDED}`;
 
 /**
  * How a Route Handler tells the browser that the 401 it just returned was an

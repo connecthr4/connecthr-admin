@@ -23,6 +23,7 @@ import AppHeader from '../AppHeader';
 import Button from '../Button';
 import TextInput from '../TextInput';
 import Dropdown from '../Dropdown';
+import SuccessBadge from '../SuccessBadge';
 import { Heading3, Text1, Text2 } from '../Typography';
 import { logger } from '@/src/lib/logger';
 import { isValidEmail } from '@/src/utils/helper';
@@ -272,7 +273,11 @@ function CreatedUserPanel({ user, onCreateAnother, onDone }: CreatedUserPanelPro
 
   return (
     <div className={styles.successPanel}>
-      <Heading3>{STRINGS.USER_CREATED_SUCCESSFULLY}</Heading3>
+      <div className={styles.successHeader}>
+        <SuccessBadge />
+
+        <Heading3>{STRINGS.USER_CREATED_SUCCESSFULLY}</Heading3>
+      </div>
 
       <div className={styles.summary}>
         <Text2 className={styles.summaryRow}>

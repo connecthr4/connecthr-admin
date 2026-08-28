@@ -58,6 +58,25 @@
   --spacing-9: 2rem; /* 32px */
   --spacing-10: 2.5rem; /* 40px */
 
+  /* ==========================
+     Scrollbars
+
+     Applied once, on `html` in globals.css. `scrollbar-width` and
+     `scrollbar-color` both inherit, so that single rule reaches every scroll
+     container in the app and components do not style their own.
+  ========================== */
+
+  /*
+  The standard property takes `thin` or `auto`, never a length — an exact width
+  needs `::-webkit-scrollbar`, which Firefox does not implement. Consistency
+  across browsers is worth more here than the two or three pixels.
+  */
+  --scrollbar-width: thin;
+  --scrollbar-thumb: var(--color-gray-300);
+
+  /* The thumb alone is enough of a signal; a filled track only adds a stripe. */
+  --scrollbar-track: transparent;
+
   /* Radius */
   --radius-xs: 5px;
   --radius-sm: 8px;

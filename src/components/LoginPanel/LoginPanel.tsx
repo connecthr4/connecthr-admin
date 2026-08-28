@@ -12,7 +12,7 @@
  */
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, X } from 'lucide-react';
 import { logger } from '@/src/lib/logger';
 import Modal from '@/src/components/Modal';
@@ -25,8 +25,10 @@ import { getApiErrorInfo } from '@/src/lib/api/helpers';
 import { Heading1, Heading2, Text1, Text2 } from '../Typography';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { changePasswordAction, loginAction } from '@/src/lib/actions/auth';
-import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
+import { NOTIFICATION_TYPES, ROUTES, SESSION_END_QUERY, STRINGS } from '@/src/constants/strings';
 import styles from './LoginPanel.module.scss';
+
+import type { SessionEndReason } from '@/src/constants/strings';
 
 type AuthStep = 'login' | 'reset-password';
 
@@ -37,15 +39,17 @@ interface LoginPanelProps {
   step: AuthStep;
 
   /**
-   * Renders the inactivity notice above the form. An inline banner rather
-   * than a toast: the user arrives here mid-navigation, and a notification
-   * that dismisses itself is easy to miss entirely — leaving them wondering
-   * why they were signed out.
+   * Why the user was sent back here, if they were: `expired` for an idle
+   * timeout, `ended` for a session that stopped working for another reason.
+   * Renders a notice above the form — an inline banner rather than a toast,
+   * because the user arrives mid-navigation and a notification that dismisses
+   * itself is easy to miss entirely, leaving them wondering why they were
+   * signed out.
    */
-  sessionExpired?: boolean;
+  sessionEndReason?: SessionEndReason;
 }
 
-export default function LoginPanel({ step = 'login', sessionExpired = false }: LoginPanelProps) {
+export default function LoginPanel({ step = 'login', sessionEndReason }: LoginPanelProps) {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
   const setTempPassword = useAuthStore((state) => state.setTempPassword);
@@ -71,6 +75,27 @@ export default function LoginPanel({ step = 'login', sessionExpired = false }: L
     newPassword: '',
     confirmPassword: '',
   });
+
+  /*
+  The banner is a one-off announcement, but the URL it is read from outlives the moment: a
+  reload, the Back button, or a browser restoring the tab would all replay it, long after the
+  session it referred to. So the marker is dropped as soon as it has been rendered once.
+
+  `replaceState` rather than `router.replace`: Next.js integrates it with the Router, and it
+  neither re-renders this page (the banner has to stay put for the visit it belongs to) nor
+  leaves the marked URL behind in the history stack.
+  */
+  useEffect(() => {
+    if (!sessionEndReason) return;
+
+    const url = new URL(window.location.href);
+
+    if (!url.searchParams.has(SESSION_END_QUERY.KEY)) return;
+
+    url.searchParams.delete(SESSION_END_QUERY.KEY);
+
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  }, [sessionEndReason]);
 
   const handleChange = (field: 'email' | 'password', value: string) => {
     setFormData((prev) => ({
@@ -207,9 +232,11 @@ export default function LoginPanel({ step = 'login', sessionExpired = false }: L
             <Heading2>{STRINGS.WELCOME}</Heading2>
             <Text2 className={styles.welcomeText}>{STRINGS.PLEASE_LOGIN_HERE}</Text2>
           </div>
-          {sessionExpired && (
+          {sessionEndReason && (
             <div className={styles.sessionExpiredBanner} role="status">
-              <Text2>{STRINGS.SESSION_EXPIRED}</Text2>
+              <Text2>
+                {sessionEndReason === SESSION_END_QUERY.IDLE ? STRINGS.SESSION_EXPIRED : STRINGS.SESSION_ENDED}
+              </Text2>
             </div>
           )}
           <div className={styles.inputSection}>

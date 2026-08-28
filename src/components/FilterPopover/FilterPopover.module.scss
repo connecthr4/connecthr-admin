@@ -43,7 +43,9 @@ styles specific to the FilterPopover component
   /*
   The panel is narrow, so a scrollbar gutter eats into the option labels —
   hide the indicator but keep the area scrollable by wheel, touch and
-  keyboard. Firefox / legacy Edge first, then WebKit.
+  keyboard. This is the deliberate opt-out from the application-wide scrollbar
+  inherited from `html` (globals.css); `scrollbar-width` is what overrides it,
+  with the two below still covering browsers that predate that property.
   */
   scrollbar-width: none;
   -ms-overflow-style: none;

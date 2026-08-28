@@ -43,16 +43,14 @@ interface SearchInputProps {
 
 export default function SearchInput({ placeholder = 'Search', value, onChange, onClear }: SearchInputProps) {
   return (
-    <div className={styles.container}>
-      <TextInput
-        placeholder={placeholder}
-        value={value}
-        onChange={(event) => onChange?.(event.target.value)}
-        leftIcon={<Search height={24} width={24} />}
-        rightIcon={
-          value ? <X height={24} width={24} onClick={() => (onClear ? onClear() : onChange?.(''))} /> : undefined
-        }
-      />
-    </div>
+    <TextInput
+      placeholder={placeholder}
+      value={value}
+      onChange={(event) => onChange?.(event.target.value)}
+      leftIcon={<Search height={24} width={24} />}
+      rightIcon={
+        value ? <X height={24} width={24} onClick={() => (onClear ? onClear() : onChange?.(''))} /> : undefined
+      }
+    />
   );
 }

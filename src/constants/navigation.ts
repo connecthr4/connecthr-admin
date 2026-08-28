@@ -40,11 +40,11 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/employees',
     icon: Users,
   },
-  {
-    label: 'All Departments',
-    href: '/departments',
-    icon: Building2,
-  },
+  // {
+  //   label: 'All Departments',
+  //   href: '/departments',
+  //   icon: Building2,
+  // },
   // {
   //   label: 'Attendance',
   //   href: '/attendance',
