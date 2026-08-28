@@ -33,6 +33,23 @@ styles specific to the EmployeeWizard component
 
   overflow-y: auto;
 
+  /*
+  The step's footer scrolls with the fields rather than being pinned, so the scrollbar runs
+  past the Next button as well as the right-hand column. These two keep it off both, and are
+  needed together because they cover different kinds of scrollbar:
+
+  - `scrollbar-gutter` reserves the track's width where scrollbars take up layout space
+    (Windows, or macOS set to always show them), so the fields also stop shifting sideways
+    the moment the form grows tall enough to scroll.
+  - It does nothing for the overlay scrollbars macOS uses by default — those float above the
+    content by design — so the padding is what holds the fields and the button clear there.
+
+  Right side only: the stepper above sits outside this container, and padding on the left
+  would push the fields out of line with it.
+  */
+  scrollbar-gutter: stable;
+  padding-right: var(--spacing-3);
+
   width: 100%;
   margin-top: 24px;
 
@@ -118,16 +135,24 @@ skeleton styles (loading state, see EmployeeWizardSkeleton)
   min-width: 450px;
 }
 
+/* No `margin-top`: the heading moved into the body, so the modal draws no header bar above. */
 .createdContainer {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-
-  margin-top: var(--spacing-7);
 }
 
-.createdName {
-  font-weight: 600;
+/* The outcome is read first, then the mark under it confirms what the words already said. */
+.createdHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.createdTitle {
+  /* Long messages wrap to a second centred line rather than pulling to the left edge. */
+  text-align: center;
 }
 
 .createdDetails {
@@ -149,6 +174,10 @@ skeleton styles (loading state, see EmployeeWizardSkeleton)
   gap: 0.25rem;
 
   min-width: 0;
+}
+
+.createdDetailWide {
+  grid-column: 1 / -1;
 }
 
 .createdLabel {

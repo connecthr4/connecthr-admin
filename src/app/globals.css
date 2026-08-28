@@ -48,6 +48,21 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   min-height: 100%;
+
+  /*
+  The application's one scrollbar style. Both properties are inherited, so
+  declaring them here covers every scroll container — the page, dialogs, lists,
+  tables, and anything added later — without each component styling its own,
+  which is how they drifted apart in the first place.
+
+  Deliberately the standard properties rather than `::-webkit-scrollbar`: those
+  are non-standard and Firefox-blind, and Chromium ignores them outright on any
+  element whose `scrollbar-color` is set, so the two cannot be layered as
+  progressive enhancement. A container that wants no scrollbar at all opts out
+  with `scrollbar-width: none` (see `FilterPopover`).
+  */
+  scrollbar-width: var(--scrollbar-width);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 body {

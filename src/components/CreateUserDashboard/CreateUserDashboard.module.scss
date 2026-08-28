@@ -54,6 +54,12 @@ styles specific to the CreateUserDashboard component
   max-width: 40rem;
 }
 
+.successHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-5);
+}
+
 .summary {
   display: flex;
   flex-direction: column;

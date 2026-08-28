@@ -21,6 +21,12 @@ styles specific to the TextInput component
   border-radius: 8px;
   background-color: var(--color-white);
 
+  /*
+  The wrapper is the visible field, so it has to carry the field's cursor — over the icons
+  and the padding the pointer would otherwise fall back to the default arrow.
+  */
+  cursor: text;
+
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -38,6 +44,7 @@ styles specific to the TextInput component
   padding-left: 0.875rem;
   color: var(--color-gray-500);
   flex-shrink: 0;
+  pointer-events: none;
 }
 
 .inputField {

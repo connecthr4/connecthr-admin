@@ -1,16 +1,16 @@
 import { z } from 'zod';
 
 /**
- * Mirrors the rule the create endpoint applies to both phone numbers — ten digits opening
- * with 6-9 — so a number it would reject is caught on the step rather than at submit.
+ * Ten digits, any of them leading: the step checks the length and nothing else, so numbers
+ * that don't follow the Indian mobile ranges are still accepted.
  */
-const INDIAN_MOBILE_NUMBER = /^[6-9]\d{9}$/;
+const TEN_DIGIT_NUMBER = /^\d{10}$/;
 
 export const personalInformationSchema = z.object({
   // Personal Details
   firstName: z.string().min(1, 'First Name is required'),
   lastName: z.string().min(1, 'Last Name is required'),
-  mobileNumber: z.string().regex(INDIAN_MOBILE_NUMBER, 'Enter a valid 10-digit Mobile Number'),
+  mobileNumber: z.string().regex(TEN_DIGIT_NUMBER, 'Enter a valid 10-digit Mobile Number'),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
   dateOfBirth: z.string().min(1, 'Date of Birth is required'),
   gender: z.string().min(1, 'Gender is required'),
@@ -43,7 +43,7 @@ export const personalInformationSchema = z.object({
   // Emergency Contact
   emergencyContactName: z.string().min(1, 'Contact Name is required'),
   emergencyRelationship: z.string().min(1, 'Relationship is required'),
-  emergencyPhoneNumber: z.string().regex(INDIAN_MOBILE_NUMBER, 'Enter a valid 10-digit Phone Number'),
+  emergencyPhoneNumber: z.string().regex(TEN_DIGIT_NUMBER, 'Enter a valid 10-digit Phone Number'),
   emergencyAddress: z.string().min(1, 'Address is required'),
 });
 

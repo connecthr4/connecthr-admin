@@ -25,21 +25,8 @@ styles specific to the DepartmentsDashboard component
   flex: 1;
   min-height: 0;
 
+  /* Scrollbar styling is inherited from `html` — see globals.css. */
   overflow-y: auto;
-
-  /* Scrollbar */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 999px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
 }
 
 .departmentsGrid {

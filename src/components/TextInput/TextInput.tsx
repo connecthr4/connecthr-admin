@@ -171,7 +171,7 @@ export default function TextInput({
           {label} {required && <Text3 className={styles.asterisk}>*</Text3>}
         </Label>
       )}
-      <div className={styles.inputWrapper}>
+      <label className={styles.inputWrapper}>
         {leftIcon && <div className={styles.leftIcon}>{leftIcon}</div>}
         <input
           type={isPasswordType && isPasswordVisible ? 'text' : type}
@@ -205,7 +205,7 @@ export default function TextInput({
         ) : (
           rightIcon && <div className={styles.iconButton}>{rightIcon}</div>
         )}
-      </div>
+      </label>
 
       {error && <ErrorText>{error}</ErrorText>}
     </div>

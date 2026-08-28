@@ -5,7 +5,7 @@ import { AuthApi } from '../api/auth';
 import { getServerApiClient } from '../api/getServerApiClient';
 import { UnauthorizedError } from '../api/errors';
 import { canManageUsers } from '../auth/roles';
-import { LOGIN_SESSION_EXPIRED_URL, ROUTES } from '../../constants/strings';
+import { LOGIN_SESSION_ENDED_URL, ROUTES } from '../../constants/strings';
 import { logger } from '../logger';
 import type { User } from '../types/auth';
 
@@ -56,9 +56,14 @@ export async function requireUser(): Promise<User> {
   `redirect` throws, so it stays out of any try block. The marker on the URL
   tells `proxy.ts` not to bounce this back to the dashboard on the strength of
   a cookie this render could not clear.
+
+  The neutral marker, not the idle one: `getCurrentUser` fails closed, so a
+  null user here is as likely to be a backend blip or a revoked token as a
+  timeout — and the idle gates ahead of this one would have caught a real
+  timeout first.
   */
   if (!user) {
-    redirect(LOGIN_SESSION_EXPIRED_URL);
+    redirect(LOGIN_SESSION_ENDED_URL);
   }
 
   if (user.mustChangePassword) {

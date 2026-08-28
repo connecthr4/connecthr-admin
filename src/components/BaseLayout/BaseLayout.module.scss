@@ -15,11 +15,16 @@ styles specific to the BaseLayout component
   overflow: hidden;
 }
 
+/*
+No `border-radius` here: this element paints nothing of its own, so a radius would only
+round the clip that `overflow: hidden` applies — and the header sits flush in its top-right
+corner, where that arc cut the corner off the user chip. The cards inside carry their own
+radii, which is where the rounding is actually seen.
+*/
 .mainContent {
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
   padding-left: var(--spacing-8);
-  border-radius: var(--radius-xl);
 }
