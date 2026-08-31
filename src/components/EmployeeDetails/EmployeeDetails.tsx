@@ -15,12 +15,12 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
-import { BriefcaseBusiness, Phone, PencilLine, UserRound, LogOut } from 'lucide-react';
+import { BriefcaseBusiness, Phone, PencilLine } from 'lucide-react';
 import AppHeader from '../AppHeader';
 import Button from '../Button';
 import Stepper from '../Stepper';
 import { Heading5, Text1, Text2, Text4 } from '../Typography/Typography';
-import { ROUTES, STEPS, STRINGS } from '@/src/constants/strings';
+import { PROFILE_ITEMS, ROUTES, STEPS, STRINGS } from '@/src/constants/strings';
 import { formatLongDate } from '@/src/utils/date';
 import type { EmployeeDetail } from '@/src/lib/types/employees';
 import styles from './EmployeeDetails.module.scss';
@@ -248,24 +248,13 @@ function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) {
   );
 }
 
-export const profileItems = [
-  {
-    label: STRINGS.PROFILE,
-    icon: UserRound,
-  },
-  {
-    label: STRINGS.SEPARATION,
-    icon: LogOut,
-  },
-];
-
 function EmployeeProfileSidebar() {
-  const [selectedItem, setSelectedItem] = useState(profileItems[0].label);
+  const [selectedItem, setSelectedItem] = useState(PROFILE_ITEMS[0].label);
 
   return (
     <div className={styles.sidebar}>
       <div className={styles.itemContainer}>
-        {profileItems.map((item) => {
+        {PROFILE_ITEMS.map((item) => {
           const Icon = item.icon;
 
           return (

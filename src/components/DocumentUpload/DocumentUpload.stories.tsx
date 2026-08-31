@@ -10,7 +10,16 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  argTypes: {},
+  argTypes: {
+    submitLabel: {
+      control: 'text',
+      description: 'Label rendered on the submit button',
+    },
+    isSubmitting: {
+      control: 'boolean',
+      description: 'Locks both actions and the upload fields while the employee is saved',
+    },
+  },
   args: {
     onSubmit: fn(),
     onBack: fn(),
@@ -21,3 +30,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Submitting: Story = {
+  args: {
+    isSubmitting: true,
+  },
+};

@@ -1,0 +1,192 @@
+/**
+------------------------------------------------------
+styles specific to the FileDropzone component
+------------------------------------------------------
+**/
+
+.field {
+  /* The hidden input is positioned against this, so it cannot escape the field. */
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+/*
+Visually hidden but still focusable and still a real input, so the picker, the keyboard and
+`htmlFor` all keep working. `display: none` would take it out of the tab order.
+*/
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.title {
+  color: var(--color-gray-900);
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+
+  min-height: 148px;
+  padding: var(--spacing-8);
+
+  border: 1px dashed var(--color-gray-300);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white);
+
+  text-align: center;
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-violet-600);
+  }
+}
+
+/* The box carries the focus ring, since the input that actually holds focus is hidden. */
+.field:has(.input:focus-visible) .dropzone {
+  border-color: var(--color-violet-600);
+  outline: 2px solid var(--color-violet-600-40);
+  outline-offset: 2px;
+}
+
+.dragging {
+  border-color: var(--color-violet-600);
+  background-color: var(--color-violet-600-5);
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: var(--radius-md);
+  background-color: var(--color-violet-600);
+  color: var(--color-white);
+}
+
+.instruction {
+  color: var(--color-gray-900);
+}
+
+.action {
+  color: var(--color-violet-600);
+}
+
+.hint {
+  color: var(--color-gray-400);
+}
+
+/* Nothing in the filled box opens the picker on its own — only the "Replace file" link does. */
+.filled {
+  gap: var(--spacing-3);
+  cursor: default;
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+
+  width: 100%;
+  max-width: 320px;
+  padding: var(--spacing-3);
+
+  border-radius: var(--radius-sm);
+  background-color: var(--color-gray-150);
+}
+
+.thumbnail {
+  flex-shrink: 0;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: var(--radius-xs);
+  object-fit: cover;
+}
+
+.fileIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: var(--radius-xs);
+  background-color: var(--color-violet-50);
+  color: var(--color-violet-600);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  /* Without this the name refuses to shrink and pushes the remove button out of the row. */
+  min-width: 0;
+
+  text-align: left;
+}
+
+.fileName {
+  color: var(--color-gray-900);
+}
+
+.fileSize {
+  color: var(--color-gray-400);
+}
+
+.remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  padding: var(--spacing-1);
+
+  border: none;
+  border-radius: var(--radius-xs);
+  background: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-red-500);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.replace {
+  color: var(--color-violet-600);
+  cursor: pointer;
+}

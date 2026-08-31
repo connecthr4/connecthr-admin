@@ -129,12 +129,19 @@ const EmployeesTable = DataTable as unknown as (props: {
  */
 interface EmployeeRowActions {
   onView: (employee: Employee) => void;
+
+  /**
+   * Fired when the pointer reaches the view action, before it is clicked — see
+   * `handleViewEmployeeIntent`.
+   */
+  onViewIntent: (employee: Employee) => void;
+
   onEdit: (employee: Employee) => void;
 }
 
 function buildEmployeeColumns(
   apiColumns: EmployeeColumn[],
-  { onView, onEdit }: EmployeeRowActions
+  { onView, onViewIntent, onEdit }: EmployeeRowActions
 ): ColumnDef<Employee>[] {
   const dynamicColumns: ColumnDef<Employee>[] = apiColumns
     .filter((column) => !FIXED_COLUMN_KEYS.has(column.accessorKey))
@@ -180,7 +187,12 @@ function buildEmployeeColumns(
 
       cell: ({ row }) => (
         <div className={styles.actions}>
-          <Eye size={20} className={clsx(styles.actionIcon)} onClick={() => onView(row.original)} />
+          <Eye
+            size={20}
+            className={clsx(styles.actionIcon)}
+            onClick={() => onView(row.original)}
+            onMouseEnter={() => onViewIntent(row.original)}
+          />
           <Pencil size={20} className={clsx(styles.actionIcon)} onClick={() => onEdit(row.original)} />
         </div>
       ),
@@ -223,6 +235,18 @@ export default function EmployeesDashboard({
   );
 
   /**
+   * The details route is dynamic, so it is never prefetched on its own — only its loading
+   * boundary can be, and only when asked. Warming it on hover means the click lands on a
+   * skeleton that is already in the browser, with just the record still streaming in.
+   */
+  const handleViewEmployeeIntent = useCallback(
+    (employee: Employee) => {
+      router.prefetch(`${ROUTES.EMPLOYEES}/${employee.id}`);
+    },
+    [router]
+  );
+
+  /**
    * The edit route fetches the record itself and renders the wizard already populated, so
    * the row action only has to navigate — nothing is fetched from the table.
    */
@@ -234,8 +258,13 @@ export default function EmployeesDashboard({
   );
 
   const employeeColumns = useMemo(
-    () => buildEmployeeColumns(initialColumns, { onView: handleViewEmployee, onEdit: handleEditEmployee }),
-    [initialColumns, handleViewEmployee, handleEditEmployee]
+    () =>
+      buildEmployeeColumns(initialColumns, {
+        onView: handleViewEmployee,
+        onViewIntent: handleViewEmployeeIntent,
+        onEdit: handleEditEmployee,
+      }),
+    [initialColumns, handleViewEmployee, handleViewEmployeeIntent, handleEditEmployee]
   );
 
   const [employees, setEmployees] = useState(initialEmployees);

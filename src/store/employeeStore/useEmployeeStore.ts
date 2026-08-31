@@ -53,6 +53,17 @@ const initialState = {
     uanNumber: '',
     esicNumber: '',
   },
+
+  /*
+  Spelled out rather than derived from EMPLOYEE_DOCUMENT_TYPES, so adding a slot to that
+  list is a type error here instead of a silently missing key.
+  */
+  documents: {
+    appointmentLetter: null,
+    salarySlips: null,
+    relievingLetter: null,
+    experienceLetter: null,
+  },
 };
 
 export const useEmployeeStore = create<EmployeeStoreState>((set) => ({
@@ -79,6 +90,14 @@ export const useEmployeeStore = create<EmployeeStoreState>((set) => ({
       payrollInformation: {
         ...state.payrollInformation,
         ...data,
+      },
+    })),
+
+  setDocument: (type, file) =>
+    set((state) => ({
+      documents: {
+        ...state.documents,
+        [type]: file,
       },
     })),
 

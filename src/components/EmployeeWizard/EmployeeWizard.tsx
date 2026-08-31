@@ -15,7 +15,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FieldValues, useFormContext } from 'react-hook-form';
-import { PartyPopper } from 'lucide-react';
+import { CircleCheck } from 'lucide-react';
 import clsx from 'clsx';
 import styles from './EmployeeWizard.module.scss';
 import AppHeader from '../AppHeader';
@@ -130,10 +130,9 @@ function EmployeeSavedModal({ title, employee, onClose }: EmployeeSavedModalProp
     Which record was saved leads the panel, so the fields below it read as that person's. It
     takes the full width because a name has no reason to be clipped to half of one.
     */
-    { label: STRINGS.EMPLOYEE_NAME, value: employee.name, wide: true },
+    { label: STRINGS.EMPLOYEE_NAME, value: employee.name },
     { label: STRINGS.EMPLOYEE_ID, value: employee.employeeId },
     { label: STRINGS.DEPARTMENT, value: employee.department },
-    { label: STRINGS.DESIGNATION, value: employee.designation },
     { label: STRINGS.EMPLOYEE_TYPE, value: employee.employeeType },
     { label: STRINGS.EMPLOYMENT_STATUS, value: employee.employmentStatus },
   ];
@@ -158,14 +157,12 @@ function EmployeeSavedModal({ title, employee, onClose }: EmployeeSavedModalProp
       <div className={styles.createdContainer}>
         <div className={styles.createdHeader}>
           <Heading4 className={styles.createdTitle}>{title}</Heading4>
-
-          {/* The celebratory mark, since a new joiner landing is worth more than a tick. */}
-          <SuccessBadge icon={PartyPopper} size={64} />
+          <SuccessBadge icon={CircleCheck} size={64} />
         </div>
 
         <dl className={styles.createdDetails}>
-          {details.map(({ label, value, wide }) => (
-            <div key={label} className={clsx(styles.createdDetail, wide && styles.createdDetailWide)}>
+          {details.map(({ label, value }) => (
+            <div key={label} className={clsx(styles.createdDetail)}>
               <Caption as="dt" className={styles.createdLabel}>
                 {label}
               </Caption>
