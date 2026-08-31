@@ -169,3 +169,100 @@ styles specific to the EmployeeDetails component
   align-items: center;
   justify-content: center;
 }
+
+/**
+------------------------------------------------------
+skeleton styles (loading state, see EmployeeDetailsSkeleton)
+------------------------------------------------------
+**/
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.bone {
+  border-radius: var(--radius-md);
+  background: var(--color-gray-200);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* Stands in for the page title, which is the employee's name. */
+.skeletonHeading {
+  display: block;
+  width: 12rem;
+  height: 2rem;
+}
+
+.skeletonAvatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 12px;
+}
+
+.skeletonName {
+  width: 14rem;
+  height: 1.5rem;
+}
+
+/* The designation and phone number lines, which sit under the name. */
+.skeletonMeta {
+  width: 10rem;
+  height: 1rem;
+}
+
+/* The "Edit Profile" button, held open so the header does not jump when it arrives. */
+.skeletonButton {
+  width: 9rem;
+  height: 3rem;
+}
+
+/*
+The sidebar rows are the real menu with only their labels unknown, so they borrow the menu
+item's own spacing rather than redefining it.
+*/
+.skeletonMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+
+  svg {
+    color: var(--color-gray-400);
+  }
+}
+
+.skeletonMenuLabel {
+  width: 6rem;
+  height: 1rem;
+}
+
+.skeletonSectionTitle {
+  width: 9rem;
+  height: 1.25rem;
+  margin-top: 8px;
+}
+
+/* Paired with `.infoItem`, so the bones keep the real rows' padding and dividers. */
+.skeletonInfoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeletonLabel {
+  width: 7rem;
+  height: 0.875rem;
+}
+
+.skeletonValue {
+  width: 11rem;
+  height: 1rem;
+}

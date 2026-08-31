@@ -11,6 +11,7 @@
  * ```
  */
 
+import type { ReactNode } from 'react';
 import type { User } from '@/src/lib/types/auth';
 import Breadcrumbs from '../Breadcrumbs';
 import UserMenu from '../UserMenu';
@@ -29,8 +30,13 @@ interface BreadcrumbItem {
 interface AppHeaderProps {
   /**
    * Primary heading displayed at the top of the page.
+   *
+   * @remarks
+   * A node rather than a string, so a screen whose title is not known yet — a loading
+   * skeleton waiting on the record it is named after — can put a placeholder in its place
+   * and keep the rest of the header on screen.
    */
-  title: string;
+  title: ReactNode;
 
   /**
    * Optional secondary text displayed below the title.
