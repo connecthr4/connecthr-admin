@@ -1,5 +1,6 @@
-import { User, BriefcaseBusiness, FileText, Wallet } from 'lucide-react';
+import { User, BriefcaseBusiness, FileText, Wallet, UserRound, LogOut } from 'lucide-react';
 import { NotificationType } from '../providers/NotificationProvider';
+import type { EmployeeDocumentType } from '../store/employeeStore/types';
 
 export const STRINGS = {
   APP_NAME: 'connectHR',
@@ -139,7 +140,49 @@ export const STRINGS = {
   CREATE_ANOTHER_USER: 'Create Another User',
   BACK_TO_USERS: 'Back to Users',
   CREATE: 'Create',
+  UPLOAD_APPOINTMENT_LETTER: 'Upload Appointment Letter',
+  UPLOAD_SALARY_SLIPS: 'Upload Salary Slips',
+  UPLOAD_RELIEVING_LETTER: 'Upload Relieving Letter',
+  UPLOAD_EXPERIENCE_LETTER: 'Upload Experience Letter',
+
+  /*
+  The three halves of the dropzone's one sentence — "choose file" is rendered as the link in
+  the middle of it, so it has to be its own string.
+  */
+  DRAG_AND_DROP: 'Drag & Drop or',
+  CHOOSE_FILE: 'choose file',
+  TO_UPLOAD: 'to upload',
+  SUPPORTED_FORMATS: 'Supported formats : Jpeg, pdf',
+
+  /** Which formats those are is already on screen, right under this message. */
+  UNSUPPORTED_FILE_TYPE: 'That file type is not supported.',
+
+  /** The dropzone appends its own limit ("...is 5MB."), since that is a prop it can be given. */
+  FILE_TOO_LARGE: 'File is too large. The maximum size is',
+  REMOVE: 'Remove',
+  REPLACE_FILE: 'Replace file',
 };
+
+/**
+ * The upload rules the documents step enforces, in one place: they are both what the file
+ * input offers and what a dropped file is checked against.
+ */
+export const DOCUMENT_UPLOAD = {
+  /** MIME types, so they can be handed to `accept` and compared against `File.type`. */
+  ACCEPTED_TYPES: ['image/jpeg', 'application/pdf'],
+  MAX_SIZE_MB: 5,
+} as const;
+
+/**
+ * The documents step's four upload fields, in the order they are laid out. Keyed by the
+ * store slot each one fills, so the step is a single `map` over this.
+ */
+export const DOCUMENT_FIELDS: readonly { id: EmployeeDocumentType; label: string }[] = [
+  { id: 'appointmentLetter', label: STRINGS.UPLOAD_APPOINTMENT_LETTER },
+  { id: 'salarySlips', label: STRINGS.UPLOAD_SALARY_SLIPS },
+  { id: 'relievingLetter', label: STRINGS.UPLOAD_RELIEVING_LETTER },
+  { id: 'experienceLetter', label: STRINGS.UPLOAD_EXPERIENCE_LETTER },
+];
 
 export const STEPS = [
   {
@@ -161,6 +204,22 @@ export const STEPS = [
     id: 'documents',
     label: 'Documents',
     icon: FileText,
+  },
+] as const;
+
+/**
+ * The employee details screen's sidebar menu. Lives here rather than in the screen itself
+ * because its loading skeleton draws the same menu, and that skeleton renders on the server
+ * — where a `'use client'` module's exports can only be rendered, never read.
+ */
+export const PROFILE_ITEMS = [
+  {
+    label: STRINGS.PROFILE,
+    icon: UserRound,
+  },
+  {
+    label: STRINGS.SEPARATION,
+    icon: LogOut,
   },
 ] as const;
 

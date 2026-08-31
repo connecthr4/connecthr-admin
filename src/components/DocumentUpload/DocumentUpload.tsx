@@ -1,6 +1,11 @@
 /**
- * The final step of the employee wizard, where an employee&#x27;s supporting documents are uploaded.
- * The upload fields are not built yet, so the step currently renders its actions only.
+ * The final step of the employee wizard, where an employee's supporting documents are uploaded.
+ *
+ * @remarks
+ * The picked files are held in the employee store alongside the rest of the wizard draft —
+ * there is no upload endpoint yet, so nothing leaves the browser until one exists. Wiring
+ * this step to remote storage later means changing what `setDocument` is handed, not this
+ * layout.
  *
  * @example
  * ```tsx
@@ -14,6 +19,9 @@
 'use client';
 
 import Button from '../Button';
+import FileDropzone from '../FileDropzone';
+import { DOCUMENT_FIELDS } from '@/src/constants/strings';
+import { useEmployeeStore } from '@/src/store/employeeStore';
 import styles from './DocumentUpload.module.scss';
 
 /**
@@ -51,9 +59,16 @@ export default function DocumentUpload({
   isSubmitting = false,
 }: DocumentUploadProps) {
   /*
+    Two narrow selections rather than one over the whole store: `documents` is replaced
+    wholesale on every change, and `setDocument` never is, so the step re-renders once per
+    pick and not at all when another step is saved.
+  */
+  const documents = useEmployeeStore((state) => state.documents);
+  const setDocument = useEmployeeStore((state) => state.setDocument);
+
+  /*
     The other wizard steps are DynamicForms, so they submit through a real form element and
-    the Enter key works. Keeping that shape here means the upload fields can be dropped in
-    later without the surrounding step having to change.
+    the Enter key works. Keeping that shape here means this step behaves the same way.
   */
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -63,7 +78,17 @@ export default function DocumentUpload({
 
   return (
     <form noValidate data-testid="DocumentUploadTest" className={styles.form} onSubmit={handleSubmit}>
-      <div className={styles.content} />
+      <div className={styles.content}>
+        {DOCUMENT_FIELDS.map(({ id, label }) => (
+          <FileDropzone
+            key={id}
+            label={label}
+            file={documents[id]}
+            disabled={isSubmitting}
+            onChange={(file) => setDocument(id, file)}
+          />
+        ))}
+      </div>
 
       <div className={styles.footer}>
         <Button type="button" variant="secondary" disabled={isSubmitting} onClick={onBack}>

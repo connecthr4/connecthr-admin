@@ -10,9 +10,24 @@ styles specific to the DocumentUpload component
   height: 100%;
 }
 
-/* Placeholder for the upload fields, so the actions stay pinned below them. */
+/*
+The four upload fields, two to a row. `minmax(0, 1fr)` rather than `1fr`, so a long file
+name is ellipsised inside its column instead of stretching it.
+*/
 .content {
   flex: 1;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 24px;
+}
+
+/* One column from the tablet breakpoint down, where two dropzones cannot both stay legible. */
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .footer {
