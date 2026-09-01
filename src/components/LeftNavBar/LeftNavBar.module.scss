@@ -4,8 +4,12 @@ styles specific to the LeftNavBar component
 ------------------------------------------------------
 **/
 
+/*
+Width comes from the grid column in `BaseLayout`, which narrows at the laptop
+breakpoints; declaring one here as well is how the two drifted 30px apart.
+*/
 .sidebar {
-  width: 17.5rem;
+  width: 100%;
   height: calc(100vh - 3rem);
   position: sticky;
   padding: var(--spacing-8);
@@ -61,4 +65,40 @@ styles specific to the LeftNavBar component
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/*
+The `height` in each tier tracks `BaseLayout`'s vertical padding (2 × 1.5rem, then
+2 × 1rem, then 2 × 0.75rem) — the sidebar is sized against the viewport rather than
+its grid area, so it has to be told when those gutters change or it overflows.
+
+The padding comes down with the column: at a 240px column the original 24px sidebar
+padding plus 24px item indent left too little for a label like "Employees" and the
+text wrapped.
+*/
+@media (max-width: 1280px) {
+  .sidebar {
+    height: calc(100vh - 2rem);
+    padding: var(--spacing-5);
+  }
+
+  .logoSection {
+    margin-bottom: var(--spacing-8);
+  }
+
+  .navItem {
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-3) var(--spacing-3) var(--spacing-5);
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    height: calc(100vh - 1.5rem);
+    padding: var(--spacing-3);
+  }
+
+  .navItem {
+    padding: var(--spacing-3);
+  }
 }
