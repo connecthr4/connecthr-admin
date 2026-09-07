@@ -36,6 +36,7 @@ const original: EmployeeDraft = {
     employmentStatus: 'Active',
     dateOfJoining: '2026-08-03',
     department: 'Engineering',
+    shiftCode: 'GENERAL',
   },
 
   payrollInformation: {

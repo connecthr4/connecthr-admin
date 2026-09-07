@@ -1,0 +1,143 @@
+/**
+------------------------------------------------------
+styles specific to the MarkAttendanceTable component
+------------------------------------------------------
+**/
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+
+  flex: 1;
+  min-height: 0;
+}
+
+.toolbarButton {
+  padding: var(--spacing-3) var(--spacing-5);
+}
+
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-height: 0;
+}
+
+/*
+The editable columns are the ones that need room; the identity columns keep
+their content on one line so a long name never squeezes a status picker.
+*/
+.idCell,
+.nameCell {
+  white-space: nowrap;
+}
+
+.nameCell {
+  font-weight: 500;
+}
+
+/*
+The shared `Dropdown`, cut down to table-cell size. Its own class names are
+hashed inside its module, so the parts are reached by element — the wrapper
+`div` it positions its trigger in, and the trigger `button` itself.
+*/
+.statusCell {
+  min-width: 10.5rem;
+}
+
+/* No label above it here, so the gap the field leaves for one comes off. */
+.statusCell div {
+  margin-top: 0;
+}
+
+.statusCell button {
+  height: 2.5rem;
+  padding: 0 var(--spacing-3);
+
+  border-radius: var(--radius-sm);
+
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-gray-500);
+}
+
+/*
+Marked rows are read by colour, so each status tints its own trigger. The menu
+is portalled to the body and keeps the dropdown's own neutral styling — the
+tint says what the row is now, not what each option would make it.
+*/
+.statusCell.present button {
+  background-color: var(--color-green-50);
+  color: var(--color-green-500);
+}
+
+.statusCell.absent button {
+  background-color: var(--color-red-400-10);
+  color: var(--color-red-500);
+}
+
+.statusCell.halfDay button {
+  background-color: rgb(245 158 11 / 10%);
+  color: var(--color-amber-500);
+}
+
+.overtimeCell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+
+  /* The pair is only as wide as it needs to be, so it never runs into remarks. */
+  width: max-content;
+}
+
+/*
+Two digits and nothing more — the pair reads as one "02 : 30" control. Nested
+under the cell so the width beats `TextInput`'s own full-width container, which
+would otherwise let each box take a share of the whole column.
+*/
+.overtimeCell .overtimeField {
+  width: 3.25rem;
+  flex: 0 0 auto;
+}
+
+.overtimeCell .overtimeInput {
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem var(--spacing-2);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.overtimeSeparator {
+  color: var(--color-gray-500);
+}
+
+.remarksField {
+  min-width: 12rem;
+}
+
+.remarksField input {
+  padding: 0.5rem var(--spacing-3);
+  font-size: 0.875rem;
+}
+
+/*
+The two commitments sit at opposite ends of the row: the one that keeps the
+work and the one that ends it should never be a mis-click apart.
+*/
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-5);
+
+  padding-top: var(--spacing-5);
+  border-top: 1px solid var(--color-gray-175);
+}
+
+.actionButton {
+  padding: var(--spacing-3) var(--spacing-8);
+}

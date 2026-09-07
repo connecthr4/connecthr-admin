@@ -20,8 +20,12 @@ import { ErrorText, Label, Text3 } from '../Typography/Typography';
 
 /**
  * Define the props available for the TextInput component.
+ *
+ * `aria-label` comes in through `AriaAttributes` so a field with no visible
+ * `label` — one in a table cell, where only the column header names it — still
+ * has an accessible name.
  */
-interface TextInputProps {
+interface TextInputProps extends Pick<React.AriaAttributes, 'aria-label'> {
   /**
    * The unique identifier for the input element.
    * Useful for associating the input with a label via the `htmlFor` attribute.
@@ -122,6 +126,12 @@ interface TextInputProps {
    *
    */
   rightIcon?: ReactNode;
+
+  /**
+   * The virtual keyboard to bring up on mobile — e.g. `"numeric"` for a field
+   * that only takes digits but is not a `number` input.
+   */
+  inputMode?: React.InputHTMLAttributes<HTMLInputElement>['inputMode'];
 
   /**
    * Event handler triggered when the input value changes.

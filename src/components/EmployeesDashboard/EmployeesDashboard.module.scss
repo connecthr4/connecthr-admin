@@ -50,6 +50,11 @@ styles specific to the EmployeesDashboard component
   align-items: center;
 }
 
+.employeeAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .actions {
   display: flex;
   align-items: center;

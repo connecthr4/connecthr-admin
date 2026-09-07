@@ -27,6 +27,18 @@ breakpoints; declaring one here as well is how the two drifted 30px apart.
   margin-bottom: var(--spacing-10);
 }
 
+/*
+Sized against the sidebar rather than the lockup's own 944px width: the full
+content column, since the lockup's viewBox is cropped tight to the artwork and
+any cap here just shrinks the wordmark below the weight the old text heading
+carried. `height: auto` is what keeps `next/image`'s intrinsic attributes from
+overriding the ratio.
+*/
+.logo {
+  width: 100%;
+  height: auto;
+}
+
 .navigation {
   display: flex;
   flex-direction: column;
@@ -42,6 +54,16 @@ breakpoints; declaring one here as well is how the two drifted 30px apart.
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   text-decoration: none;
   transition: all 0.2s ease;
+}
+
+/*
+Same hover treatment the sub-items get, so the two tiers respond alike. Skipped
+on the active item, whose stronger violet fill would otherwise wash out to the
+lighter hover tint under the pointer and read as a deselection.
+*/
+.navItem:not(.active):hover {
+  background-color: var(--color-violet-600-5);
+  color: var(--color-violet-600);
 }
 
 .active {
@@ -67,6 +89,60 @@ breakpoints; declaring one here as well is how the two drifted 30px apart.
   justify-content: center;
 }
 
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+/*
+A button, not a link — the group owns a URL segment that has no page of its
+own. Stripped back to the anchor's own appearance so `.navItem` styles both.
+*/
+.groupToggle {
+  width: 100%;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+
+  /*
+  Indented so the sub-items start where the group's label does — the sidebar
+  padding plus the item's own left padding plus the group icon and its gap —
+  which steps the sub-labels one column further in than the group's.
+  */
+  padding-left: 3.25rem;
+}
+
+.submenuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-5);
+  border-radius: var(--radius-sm);
+  color: var(--color-gray-400);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.submenuItem:hover {
+  background-color: var(--color-violet-600-5);
+  color: var(--color-violet-600);
+}
+
+.submenuItemActive {
+  background-color: var(--color-violet-50);
+  color: var(--color-violet-600);
+  font-weight: 700;
+}
+
 /*
 The `height` in each tier tracks `BaseLayout`'s vertical padding (2 × 1.5rem, then
 2 × 1rem, then 2 × 0.75rem) — the sidebar is sized against the viewport rather than
@@ -90,6 +166,15 @@ text wrapped.
     gap: var(--spacing-3);
     padding: var(--spacing-3) var(--spacing-3) var(--spacing-3) var(--spacing-5);
   }
+
+  /* Tracks the item indent above, so the sub-links stay under the group label. */
+  .submenu {
+    padding-left: 2.5rem;
+  }
+
+  .submenuItem {
+    padding: var(--spacing-2) var(--spacing-3);
+  }
 }
 
 @media (max-width: 1024px) {
@@ -100,5 +185,9 @@ text wrapped.
 
   .navItem {
     padding: var(--spacing-3);
+  }
+
+  .submenu {
+    padding-left: 2rem;
   }
 }

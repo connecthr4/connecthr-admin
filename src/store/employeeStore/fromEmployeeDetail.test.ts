@@ -39,6 +39,7 @@ const employee: EmployeeDetail = {
     employmentStatus: 'Active',
     dateOfJoining: '2023-04-01',
     department: 'Engineering',
+    shiftCode: 'GENERAL',
     designation: 'Project Manager',
     workMode: 'Office',
   },
@@ -74,6 +75,7 @@ describe('fromEmployeeDetail', () => {
       employmentStatus: 'Active',
       dateOfJoining: '2023-04-01',
       department: 'Engineering',
+      shiftCode: 'GENERAL',
     });
 
     expect(draft.payrollInformation.accountHolderName).toBe('Brooklyn Simmons');
@@ -86,6 +88,19 @@ describe('fromEmployeeDetail', () => {
     expect(draft.personalInformation).not.toHaveProperty('permanentDistrict');
     expect(draft.professionalInformation).not.toHaveProperty('designation');
     expect(draft.professionalInformation).not.toHaveProperty('workMode');
+  });
+
+  it('reads a record with no shift as nothing picked', () => {
+    const draft = fromEmployeeDetail({
+      ...employee,
+      professionalInformation: {
+        ...employee.professionalInformation,
+        // Records created before shifts were captured come back without one.
+        shiftCode: null as unknown as string,
+      },
+    });
+
+    expect(draft.professionalInformation.shiftCode).toBe('');
   });
 
   it('seeds the confirmation field the payroll step validates against', () => {

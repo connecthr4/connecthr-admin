@@ -4,20 +4,16 @@ styles specific to the DatePicker component
 ------------------------------------------------------
 **/
 
+/*
+Only ever an anchor for the calendar, which is out of flow in both modes —
+absolute below the field inline, fixed over the page as a modal. So it is kept
+at zero height and given no box of its own: as an `inline-block` it sat on a
+line box and added a line's worth of height to the field the moment the
+calendar opened, which pushed whatever shared its row down by that much.
+*/
 .datePickerWrapper {
   position: relative;
-  display: inline-block;
-  // width: 100%;
-  // padding: 0.8rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease-in-out;
-  border-radius: 8px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-
-  &:hover {
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
-  }
+  height: 0;
 }
 
 .calendarIcon {
