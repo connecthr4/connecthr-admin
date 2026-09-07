@@ -12,6 +12,7 @@
  */
 'use client';
 
+import AppImage from '@/src/components/AppImage';
 import { useEffect, useState } from 'react';
 import { Check, X } from 'lucide-react';
 import { logger } from '@/src/lib/logger';
@@ -22,7 +23,7 @@ import { useAuthStore } from '@/src/store/auth';
 import { isValidEmail } from '@/src/utils/helper';
 import TextInput from '@/src/components/TextInput';
 import { getApiErrorInfo } from '@/src/lib/api/helpers';
-import { Heading1, Heading2, Text1, Text2 } from '../Typography';
+import { Heading2, Text1, Text2 } from '../Typography';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { changePasswordAction, loginAction } from '@/src/lib/actions/auth';
 import { NOTIFICATION_TYPES, ROUTES, SESSION_END_QUERY, STRINGS } from '@/src/constants/strings';
@@ -224,7 +225,14 @@ export default function LoginPanel({ step = 'login', sessionEndReason }: LoginPa
 
   return (
     <div className={styles.container}>
-      <Heading1>{STRINGS.APP_NAME}</Heading1>
+      <AppImage
+        src="/zentrohr-logo.svg"
+        alt={STRINGS.APP_NAME}
+        width={931}
+        height={202}
+        className={styles.brandLogo}
+        preload
+      />
 
       {step === 'login' && (
         <>

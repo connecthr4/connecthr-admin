@@ -234,6 +234,7 @@ async function submitCreate(): Promise<SubmitOutcome> {
       employmentStatus: professionalInformation.employmentStatus,
       dateOfJoining: professionalInformation.dateOfJoining,
       department: professionalInformation.department,
+      shiftCode: professionalInformation.shiftCode,
     },
     payrollInformation,
   };

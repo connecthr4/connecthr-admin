@@ -12,8 +12,8 @@
  */
 'use client';
 
-import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
+import AppImage from '../AppImage';
 import styles from './DepartmentEmployeeCard.module.scss';
 import { Heading4, Text1, Text2 } from '../Typography';
 import Button from '../Button';
@@ -67,7 +67,7 @@ export default function DepartmentEmployeeCard({
             <div className={styles.employeeInfo}>
               {/* Avatar */}
               <div className={styles.avatarWrapper}>
-                <Image src={employee.avatar} alt={employee.name} fill className={styles.avatar} />
+                <AppImage src={employee.avatar} alt={employee.name} fill sizes="48px" className={styles.avatar} />
               </div>
 
               {/* Employee Details */}

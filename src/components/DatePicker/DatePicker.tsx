@@ -17,7 +17,7 @@ import { Calendar } from 'lucide-react';
 import TextInput from '@/src/components/TextInput';
 import { DayPicker, DateRange, Matcher } from '@daypicker/react';
 import '@daypicker/react/style.css';
-import { formatDisplayDate, parseLocalDate } from '@/src/utils/date';
+import { formatDisplayDate, formatLongDateValue, parseLocalDate } from '@/src/utils/date';
 import styles from './DatePicker.module.scss';
 
 type DatePickerValue = Date | Date[] | DateRange | string | undefined;
@@ -206,6 +206,11 @@ export default function DatePicker({
     setOpen(false);
   };
 
+  /*
+  What the field reads, in the long form ("04 Sep 2026") rather than the ISO
+  one — only this string changes. The value handed to `onChange` stays
+  "YYYY-MM-DD", so what callers store and send is untouched.
+  */
   const formattedValue = useMemo(() => {
     const currentValue = value || currentSelectedDate;
 
@@ -213,23 +218,21 @@ export default function DatePicker({
 
     // Handle ISO string values from store/API
     if (typeof currentValue === 'string') {
-      const date = parseLocalDate(currentValue);
-
-      return date ? formatDisplayDate(date) : '';
+      return formatLongDateValue(parseLocalDate(currentValue));
     }
 
     if (currentValue instanceof Date) {
-      return formatDisplayDate(currentValue);
+      return formatLongDateValue(currentValue);
     }
 
     if (Array.isArray(currentValue)) {
-      return currentValue.map(formatDisplayDate).join(', ');
+      return currentValue.map(formatLongDateValue).join(', ');
     }
 
     if (typeof currentValue === 'object' && currentValue !== null && 'from' in currentValue) {
-      const from = currentValue.from ? formatDisplayDate(currentValue.from) : '';
+      const from = formatLongDateValue(currentValue.from);
 
-      const to = currentValue.to ? formatDisplayDate(currentValue.to) : '';
+      const to = formatLongDateValue(currentValue.to);
 
       return `${from} - ${to}`;
     }

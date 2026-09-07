@@ -64,7 +64,7 @@ describe('LoginPanel', () => {
     it('renders the login form', () => {
       render(<LoginPanel step="login" />);
 
-      expect(screen.getByText('connectHR')).toBeInTheDocument();
+      expect(screen.getByAltText('ZentroHR')).toBeInTheDocument();
       expect(screen.getByText('Welcome')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Enter email address')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Enter password')).toBeInTheDocument();

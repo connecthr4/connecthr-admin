@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { BriefcaseBusiness, Phone, PencilLine } from 'lucide-react';
 import AppHeader from '../AppHeader';
+import AppImage from '../AppImage';
 import Button from '../Button';
 import Stepper from '../Stepper';
 import { Heading5, Text1, Text2, Text4 } from '../Typography/Typography';
@@ -222,7 +223,7 @@ function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) {
   return (
     <div className={styles.profileHeader}>
       <div className={styles.employeeInfo}>
-        <img src={employee.avatar} alt={employee.name} className={styles.avatar} />
+        <AppImage src={employee.avatar} alt={employee.name} width={110} height={110} className={styles.avatar} />
 
         <div className={styles.details}>
           <Heading5>{employee.name}</Heading5>

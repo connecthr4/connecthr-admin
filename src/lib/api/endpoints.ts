@@ -51,6 +51,49 @@ export const API_ENDPOINTS = {
     CREATE: '/departments',
   },
 
+  ATTENDANCE: {
+    /**
+     * A POST rather than a GET: the sheet is scoped by a date, a search term
+     * and repeatable department and shift filters, which travel as a body the
+     * same way the employee list's criteria do.
+     */
+    SHEET: '/attendance/sheet',
+
+    /**
+     * Every option the module's dropdowns offer — statuses, shifts and
+     * departments — in one read, so the three lists can never disagree about
+     * what the backend will accept.
+     */
+    OPTIONS: '/attendance/options',
+
+    /**
+     * A whole day's markings in one write — the date plus one record per
+     * employee — so a sheet marked across several pages is recorded as a single
+     * transaction rather than a row at a time.
+     */
+    SUBMIT: '/attendance/submit',
+
+    /**
+     * The same payload as {@link SUBMIT}, kept as work in progress: a partly
+     * marked day is stored server-side, so the draft survives the browser and
+     * comes back on the sheet wherever it is next opened.
+     */
+    DRAFT: '/attendance/draft',
+  },
+
+  SHIFTS: {
+    GET_ALL: '/shifts',
+  },
+
+  OPTIONS: {
+    /**
+     * The values one employee field may be filled with — department, gender and marital
+     * status among them — so the dropdowns offering them can never disagree with what the
+     * create and update endpoints accept.
+     */
+    GET_EMPLOYEE_OPTIONS: (field: string) => `/options/employee/${encodeURIComponent(field)}`,
+  },
+
   HOLIDAYS: {
     GET_HOLIDAYS_LIST: '/holidays',
 

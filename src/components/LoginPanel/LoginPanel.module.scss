@@ -11,6 +11,20 @@ styles specific to the LoginPanel component
   flex-direction: column;
 }
 
+/*
+`align-self` because the container stretches its children, and a full-bleed
+lockup would tower over the form it sits above. The cap is sized so the wordmark
+carries about the cap height the `Heading1` it replaced did, which puts the mark
+alongside it at roughly twice that — banner scale without swamping the panel.
+`height: auto` keeps `next/image`'s intrinsic attributes from fighting the ratio.
+*/
+.brandLogo {
+  align-self: flex-start;
+  width: 100%;
+  max-width: 20rem;
+  height: auto;
+}
+
 .welcomeSection {
   margin-top: var(--spacing-7);
   display: flex;

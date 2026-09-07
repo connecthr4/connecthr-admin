@@ -60,7 +60,7 @@ export default function EmployeeDetailsSkeleton() {
         <div className={styles.subContent}>
           <div className={styles.sidebar}>
             <div className={styles.itemContainer}>
-              {/* The menu is the same two entries for every employee, so it is drawn in full. */}
+              {/* The menu is the same for every employee, so it is drawn in full. */}
               {PROFILE_ITEMS.map(({ label, icon: Icon }) => (
                 <div key={label} className={styles.skeletonMenuItem}>
                   <Icon size={24} />

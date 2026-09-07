@@ -103,5 +103,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  /*
+  Static assets are excluded by extension as well as by path. Files served from `public/`
+  and the app-icon conventions sit at the root, not under `/_next/static`, so without this
+  the auth gate above treats them as protected pages: a logged-out visitor's request for
+  `/zentrohr-logo.svg` is redirected to `/login` and the <img> receives HTML.
+  */
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico)$).*)'],
 };

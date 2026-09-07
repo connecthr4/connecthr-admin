@@ -1,9 +1,9 @@
-import { User, BriefcaseBusiness, FileText, Wallet, UserRound, LogOut } from 'lucide-react';
+import { User, BriefcaseBusiness, FileText, Wallet, UserRound } from 'lucide-react';
 import { NotificationType } from '../providers/NotificationProvider';
 import type { EmployeeDocumentType } from '../store/employeeStore/types';
 
 export const STRINGS = {
-  APP_NAME: 'connectHR',
+  APP_NAME: 'ZentroHR',
   YEAR: 'Year - 2026',
   UPCOMING_HOLIDAYS: 'Upcoming Holidays',
   VIEW_ALL: 'View all',
@@ -161,6 +161,59 @@ export const STRINGS = {
   FILE_TOO_LARGE: 'File is too large. The maximum size is',
   REMOVE: 'Remove',
   REPLACE_FILE: 'Replace file',
+  ATTENDANCE: 'Attendance',
+  MARK_ATTENDANCE: 'Mark Attendance',
+  MARK_ATTENDANCE_SUBTITLE: 'Mark attendance for your employees',
+  ATTENDANCE_LIST: 'Attendance List',
+  ATTENDANCE_LIST_SUBTITLE: 'Daily attendance and overtime records',
+  DATE: 'Date',
+  ALL_DEPARTMENTS: 'All Departments',
+  ALL_SHIFTS: 'All Shifts',
+  VIEW: 'View',
+  RESET: 'Reset',
+  TOTAL_EMPLOYEES: 'Total Employees',
+  PRESENT: 'Present',
+  ABSENT: 'Absent',
+  HALF_DAY: 'Half Day',
+  ON_LEAVE: 'On Leave',
+
+  /**
+   * A half day is marked as one of two statuses rather than "Half Day" plus a
+   * separate which-half column, so the row carries a single value.
+   */
+  HALF_DAY_FIRST_HALF: 'Half Day (First Half)',
+  HALF_DAY_SECOND_HALF: 'Half Day (Second Half)',
+  SHIFT: 'Shift',
+  ATTENDANCE_STATUS: 'Attendance Status',
+  OVERTIME: 'Overtime',
+  REMARKS: 'Remarks',
+  SELECT_STATUS: 'Select status',
+  ADD_REMARKS: 'Add remarks...',
+  SEARCH_EMPLOYEE_NAME_OR_ID: 'Search by employee name or ID...',
+  OVERTIME_HOURS_PLACEHOLDER: 'HH',
+  OVERTIME_MINUTES_PLACEHOLDER: 'MM',
+  SAVE_AS_DRAFT: 'Save as Draft',
+  SUBMIT_ATTENDANCE: 'Submit Attendance',
+  ATTENDANCE_DRAFT_SAVED: 'Draft saved',
+  ATTENDANCE_DRAFT_SAVE_FAILED: 'Draft could not be saved',
+  ATTENDANCE_NOTHING_TO_MARK: 'Nothing has been marked yet',
+  ATTENDANCE_INCOMPLETE: 'Some employees are not marked yet',
+
+  /** The count it is missing is prefixed by the caller: "3 of 28 ...". */
+  ATTENDANCE_UNMARKED_MESSAGE: 'employees are still unmarked. Mark them, or save what you have as a draft.',
+  ATTENDANCE_EXPORTED_SUCCESSFULLY: 'Attendance sheet exported successfully',
+  ATTENDANCE_FETCH_FAILED: 'Failed to load the attendance sheet',
+
+  /**
+   * The heading a submission is reported under. The detail beneath it is the
+   * backend's own message, so what the user reads is what was actually
+   * recorded — these only say which way it went.
+   */
+  ATTENDANCE_SUBMITTED: 'Attendance submitted',
+  ATTENDANCE_SUBMIT_FAILED: 'Attendance could not be submitted',
+
+  /** Stands in until the attendance endpoints exist for these two screens to read. */
+  ATTENDANCE_COMING_SOON: 'This screen is being built. Attendance records will appear here.',
 };
 
 /**
@@ -217,10 +270,6 @@ export const PROFILE_ITEMS = [
     label: STRINGS.PROFILE,
     icon: UserRound,
   },
-  {
-    label: STRINGS.SEPARATION,
-    icon: LogOut,
-  },
 ] as const;
 
 export const ROUTES = {
@@ -229,6 +278,15 @@ export const ROUTES = {
   RESET_PASSWORD: '/reset-password',
   DASHBOARD: '/dashboard',
   EMPLOYEES: '/employees',
+
+  /**
+   * The attendance segment itself has no screen — it is the group the two
+   * routes below sit in, and what the sidebar matches the current path against
+   * to decide the group is the one open. Visiting it lands on Mark Attendance.
+   */
+  ATTENDANCE: '/attendance',
+  MARK_ATTENDANCE: '/attendance/mark-attendance',
+  ATTENDANCE_LIST: '/attendance/attendance-list',
   HOLIDAYS: '/holidays',
   USERS: '/users',
   CREATE_USER: '/create-user',

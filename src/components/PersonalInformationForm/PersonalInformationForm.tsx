@@ -16,23 +16,27 @@ import { Text1 } from '../Typography';
 import { useEmployeeStore } from '@/src/store/employeeStore';
 import DynamicForm, { FieldConfig, FieldWidth } from '../DynamicForm/DynamicForm';
 import { LocationsClient } from '@/src/lib/api/locationsClient';
+import { EmployeeOptionsClient } from '@/src/lib/api/optionsClient';
 import { personalInformationSchema, PersonalInformationFormValues } from './PersonalInformationForm.schema';
 import type { DropdownOption } from '../Dropdown/Dropdown';
 
 /**
- * Resolves the address dropdowns. Both lists come from the backend, and both are taken as
- * props so Storybook and tests can render the form without one — the defaults go through
- * `LocationsClient`, which caches each list for the lifetime of the page.
+ * Resolves the dropdowns the backend owns — the address pair, and the two personal details
+ * whose values it defines. Every list is taken as a prop so Storybook and tests can render
+ * the form without one; the defaults go through `LocationsClient` and
+ * `EmployeeOptionsClient`, which cache each list for the lifetime of the page.
  */
-export interface LocationOptionLoaders {
+export interface PersonalOptionLoaders {
   loadStateOptions?: () => Promise<DropdownOption[]>;
   loadDistrictOptions?: (stateCode: string) => Promise<DropdownOption[]>;
+  loadGenderOptions?: () => Promise<DropdownOption[]>;
+  loadMaritalStatusOptions?: () => Promise<DropdownOption[]>;
 }
 
 /**
  * Define the props available for the PersonalInformationForm component.
  */
-interface PersonalInformationFormProps extends LocationOptionLoaders {
+interface PersonalInformationFormProps extends PersonalOptionLoaders {
   onSubmit: (data: PersonalInformationFormValues) => void;
   footer?: React.ReactNode;
 }
@@ -49,7 +53,9 @@ const LATEST_DATE_OF_BIRTH = new Date(today.getFullYear(), today.getMonth(), tod
 export const createPersonalInformationFormConfig = ({
   loadStateOptions = LocationsClient.getStateOptions,
   loadDistrictOptions = LocationsClient.getDistrictOptions,
-}: LocationOptionLoaders = {}): FieldConfig<PersonalInformationFormValues>[] => [
+  loadGenderOptions = EmployeeOptionsClient.getGenderOptions,
+  loadMaritalStatusOptions = EmployeeOptionsClient.getMaritalStatusOptions,
+}: PersonalOptionLoaders = {}): FieldConfig<PersonalInformationFormValues>[] => [
   {
     name: 'personalDetailsLabel',
     label: 'Personal Details',
@@ -104,20 +110,7 @@ export const createPersonalInformationFormConfig = ({
     type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
-    options: [
-      {
-        label: 'Male',
-        value: 'Male',
-      },
-      {
-        label: 'Female',
-        value: 'Female',
-      },
-      {
-        label: 'Other',
-        value: 'Other',
-      },
-    ],
+    asyncOptions: { load: loadGenderOptions },
   },
   {
     name: 'nationality',
@@ -134,24 +127,7 @@ export const createPersonalInformationFormConfig = ({
     type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
-    options: [
-      {
-        label: 'Single',
-        value: 'Single',
-      },
-      {
-        label: 'Married',
-        value: 'Married',
-      },
-      {
-        label: 'Divorced',
-        value: 'Divorced',
-      },
-      {
-        label: 'Widowed',
-        value: 'Widowed',
-      },
-    ],
+    asyncOptions: { load: loadMaritalStatusOptions },
   },
   {
     name: 'aadhaarNumber',
@@ -333,17 +309,20 @@ export default function PersonalInformationForm({
   footer,
   loadStateOptions,
   loadDistrictOptions,
+  loadGenderOptions,
+  loadMaritalStatusOptions,
 }: PersonalInformationFormProps) {
   const personalInformation = useEmployeeStore((state) => state.personalInformation);
 
-  /*
-    The config carries the option loaders, so it has to be rebuilt whenever they change —
-    and kept stable otherwise, since DynamicForm reloads the address dropdowns whenever the
-    field list changes identity.
-  */
   const fields = useMemo(
-    () => createPersonalInformationFormConfig({ loadStateOptions, loadDistrictOptions }),
-    [loadStateOptions, loadDistrictOptions]
+    () =>
+      createPersonalInformationFormConfig({
+        loadStateOptions,
+        loadDistrictOptions,
+        loadGenderOptions,
+        loadMaritalStatusOptions,
+      }),
+    [loadStateOptions, loadDistrictOptions, loadGenderOptions, loadMaritalStatusOptions]
   );
 
   return (
