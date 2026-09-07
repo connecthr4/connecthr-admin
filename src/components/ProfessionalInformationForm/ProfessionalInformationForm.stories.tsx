@@ -12,7 +12,29 @@ const filledProfessionalInformation: ProfessionalInformationDraft = {
   employmentStatus: 'Active',
   dateOfJoining: '2024-03-18',
   department: 'Engineering',
+  shiftCode: 'GENERAL',
 };
+
+/**
+ * The shifts as `/shifts` lists them: the dropdown stores the `code` and shows the `name`.
+ * Passed in so the stories render without the backend.
+ */
+const loadShiftOptions = () =>
+  Promise.resolve([
+    { label: 'General Shift', value: 'GENERAL' },
+    { label: 'Night Shift', value: 'NIGHT' },
+  ]);
+
+/**
+ * The departments as `/options/employee/department` serves them — the label is also the
+ * value, since that is the display text the create endpoint stores.
+ */
+const loadDepartmentOptions = () =>
+  Promise.resolve([
+    { label: 'Engineering', value: 'Engineering' },
+    { label: 'Finance', value: 'Finance' },
+    { label: 'Quality Assurance', value: 'Quality Assurance' },
+  ]);
 
 const meta = {
   title: 'components/ProfessionalInformationForm',
@@ -28,9 +50,13 @@ const meta = {
   argTypes: {
     onSubmit: { action: 'submitted' },
     footer: { control: false },
+    loadShiftOptions: { control: false },
+    loadDepartmentOptions: { control: false },
   },
   args: {
     onSubmit: fn(),
+    loadShiftOptions,
+    loadDepartmentOptions,
     /*
       The component renders no actions of its own — the wizard passes them in. Without a
       submit button here there is no way to reach validation or `onSubmit` from the story.
@@ -103,20 +129,21 @@ export const WithValidationErrors: Story = {
     await expect(await canvas.findByText('Employee Type is required')).toBeInTheDocument();
     await expect(await canvas.findByText('Date of Joining is required')).toBeInTheDocument();
     await expect(await canvas.findByText('Department is required')).toBeInTheDocument();
+    await expect(await canvas.findByText('Shift is required')).toBeInTheDocument();
 
     await expect(args.onSubmit).not.toHaveBeenCalled();
   },
 };
 
 /**
- * Picking the two open dropdowns completes the step and hands the values to the wizard. The
- * joining date is restored from the store rather than picked here, so the run does not
+ * Picking the three open dropdowns completes the step and hands the values to the wizard.
+ * The joining date is restored from the store rather than picked here, so the run does not
  * depend on which month the calendar happens to open on.
  */
 export const CompletingTheStep: Story = {
   beforeEach: () => {
     useEmployeeStore.setState({
-      professionalInformation: { ...filledProfessionalInformation, employeeType: '', department: '' },
+      professionalInformation: { ...filledProfessionalInformation, employeeType: '', department: '', shiftCode: '' },
     });
   },
   play: async ({ canvasElement, args }) => {
@@ -128,6 +155,9 @@ export const CompletingTheStep: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Select Department' }));
     await userEvent.click(await canvas.findByRole('button', { name: 'Engineering' }));
 
+    await userEvent.click(canvas.getByRole('button', { name: 'Select Shift' }));
+    await userEvent.click(await canvas.findByRole('button', { name: 'Night Shift' }));
+
     await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
 
     await waitFor(() => expect(args.onSubmit).toHaveBeenCalled());
@@ -138,6 +168,8 @@ export const CompletingTheStep: Story = {
         department: 'Engineering',
         employmentStatus: 'Active',
         dateOfJoining: '2024-03-18',
+        // The shift travels as the code the backend stores, not as the name shown.
+        shiftCode: 'NIGHT',
       }),
       expect.anything()
     );

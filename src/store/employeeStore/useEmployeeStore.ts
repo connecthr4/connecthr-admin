@@ -40,6 +40,7 @@ const initialState = {
     employmentStatus: 'Active',
     dateOfJoining: '',
     department: '',
+    shiftCode: '',
   },
 
   payrollInformation: {

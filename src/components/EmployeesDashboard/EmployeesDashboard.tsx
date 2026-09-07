@@ -14,6 +14,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AppHeader from '../AppHeader';
+import AppImage from '../AppImage';
 import Button from '../Button';
 import TableToolbar from '../TableToolbar';
 import ExportConfirmationModal from '../ExportConfirmationModal';
@@ -102,12 +103,13 @@ function toExportRequest(
 }
 
 /**
- * `name` and `status` are rendered with custom cells (avatar, badge) and are
- * always shown regardless of what the columns API returns; every other
- * column is driven entirely by the API response so the backend controls
- * which employee fields appear in the table.
+ * Keys the API returns that are not turned into generic columns: `name` and
+ * `status` are rendered with custom cells (avatar, badge) and always shown,
+ * and `designation` is dropped from the table. Every other column is driven
+ * entirely by the API response so the backend controls which employee fields
+ * appear in the table.
  */
-const FIXED_COLUMN_KEYS = new Set(['name', 'status']);
+const EXCLUDED_COLUMN_KEYS = new Set(['name', 'status', 'designation']);
 
 /**
  * `DataTable` is generic and wrapped in `memo()`, which TypeScript can't
@@ -144,7 +146,7 @@ function buildEmployeeColumns(
   { onView, onViewIntent, onEdit }: EmployeeRowActions
 ): ColumnDef<Employee>[] {
   const dynamicColumns: ColumnDef<Employee>[] = apiColumns
-    .filter((column) => !FIXED_COLUMN_KEYS.has(column.accessorKey))
+    .filter((column) => !EXCLUDED_COLUMN_KEYS.has(column.accessorKey))
     .map((column) => ({
       accessorKey: column.accessorKey,
       header: column.header,
@@ -156,15 +158,12 @@ function buildEmployeeColumns(
       header: 'Employee Name',
       cell: ({ row }) => (
         <div className={styles.employeeCell}>
-          <img
+          <AppImage
             src={row.original.avatar}
             alt={row.original.name}
             width={40}
             height={40}
-            style={{
-              borderRadius: '50%',
-              objectFit: 'cover',
-            }}
+            className={styles.employeeAvatar}
           />
 
           <span>{row.original.name}</span>

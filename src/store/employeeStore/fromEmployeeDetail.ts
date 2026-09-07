@@ -87,6 +87,9 @@ export function fromEmployeeDetail(employee: EmployeeDetail): EmployeeDraft {
       employmentStatus: professionalInformation.employmentStatus,
       dateOfJoining: toDateOnly(professionalInformation.dateOfJoining),
       department: professionalInformation.department,
+      // A record created before shifts were captured has none, and the dropdown reads an
+      // absent value as "nothing picked" rather than showing an empty option.
+      shiftCode: professionalInformation.shiftCode ?? '',
     },
 
     payrollInformation: {

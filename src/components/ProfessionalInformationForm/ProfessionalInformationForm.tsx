@@ -11,16 +11,30 @@
  * ```
  */
 
+import { useMemo } from 'react';
 import { useEmployeeStore } from '@/src/store/employeeStore';
 import DynamicForm from '../DynamicForm';
 import { FieldConfig, FieldWidth } from '../DynamicForm/DynamicForm';
 import { Text1 } from '../Typography';
+import { ShiftsClient } from '@/src/lib/api/shiftsClient';
+import { EmployeeOptionsClient } from '@/src/lib/api/optionsClient';
 import { professionalInformationSchema, ProfessionalInformationFormValues } from './ProfessionalInformationForm.schema';
+import type { DropdownOption } from '../Dropdown/Dropdown';
+
+/**
+ * Resolves the dropdowns the backend owns. Both lists are taken as props so Storybook and
+ * tests can render the form without one — the defaults go through `ShiftsClient` and
+ * `EmployeeOptionsClient`, which cache each list for the lifetime of the page.
+ */
+export interface ProfessionalOptionLoaders {
+  loadShiftOptions?: () => Promise<DropdownOption[]>;
+  loadDepartmentOptions?: () => Promise<DropdownOption[]>;
+}
 
 /**
  * Define the props available for the ProfessionalInformationForm component.
  */
-interface ProfessionalInformationFormProps {
+interface ProfessionalInformationFormProps extends ProfessionalOptionLoaders {
   onSubmit: (data: ProfessionalInformationFormValues) => void;
   footer?: React.ReactNode;
 }
@@ -33,7 +47,10 @@ interface ProfessionalInformationFormProps {
 const EARLIEST_JOINING_DATE = new Date(1990, 0, 1);
 const LATEST_JOINING_DATE = new Date();
 
-export const professionalInformationFormConfig: FieldConfig<ProfessionalInformationFormValues>[] = [
+export const createProfessionalInformationFormConfig = ({
+  loadShiftOptions = ShiftsClient.getShiftOptions,
+  loadDepartmentOptions = EmployeeOptionsClient.getDepartmentOptions,
+}: ProfessionalOptionLoaders = {}): FieldConfig<ProfessionalInformationFormValues>[] => [
   {
     name: 'employmentDetailsLabel',
     label: 'Employment Details',
@@ -123,28 +140,55 @@ export const professionalInformationFormConfig: FieldConfig<ProfessionalInformat
     type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
-    options: [
-      {
-        label: 'Engineering',
-        value: 'Engineering',
-      },
-      {
-        label: 'Finance',
-        value: 'Finance',
-      },
-      {
-        label: 'Quality Assurance',
-        value: 'Quality Assurance',
-      },
-    ],
+    /*
+      The departments are the ones the backend defines, so they are read from
+      `/options/employee/department` rather than declared here: the create endpoint takes the
+      display text and rejects anything outside that set. A department restored from a saved
+      draft — or from the record being edited — that is no longer offered is dropped by
+      DynamicForm, so the step cannot be completed with one that has since been retired.
+    */
+    asyncOptions: { load: loadDepartmentOptions },
+  },
+  {
+    name: 'shiftCode',
+    label: 'Shift',
+    placeholder: 'Select Shift',
+    type: 'dropdown',
+    width: FieldWidth.HALF,
+    required: true,
+    searchable: true,
+    /*
+      The options are the shifts the backend defines, so they are read from `/shifts` rather
+      than declared here: the create endpoint takes a shift `code` and rejects one it does
+      not know. A code restored from a saved draft — or from the record being edited — that
+      is no longer in the list is dropped by DynamicForm, so the step cannot be completed
+      with a shift that has since been retired.
+    */
+    asyncOptions: { load: loadShiftOptions },
   },
 ];
 
-export default function ProfessionalInformationForm({ onSubmit, footer }: ProfessionalInformationFormProps) {
+export default function ProfessionalInformationForm({
+  onSubmit,
+  footer,
+  loadShiftOptions,
+  loadDepartmentOptions,
+}: ProfessionalInformationFormProps) {
   const professionalInformation = useEmployeeStore((state) => state.professionalInformation);
+
+  /*
+    The config carries the option loaders, so it has to be rebuilt whenever they change — and
+    kept stable otherwise, since DynamicForm reloads the fetched dropdowns whenever the field
+    list changes identity.
+  */
+  const fields = useMemo(
+    () => createProfessionalInformationFormConfig({ loadShiftOptions, loadDepartmentOptions }),
+    [loadShiftOptions, loadDepartmentOptions]
+  );
+
   return (
     <DynamicForm
-      fields={professionalInformationFormConfig}
+      fields={fields}
       schema={professionalInformationSchema}
       defaultValues={professionalInformation}
       onSubmit={onSubmit}

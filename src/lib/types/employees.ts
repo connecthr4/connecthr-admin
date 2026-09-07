@@ -40,6 +40,12 @@ export interface ProfessionalInformation {
   employmentStatus: string;
   dateOfJoining: string;
   department: string;
+
+  /**
+   * The shift's `code` from `/shifts` ("GENERAL"), not its name: it is what the backend
+   * stores and what an attendance row is matched on — the name is only what the user reads.
+   */
+  shiftCode: string;
 }
 
 export interface PayrollInformation {

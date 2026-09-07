@@ -66,6 +66,18 @@ const LONG_DATE_FORMATTER = new Intl.DateTimeFormat('en-GB', {
 });
 
 /**
+ * Formats a date for display, e.g. "01 Jun 1985". Empty for a missing or
+ * invalid date, so callers can pick their own placeholder.
+ */
+export const formatLongDateValue = (date?: Date): string => {
+  if (!date || Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  return LONG_DATE_FORMATTER.format(date);
+};
+
+/**
  * Formats an API date ("YYYY-MM-DD") for display, e.g. "01 Jun 1985".
  * Unparseable values are passed through untouched rather than shown as "Invalid Date".
  */

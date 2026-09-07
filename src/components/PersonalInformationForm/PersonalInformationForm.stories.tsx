@@ -32,6 +32,25 @@ const loadStateOptions = () => Promise.resolve(stateOptions);
 
 const loadDistrictOptions = (stateCode: string) => Promise.resolve(districtOptionsByState[stateCode] ?? []);
 
+/**
+ * Gender and Marital Status come from `/options/employee/{field}` in the app, and are served
+ * from fixtures here for the same reason as the addresses above.
+ */
+const loadGenderOptions = () =>
+  Promise.resolve([
+    { label: 'Male', value: 'Male' },
+    { label: 'Female', value: 'Female' },
+    { label: 'Other', value: 'Other' },
+  ]);
+
+const loadMaritalStatusOptions = () =>
+  Promise.resolve([
+    { label: 'Single', value: 'Single' },
+    { label: 'Married', value: 'Married' },
+    { label: 'Divorced', value: 'Divorced' },
+    { label: 'Widowed', value: 'Widowed' },
+  ]);
+
 const filledPersonalInformation: PersonalInformation = {
   firstName: 'Brooklyn',
   lastName: 'Simmons',
@@ -75,11 +94,15 @@ const meta = {
     footer: { control: false },
     loadStateOptions: { control: false },
     loadDistrictOptions: { control: false },
+    loadGenderOptions: { control: false },
+    loadMaritalStatusOptions: { control: false },
   },
   args: {
     onSubmit: fn(),
     loadStateOptions,
     loadDistrictOptions,
+    loadGenderOptions,
+    loadMaritalStatusOptions,
     /*
       The component renders no actions of its own — the wizard passes them in. Without a
       submit button here there is no way to reach validation or `onSubmit` from the story.

@@ -56,6 +56,13 @@ interface TableToolbarProps {
   onFilterChange?: (selection: FilterSelection) => void;
 
   /**
+   * Whether the filter trigger is shown. Off for tables that are filtered
+   * from outside the toolbar — the marking sheet picks its date and
+   * department above the table, so a filter button here would offer nothing.
+   */
+  showFilter?: boolean;
+
+  /**
    * Module-specific actions (e.g. an "Add New" button), rendered between
    * the search input and the filter button.
    */
@@ -68,6 +75,7 @@ export default function TableToolbar({
   searchPlaceholder = 'Search...',
   filterOptions,
   onFilterChange,
+  showFilter = true,
   children,
 }: TableToolbarProps) {
   return (
@@ -77,7 +85,7 @@ export default function TableToolbar({
           <SearchInput placeholder={searchPlaceholder} value={searchValue} onChange={onSearchChange} />
         </div>
 
-        <FilterPopover filterOptions={filterOptions} onFilterChange={onFilterChange} />
+        {showFilter && <FilterPopover filterOptions={filterOptions} onFilterChange={onFilterChange} />}
       </div>
 
       <div className={styles.right}>{children}</div>
