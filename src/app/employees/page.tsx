@@ -16,6 +16,16 @@ import { logger } from '@/src/lib/logger';
 const DEFAULT_PAGE_SIZE = 10;
 
 /**
+ * Filter groups `/filters/employee` still serves but the list shouldn't offer.
+ * Compared against each group's `id` with separators and case stripped, so
+ * `maritalStatus`, `marital_status` and `Marital Status` all match.
+ */
+const HIDDEN_FILTER_GROUP_IDS = ['gender', 'maritalstatus'];
+
+const isHiddenFilterGroup = (id: string) =>
+  HIDDEN_FILTER_GROUP_IDS.includes(id.toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+/**
  * Depends on the caller's session cookie, so it can never be statically
  * prerendered — always render this route per-request.
  */
@@ -60,7 +70,7 @@ export default async function EmployeesPage() {
     initialColumns = columnsResponse?.data ?? [];
     initialEmployees = employeesResponse?.data ?? [];
     initialMeta = employeesResponse?.meta ?? initialMeta;
-    filterOptions = filterOptionsResponse?.data ?? [];
+    filterOptions = (filterOptionsResponse?.data ?? []).filter((group) => !isHiddenFilterGroup(group.id));
   } catch (error) {
     logger.error('Error fetching initial data for EmployeesPage:', error);
     if (error instanceof UnauthorizedError) {
