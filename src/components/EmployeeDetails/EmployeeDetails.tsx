@@ -102,7 +102,6 @@ const professionalSections: SectionConfig[] = [
       { label: STRINGS.EMPLOYMENT_STATUS, get: (e) => e.professionalInformation.employmentStatus },
       { label: 'Date of Joining', get: (e) => formatLongDate(e.professionalInformation.dateOfJoining) },
       { label: STRINGS.DEPARTMENT, get: (e) => e.professionalInformation.department },
-      { label: STRINGS.DESIGNATION, get: (e) => e.professionalInformation.designation },
       { label: 'Work Mode', get: (e) => e.professionalInformation.workMode },
     ],
   },
@@ -231,7 +230,7 @@ function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) {
           <div className={styles.columnContainer}>
             <div className={styles.metaItem}>
               <BriefcaseBusiness size={24} />
-              <Text4>{employee.professionalInformation.designation}</Text4>
+              <Text4>{employee.professionalInformation.department}</Text4>
             </div>
 
             <div className={styles.metaItem}>
