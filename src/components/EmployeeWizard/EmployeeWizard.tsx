@@ -183,12 +183,15 @@ function EmployeeSavedModal({ title, employee, onClose }: EmployeeSavedModalProp
 }
 
 /**
- * What the final step's submit came back with. `unchanged` only ever comes out of an edit:
- * the user walked to the last step without touching a field, so there is nothing to PATCH.
+ * What the final step's submit came back with. `unchanged` only ever comes out of an edit,
+ * from either of two places: the draft matched the record it was seeded from, so there was
+ * nothing to PATCH, or the PATCH went out and the backend answered `meta.changed: false`
+ * because the values it carried already matched the stored record. The second case brings
+ * the backend's own wording along in `message`; the first has none of its own.
  */
 type SubmitOutcome =
   | { status: 'saved'; message: string; employee: EmployeeSummary }
-  | { status: 'unchanged' }
+  | { status: 'unchanged'; message?: string }
   | { status: 'failed'; message: string };
 
 /**
@@ -263,6 +266,17 @@ async function submitUpdate(employeeId: string, original: EmployeeDraft): Promis
 
   if (!result.success) {
     return { status: 'failed', message: result.message };
+  }
+
+  /*
+    The diff above only catches what the wizard itself knows about; the backend compares
+    against the stored record and can still come back with nothing written — a value the
+    form normalised differently, or a record changed elsewhere since this page loaded. That
+    is a `success: true` response, so it is told apart by `meta.changed` alone, and it must
+    not raise the "employee updated" confirmation.
+  */
+  if (result.meta?.changed === false) {
+    return { status: 'unchanged', message: result.message };
   }
 
   return { status: 'saved', message: result.message, employee: toEmployeeSummary(result.data) };
@@ -363,9 +377,11 @@ export default function EmployeeWizard({ mode, employee }: EmployeeWizardProps) 
           return setSavedEmployee({ message: outcome.message, employee: outcome.employee });
 
         case 'unchanged':
+          // The backend's wording when it is the one that found nothing to write; the
+          // wizard's own prompt when the diff never left the browser.
           return showNotification(
             STRINGS.NO_CHANGES_TO_UPDATE,
-            STRINGS.NOTHING_WAS_CHANGED,
+            outcome.message ?? STRINGS.NOTHING_WAS_CHANGED,
             NOTIFICATION_TYPES.INFO,
             5000,
             'top-right',

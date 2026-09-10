@@ -102,7 +102,9 @@ const professionalSections: SectionConfig[] = [
       { label: STRINGS.EMPLOYMENT_STATUS, get: (e) => e.professionalInformation.employmentStatus },
       { label: 'Date of Joining', get: (e) => formatLongDate(e.professionalInformation.dateOfJoining) },
       { label: STRINGS.DEPARTMENT, get: (e) => e.professionalInformation.department },
-      { label: 'Work Mode', get: (e) => e.professionalInformation.workMode },
+      // The resolved name, not `shiftCode` — "GENERAL" is what the backend stores, "General"
+      // is what the user reads.
+      { label: 'Shift', get: (e) => e.professionalInformation.shift },
     ],
   },
 ];

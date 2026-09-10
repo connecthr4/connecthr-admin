@@ -40,6 +40,7 @@ const employee: EmployeeDetail = {
     dateOfJoining: '2017-01-11',
     department: 'PM',
     shiftCode: 'GENERAL',
+    shift: 'General',
     designation: 'Associate Project Manager',
     workMode: 'Hybrid',
   },
