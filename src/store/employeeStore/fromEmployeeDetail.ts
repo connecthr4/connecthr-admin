@@ -3,8 +3,8 @@
  *
  * The read model and the write model are deliberately different shapes (see
  * `lib/types/employees`), so the fields that only ever come back on a read — resolved
- * district names, designation, work mode — are dropped here rather than carried into the
- * store, where they would end up in the next write payload.
+ * district and shift names, designation, work mode — are dropped here rather than carried
+ * into the store, where they would end up in the next write payload.
  */
 
 import { formatDisplayDate, parseLocalDate } from '@/src/utils/date';
