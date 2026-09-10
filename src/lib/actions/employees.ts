@@ -98,12 +98,16 @@ export async function updateEmployee(
 
     /*
       The details screen and the list are both server-rendered, so without this the user
-      would be handed back to a cached render of the record they just changed.
+      would be handed back to a cached render of the record they just changed. Skipped when
+      the backend reports `changed: false`: nothing was written, so the caches still hold
+      the current record.
     */
-    revalidatePath(`${ROUTES.EMPLOYEES}/${employeeId}`);
-    revalidatePath(ROUTES.EMPLOYEES);
+    if (response.meta?.changed !== false) {
+      revalidatePath(`${ROUTES.EMPLOYEES}/${employeeId}`);
+      revalidatePath(ROUTES.EMPLOYEES);
+    }
 
-    return { success: true, message: response.message, data: response.data };
+    return { success: true, message: response.message, data: response.data, meta: response.meta };
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       redirect(ROUTES.LOGIN);

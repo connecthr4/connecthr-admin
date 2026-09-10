@@ -129,12 +129,18 @@ export interface EmployeePersonalDetails extends Omit<PersonalInformation, 'same
 }
 
 /**
- * The read model is richer than the create payload: `designation` and `workMode` are
- * derived by the backend and only ever come back on a read.
+ * The read model is richer than the create payload: `designation`, `workMode` and the
+ * shift's display name are resolved by the backend and only ever come back on a read.
  */
 export interface EmployeeProfessionalDetails extends ProfessionalInformation {
   designation: string;
   workMode: string;
+
+  /**
+   * The shift's name ("General") for the `shiftCode` the record is stored against — what the
+   * details screen shows, since the code itself means nothing to the user.
+   */
+  shift: string;
 }
 
 /**
@@ -181,6 +187,15 @@ export interface UpdateEmployeeRequest {
 }
 
 /**
+ * Told apart from a save that actually wrote something: the backend answers a PATCH whose
+ * values all match the stored record with `changed: false` and a message saying so, rather
+ * than with an error.
+ */
+export interface UpdateEmployeeMeta {
+  changed: boolean;
+}
+
+/**
  * Unlike create, the update endpoint echoes back the *full* record — the same shape
  * `/employees/:id` returns.
  */
@@ -188,6 +203,7 @@ export interface UpdateEmployeeResponse {
   success: boolean;
   message: string;
   data: EmployeeDetail;
+  meta?: UpdateEmployeeMeta;
 }
 
 /**
@@ -195,7 +211,7 @@ export interface UpdateEmployeeResponse {
  * cannot carry `ApiError` across the client/server boundary intact.
  */
 export type UpdateEmployeeResult =
-  | { success: true; message: string; data: EmployeeDetail }
+  | { success: true; message: string; data: EmployeeDetail; meta?: UpdateEmployeeMeta }
   | { success: false; message: string };
 
 export interface EmployeeColumn {

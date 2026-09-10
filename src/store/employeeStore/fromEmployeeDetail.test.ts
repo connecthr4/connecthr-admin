@@ -40,6 +40,7 @@ const employee: EmployeeDetail = {
     dateOfJoining: '2023-04-01',
     department: 'Engineering',
     shiftCode: 'GENERAL',
+    shift: 'General',
     designation: 'Project Manager',
     workMode: 'Office',
   },
@@ -88,6 +89,8 @@ describe('fromEmployeeDetail', () => {
     expect(draft.personalInformation).not.toHaveProperty('permanentDistrict');
     expect(draft.professionalInformation).not.toHaveProperty('designation');
     expect(draft.professionalInformation).not.toHaveProperty('workMode');
+    // The form's dropdown is keyed on the code, so the resolved name has no place in the draft.
+    expect(draft.professionalInformation).not.toHaveProperty('shift');
   });
 
   it('reads a record with no shift as nothing picked', () => {
