@@ -24,6 +24,19 @@ export interface MarkAttendanceFilters {
 }
 
 /**
+ * What the Attendance List screen is scoped to. The same day-and-department
+ * pair the sheet is read by, plus the status the listing narrows to — which is
+ * the one criterion that screen has and the marking sheet does not.
+ */
+export interface AttendanceListFilters {
+  date: string;
+  department: string;
+
+  /** A status value, or {@link ALL_STATUSES}, on the same terms as the department. */
+  status: string;
+}
+
+/**
  * The head count for one day, as the summary cards read it.
  *
  * Every count is nullable so the cards can render "--" for a day that has not
@@ -34,7 +47,6 @@ export interface MarkAttendanceFilters {
 export interface AttendanceSummary {
   totalEmployees: number | null;
   present: number | null;
-  absent: number | null;
   halfDay: number | null;
   onLeave: number | null;
 }
@@ -45,11 +57,13 @@ export const ALL_DEPARTMENTS = 'all';
 /** The same, for the shift dropdown. */
 export const ALL_SHIFTS = 'all';
 
+/** The same, for the status dropdown. */
+export const ALL_STATUSES = 'all';
+
 /** No counts at all — what the cards render before any day has been loaded. */
 export const EMPTY_ATTENDANCE_SUMMARY: AttendanceSummary = {
   totalEmployees: null,
   present: null,
-  absent: null,
   halfDay: null,
   onLeave: null,
 };
@@ -223,6 +237,13 @@ export interface GetAttendanceSheetRequest {
    * carries as its `shiftCode`. ORed the same way.
    */
   shifts?: string[];
+
+  /**
+   * Status *values*, as `/attendance/options` offers them — what a row carries
+   * as its `status`. ORed the same way, and left off entirely for a listing
+   * that is not narrowed to one.
+   */
+  statuses?: AttendanceStatus[];
 
   /** Matched against employee name and code. */
   search?: string;

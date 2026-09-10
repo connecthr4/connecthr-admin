@@ -4,6 +4,7 @@
 
 import AttendanceListDashboard from '@/src/components/AttendanceListDashboard';
 import { getCurrentUser } from '@/src/lib/server/currentUser';
+import { getAttendanceOptions } from '@/src/lib/server/attendance';
 
 /**
  * Depends on the caller's session cookie, so it can never be statically
@@ -22,7 +23,9 @@ export const dynamic = 'force-dynamic';
  * @returns The page UI for the route.
  */
 export default async function AttendanceListPage() {
-  const currentUser = await getCurrentUser();
+  const [currentUser, options] = await Promise.all([getCurrentUser(), getAttendanceOptions()]);
 
-  return <AttendanceListDashboard currentUser={currentUser} />;
+  return (
+    <AttendanceListDashboard currentUser={currentUser} departments={options.departments} statuses={options.statuses} />
+  );
 }

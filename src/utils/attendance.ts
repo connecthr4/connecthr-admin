@@ -80,6 +80,37 @@ export function getAttendanceStatusLabel(status: AttendanceStatus | '', options:
 }
 
 /**
+ * How a status is read at a glance. Named after what the marking means rather
+ * than the colour, so each table can paint the tone in its own module without
+ * the rule below being written twice.
+ */
+export type AttendanceStatusTone = 'present' | 'absent' | 'halfDay';
+
+/**
+ * The tone a status is painted in, or `undefined` for one that has none.
+ *
+ * Matched by rule rather than by an exhaustive map: the statuses come from
+ * `/attendance/options`, so one the backend adds has to land somewhere. Both
+ * halves of a half day share a tone, and anything unrecognised is left
+ * untinted rather than being given a colour that would claim something.
+ */
+export function getAttendanceStatusTone(status: AttendanceStatus): AttendanceStatusTone | undefined {
+  if (status.startsWith('HALF_DAY')) {
+    return 'halfDay';
+  }
+
+  if (status === 'PRESENT') {
+    return 'present';
+  }
+
+  if (status === 'ABSENT' || status === 'ON_LEAVE') {
+    return 'absent';
+  }
+
+  return undefined;
+}
+
+/**
  * The shifts, as the dropdown takes them. The `code` is the value — it is what
  * a sheet row carries and what the sheet request filters on — and the `name` is
  * what the user reads.
