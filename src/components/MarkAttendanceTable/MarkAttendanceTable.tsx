@@ -33,10 +33,16 @@ import TextInput from '../TextInput';
 import { Text3 } from '../Typography/Typography';
 import { EMPTY_ATTENDANCE_ENTRY } from '@/src/constants/attendance';
 import { STRINGS } from '@/src/constants/strings';
-import { clampOvertimeHours, clampOvertimeMinutes, getAttendanceKey } from '@/src/utils/attendance';
+import {
+  clampOvertimeHours,
+  clampOvertimeMinutes,
+  getAttendanceKey,
+  getAttendanceStatusTone,
+} from '@/src/utils/attendance';
 import styles from './MarkAttendanceTable.module.scss';
 
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
+import type { AttendanceStatusTone } from '@/src/utils/attendance';
 import type {
   AttendanceEntries,
   AttendanceEntry,
@@ -64,28 +70,18 @@ interface AttendanceRow {
   entry: AttendanceEntry;
 }
 
-/**
- * How a status paints its cell — the sheet is read by colour at a glance.
- *
- * Matched by rule rather than by an exhaustive map: the statuses come from
- * `/attendance/options`, so one the backend adds has to land somewhere. Both
- * halves of a half day share the amber tone, and anything unrecognised is left
- * untinted rather than being given a colour that would claim something.
- */
-function getStatusTone(status: AttendanceStatus): string | undefined {
-  if (status.startsWith('HALF_DAY')) {
-    return styles.halfDay;
-  }
+/** The class each tone is painted in here — the rule itself is shared. */
+const TONE_STYLES: Record<AttendanceStatusTone, string> = {
+  present: styles.present,
+  absent: styles.absent,
+  halfDay: styles.halfDay,
+};
 
-  if (status === 'PRESENT') {
-    return styles.present;
-  }
+/** The class a marking tints its trigger with, or nothing for an untinted one. */
+function getStatusToneStyle(status: AttendanceStatus): string | undefined {
+  const tone = getAttendanceStatusTone(status);
 
-  if (status === 'ABSENT' || status === 'ON_LEAVE') {
-    return styles.absent;
-  }
-
-  return undefined;
+  return tone && TONE_STYLES[tone];
 }
 
 /**
@@ -107,7 +103,7 @@ const StatusCell = memo(function StatusCell({
   onChange: EntryChangeHandler;
 }) {
   return (
-    <div className={clsx(styles.statusCell, value && getStatusTone(value))}>
+    <div className={clsx(styles.statusCell, value && getStatusToneStyle(value))}>
       <Dropdown
         portalMenu
         options={options}

@@ -169,7 +169,10 @@ export const STRINGS = {
   DATE: 'Date',
   ALL_DEPARTMENTS: 'All Departments',
   ALL_SHIFTS: 'All Shifts',
+  ALL_STATUS: 'All Status',
+  STATUS: 'Status',
   VIEW: 'View',
+  APPLY: 'Apply',
   RESET: 'Reset',
   TOTAL_EMPLOYEES: 'Total Employees',
   PRESENT: 'Present',
@@ -211,9 +214,6 @@ export const STRINGS = {
    */
   ATTENDANCE_SUBMITTED: 'Attendance submitted',
   ATTENDANCE_SUBMIT_FAILED: 'Attendance could not be submitted',
-
-  /** Stands in until the attendance endpoints exist for these two screens to read. */
-  ATTENDANCE_COMING_SOON: 'This screen is being built. Attendance records will appear here.',
 };
 
 /**

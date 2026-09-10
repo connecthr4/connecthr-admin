@@ -1,0 +1,71 @@
+/**
+------------------------------------------------------
+styles specific to the AttendanceListTable component
+------------------------------------------------------
+**/
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+
+  flex: 1;
+  min-height: 0;
+}
+
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-height: 0;
+}
+
+/* The identity columns keep their content on one line. */
+.idCell,
+.nameCell {
+  white-space: nowrap;
+}
+
+.nameCell {
+  font-weight: 500;
+}
+
+/*
+The marking as a pill rather than plain text: the listing is scanned down the
+status column, and a tinted block is what makes that possible at a glance.
+*/
+.statusPill {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+
+  border-radius: var(--radius-sm);
+
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+
+  /* The floor under a status the tone rule does not recognise. */
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-500);
+}
+
+.statusPill.present {
+  background-color: var(--color-green-50);
+  color: var(--color-green-500);
+}
+
+.statusPill.absent {
+  background-color: var(--color-red-400-10);
+  color: var(--color-red-500);
+}
+
+.statusPill.halfDay {
+  background-color: rgb(245 158 11 / 10%);
+  color: var(--color-amber-500);
+}
+
+/* The dash a row with nothing recorded reads as. */
+.muted {
+  color: var(--color-gray-400);
+}
