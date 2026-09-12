@@ -2,9 +2,11 @@
  * The read-only view of a day's attendance and overtime records: the head count
  * the day stands at, and the records behind it.
  *
- * The same day-and-department scope the marking sheet is read by, narrowed
- * further by status — and nothing on it is editable, since this screen reports
- * what was marked rather than marking it.
+ * The day is chosen above the table and is the only thing the screen insists
+ * on — it opens on today, unnarrowed. Department and status are optional
+ * narrowings, taken from the table toolbar's filter panel where several of each
+ * can be ticked at once. Nothing here is editable: this screen reports what was
+ * marked rather than marking it.
  *
  * @example
  * ```tsx
@@ -17,18 +19,22 @@
  */
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { Download } from 'lucide-react';
 import AppHeader from '../AppHeader';
 import AttendanceListTable from '../AttendanceListTable';
 import Button from '../Button';
 import DatePicker from '../DatePicker';
-import Dropdown from '../Dropdown';
+import ExportConfirmationModal from '../ExportConfirmationModal';
+import ExportScopeOptions from '../ExportScopeOptions';
 import { Heading2, Text2 } from '../Typography';
 import { useToday } from '@/src/hooks/useToday';
 import { useDebounce } from '@/src/hooks/useDebounce';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { getAttendanceSheet } from '@/src/lib/actions/attendance';
+import { AttendanceClient } from '@/src/lib/api/attendanceClient';
+import { getApiErrorInfo } from '@/src/lib/api/helpers';
 import { logger } from '@/src/lib/logger';
 import { parseLocalDate } from '@/src/utils/date';
 import {
@@ -38,23 +44,47 @@ import {
   FALLBACK_ATTENDANCE_STATUS_OPTIONS,
 } from '@/src/constants/attendance';
 import { NOTIFICATION_TYPES, STRINGS } from '@/src/constants/strings';
-import { ALL_DEPARTMENTS, ALL_STATUSES, EMPTY_ATTENDANCE_SUMMARY } from '@/src/lib/types/attendance';
+import { EMPTY_ATTENDANCE_SUMMARY } from '@/src/lib/types/attendance';
 import styles from './AttendanceListDashboard.module.scss';
 
 import type { PaginationState } from '@tanstack/react-table';
 import type { User } from '@/src/lib/types/auth';
 import type { DropdownOption } from '../Dropdown/Dropdown';
+import type { ExportScope } from '../ExportScopeOptions';
+import type { FilterSelection } from '../FilterPopover';
+import type { FilterOptions } from '@/src/lib/types/filters';
 import type {
-  AttendanceListFilters,
   AttendanceSheetRow,
   AttendanceStatusOption,
   AttendanceSummary,
+  ExportAttendanceRequest,
 } from '@/src/lib/types/attendance';
 
-/** Where the listing starts, and what "Reset" and a fresh scope go back to. */
+/** Where the listing starts, and what a fresh scope goes back to. */
 const INITIAL_PAGINATION: PaginationState = { pageIndex: 0, pageSize: ATTENDANCE_PAGE_SIZE };
 
 const NO_ROWS: AttendanceSheetRow[] = [];
+
+/** Nothing ticked — the scope the screen opens on. */
+const NO_SELECTION: FilterSelection = {};
+
+/** What an untouched filter group reads as, shared so it stays referentially stable. */
+const NO_VALUES: string[] = [];
+
+/**
+ * The filter panel's group ids, which are deliberately the names of the request
+ * fields they fill: a selection becomes a request body directly, with no
+ * translation table in between that could drift from either side.
+ */
+const DEPARTMENTS_FILTER_ID = 'departments';
+const STATUSES_FILTER_ID = 'statuses';
+
+/**
+ * The export scope the modal opens on. The whole roster is the safer default:
+ * it is what a user reaching for "Export" usually means, and it cannot
+ * silently omit rows they forgot they had filtered out.
+ */
+const DEFAULT_EXPORT_SCOPE: ExportScope = 'all';
 
 /**
  * Which tone a card's label and count are painted in. Named after what the
@@ -118,6 +148,57 @@ interface AttendanceListDashboardProps {
   statuses?: AttendanceStatusOption[];
 }
 
+/**
+ * The department and status values a request should carry, read out of the
+ * panel's selection. Groups the user left empty come back as one shared empty
+ * array rather than a fresh one, so an unnarrowed screen doesn't churn
+ * identities on every render.
+ */
+function readSelection(selection: FilterSelection) {
+  return {
+    departments: selection[DEPARTMENTS_FILTER_ID] ?? NO_VALUES,
+    statuses: selection[STATUSES_FILTER_ID] ?? NO_VALUES,
+  };
+}
+
+/** The criteria a `filtered` export repeats, as the listing was read with. */
+interface ExportCriteria {
+  date: string;
+  departments: string[];
+  statuses: string[];
+  search: string;
+}
+
+/**
+ * Builds the export payload.
+ *
+ * The date is sent on both scopes — an attendance export is always one day's,
+ * so "all" means the whole roster for that day rather than every day on
+ * record. On `filtered` the narrowing is the very same the list request was
+ * made with, so the file matches the rows on screen; on `all` it is left off
+ * entirely. The sort is sent either way, so the file is ordered like the table
+ * rather than however the backend happens to default.
+ */
+function toExportRequest(scope: ExportScope, criteria: ExportCriteria): ExportAttendanceRequest {
+  const request: ExportAttendanceRequest = {
+    scope,
+    date: criteria.date,
+    sortBy: ATTENDANCE_SHEET_SORT_BY,
+    sortOrder: ATTENDANCE_SHEET_SORT_ORDER,
+  };
+
+  if (scope === 'all') {
+    return request;
+  }
+
+  return {
+    ...request,
+    ...(criteria.search ? { search: criteria.search } : {}),
+    ...(criteria.departments.length > 0 ? { departments: criteria.departments } : {}),
+    ...(criteria.statuses.length > 0 ? { statuses: criteria.statuses } : {}),
+  };
+}
+
 export default function AttendanceListDashboard({
   currentUser,
   departments = [],
@@ -127,29 +208,20 @@ export default function AttendanceListDashboard({
 
   /*
   Null until the user picks a date, which is what makes "today" follow the clock
-  rather than freezing at whatever it was when the screen mounted — and what
-  Reset goes back to. `today` is empty during the server render, so the field
-  starts blank on both sides of hydration and fills in on the client.
+  rather than freezing at whatever it was when the screen mounted. `today` is
+  empty during the server render, so the field starts blank on both sides of
+  hydration and fills in on the client — the one render nobody can act on.
   */
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [department, setDepartment] = useState(ALL_DEPARTMENTS);
-  const [status, setStatus] = useState(ALL_STATUSES);
 
   const date = selectedDate ?? today;
 
   /*
-  The scope the screen is showing, which only moves when Apply is pressed —
-  editing the fields is not meant to re-read the day out from under whatever is
-  already listed.
-
-  Empty only until the client's clock arrives, which is the one render nobody
-  can act on; the block below opens it on today, unnarrowed.
+  What the toolbar's filter panel was last applied with. The panel keeps its own
+  draft while the user ticks boxes and reports the whole selection on "Apply
+  Filter", so the listing is never re-read halfway through a change of mind.
   */
-  const [appliedFilters, setAppliedFilters] = useState<AttendanceListFilters>({
-    date: '',
-    department: ALL_DEPARTMENTS,
-    status: ALL_STATUSES,
-  });
+  const [filterSelection, setFilterSelection] = useState<FilterSelection>(NO_SELECTION);
 
   const [rows, setRows] = useState<AttendanceSheetRow[]>(NO_ROWS);
   const [totalItems, setTotalItems] = useState(0);
@@ -170,15 +242,12 @@ export default function AttendanceListDashboard({
    */
   const [loadedScope, setLoadedScope] = useState('');
 
-  /**
-   * Bumped every time Apply is pressed, so pressing it again re-reads the same
-   * day rather than being mistaken for the scope the screen is already on.
-   */
-  const [viewCount, setViewCount] = useState(0);
-
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search);
-  const [appliedSearch, setAppliedSearch] = useState(debouncedSearch);
+
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportScope, setExportScope] = useState<ExportScope>(DEFAULT_EXPORT_SCOPE);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { showNotification } = useNotification();
 
@@ -188,65 +257,32 @@ export default function AttendanceListDashboard({
    */
   const latestRequestIdRef = useRef(0);
 
-  /**
-   * Moves the screen onto a scope: a new day, department or status starts from
-   * the first page with a clear search box.
-   *
-   * The one place a scope changes, so Apply, Reset and the opening read cannot
-   * drift apart on what "showing a day" means.
-   */
-  const applyScope = useCallback((scope: AttendanceListFilters) => {
-    setAppliedFilters(scope);
-    setPagination(INITIAL_PAGINATION);
-    setSearch('');
-
-    /* Re-reading the same scope has to count as a new request, not as a no-op. */
-    setViewCount((previous) => previous + 1);
-  }, []);
-
   /*
-  A new query always restarts at the first page. Adjusted during render —
-  React's recommended pattern for derived state — rather than in an effect, so
-  the fetch below sees the corrected page in this same pass.
+  The two groups the filter panel offers. Departments are dropped when the
+  options read came back with none, so the panel never shows a heading with
+  nothing under it; statuses always have a floor to fall back to — see the
+  `statuses` prop. Both halves of a half day are listed separately, which is
+  what makes "first half" and "second half" tickable without a second group for
+  the half.
   */
-  if (appliedSearch !== debouncedSearch) {
-    setAppliedSearch(debouncedSearch);
+  const filterOptions = useMemo<FilterOptions>(() => {
+    const departmentGroup: FilterOptions =
+      departments.length > 0
+        ? [{ id: DEPARTMENTS_FILTER_ID, label: STRINGS.DEPARTMENT, isMulti: true, options: departments }]
+        : [];
 
-    if (pagination.pageIndex !== 0) {
-      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-    }
-  }
+    return [
+      ...departmentGroup,
+      {
+        id: STATUSES_FILTER_ID,
+        label: STRINGS.ATTENDANCE_STATUS,
+        isMulti: true,
+        options: statuses.length > 0 ? statuses : FALLBACK_ATTENDANCE_STATUS_OPTIONS,
+      },
+    ];
+  }, [departments, statuses]);
 
-  /*
-  Opens on today, unnarrowed — the scope the filters already read, so the screen
-  the user lands on is the one they came for and Apply is left for changing it.
-
-  Adjusted during render for the same reason as the search above. It waits for
-  `today`, which is deliberately unknown until the client's clock is available,
-  and runs only while no scope has been applied — Reset goes back through the
-  same door and must not be re-opened from here afterwards.
-  */
-  if (today && !appliedFilters.date) {
-    applyScope({ date: today, department: ALL_DEPARTMENTS, status: ALL_STATUSES });
-  }
-
-  const departmentOptions = useMemo<DropdownOption[]>(
-    () => [{ label: STRINGS.ALL_DEPARTMENTS, value: ALL_DEPARTMENTS }, ...departments],
-    [departments]
-  );
-
-  /*
-  The floor under a failed options read — see the `statuses` prop. Both halves
-  of a half day are listed separately, which is what makes "first half" and
-  "second half" selectable filters without a second dropdown for the half.
-  */
-  const statusOptions = useMemo<DropdownOption[]>(
-    () => [
-      { label: STRINGS.ALL_STATUS, value: ALL_STATUSES },
-      ...(statuses.length > 0 ? statuses : FALLBACK_ATTENDANCE_STATUS_OPTIONS),
-    ],
-    [statuses]
-  );
+  const { departments: selectedDepartments, statuses: selectedStatuses } = readSelection(filterSelection);
 
   /*
   A day that has not happened yet has no attendance to list, so the calendar
@@ -256,18 +292,33 @@ export default function AttendanceListDashboard({
   const maxDate = useMemo(() => (today ? parseLocalDate(today) : undefined), [today]);
 
   /**
-   * Everything a request is made of, in one comparable value — what the rows on
-   * screen are checked against to know whether they are still current.
+   * What the listing is narrowed to, in one comparable value. Every criterion
+   * except the page — changing any of them re-reads the day from its first
+   * page, since the page the user was on may not exist in the new scope.
    */
-  const requestScope = [
-    viewCount,
-    appliedFilters.date,
-    appliedFilters.department,
-    appliedFilters.status,
-    pagination.pageIndex,
-    pagination.pageSize,
-    debouncedSearch,
-  ].join('|');
+  const queryScope = [date, selectedDepartments.join(','), selectedStatuses.join(','), debouncedSearch].join('|');
+
+  const [appliedScope, setAppliedScope] = useState(queryScope);
+
+  /*
+  Back to the first page whenever the scope moves. Adjusted during render —
+  React's recommended pattern for derived state — rather than in an effect, so
+  the fetch below sees the corrected page in this same pass instead of reading
+  a page that is about to be thrown away.
+  */
+  if (appliedScope !== queryScope) {
+    setAppliedScope(queryScope);
+
+    if (pagination.pageIndex !== 0) {
+      setPagination((previous) => ({ ...previous, pageIndex: 0 }));
+    }
+  }
+
+  /**
+   * Everything a request is made of — what the rows on screen are checked
+   * against to know whether they are still current.
+   */
+  const requestScope = [queryScope, pagination.pageIndex, pagination.pageSize].join('|');
 
   /*
   True through the first render too, when the date is still unknown: the screen
@@ -283,21 +334,22 @@ export default function AttendanceListDashboard({
   asked for.
   */
   useEffect(() => {
-    if (!appliedFilters.date) {
+    /* No day to read yet — the client's clock has not arrived. */
+    if (!date) {
       return;
     }
 
     const requestId = ++latestRequestIdRef.current;
 
     getAttendanceSheet({
-      date: appliedFilters.date,
+      date,
       page: pagination.pageIndex + 1,
       limit: pagination.pageSize,
       sortBy: ATTENDANCE_SHEET_SORT_BY,
       sortOrder: ATTENDANCE_SHEET_SORT_ORDER,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
-      ...(appliedFilters.department !== ALL_DEPARTMENTS ? { departments: [appliedFilters.department] } : {}),
-      ...(appliedFilters.status !== ALL_STATUSES ? { statuses: [appliedFilters.status] } : {}),
+      ...(selectedDepartments.length > 0 ? { departments: selectedDepartments } : {}),
+      ...(selectedStatuses.length > 0 ? { statuses: selectedStatuses } : {}),
     })
       .then((result) => {
         // A newer request has since been kicked off — ignore this stale response.
@@ -346,18 +398,45 @@ export default function AttendanceListDashboard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestScope]);
 
-  const handleApply = () => applyScope({ date, department, status });
+  /**
+   * The scope resets on every open, so a one-off "filtered" export never
+   * carries over into the next one the user reaches for.
+   */
+  const handleOpenExportModal = () => {
+    setExportScope(DEFAULT_EXPORT_SCOPE);
+    setIsExportModalOpen(true);
+  };
 
-  /*
-  Back to the view the screen opens on — today, every department, every status —
-  rather than to a blank screen: the listing always shows a day now, so "reset"
-  means the default day rather than none at all.
-  */
-  const handleReset = () => {
-    setSelectedDate(null);
-    setDepartment(ALL_DEPARTMENTS);
-    setStatus(ALL_STATUSES);
-    applyScope({ date: today, department: ALL_DEPARTMENTS, status: ALL_STATUSES });
+  const handleExportAttendance = async () => {
+    setIsExporting(true);
+
+    try {
+      await AttendanceClient.exportAttendance(
+        toExportRequest(exportScope, {
+          date,
+          departments: selectedDepartments,
+          statuses: selectedStatuses,
+          search: debouncedSearch,
+        })
+      );
+
+      setIsExportModalOpen(false);
+      showNotification(
+        STRINGS.ATTENDANCE_EXPORTED_SUCCESSFULLY,
+        '',
+        NOTIFICATION_TYPES.SUCCESS,
+        5000,
+        'top-right',
+        false
+      );
+    } catch (error) {
+      logger.error('Error occurred while exporting the attendance list:', error);
+      const { message } = getApiErrorInfo(error);
+
+      showNotification(STRINGS.ATTENDANCE_EXPORT_FAILED, message, NOTIFICATION_TYPES.ERROR, 5000, 'top-right', false);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -369,40 +448,20 @@ export default function AttendanceListDashboard({
       />
 
       <div className={styles.content}>
-        <div className={styles.filters}>
-          <div className={styles.field}>
-            <DatePicker
-              label={STRINGS.DATE}
-              value={date}
-              maxDate={maxDate}
-              onChange={(value) => setSelectedDate(String(value ?? ''))}
-            />
-          </div>
-
-          <div className={styles.field}>
-            <Dropdown
-              label={STRINGS.DEPARTMENT}
-              options={departmentOptions}
-              value={department}
-              searchable
-              onChange={setDepartment}
-            />
-          </div>
-
-          <div className={styles.field}>
-            <Dropdown label={STRINGS.STATUS} options={statusOptions} value={status} onChange={setStatus} />
-          </div>
-
-          <div className={styles.actions}>
-            {/* Nothing to scope the day to until a date is chosen. */}
-            <Button className={styles.button} disabled={!date} onClick={handleApply}>
-              {STRINGS.APPLY}
-            </Button>
-
-            <Button variant="secondary" className={styles.button} onClick={handleReset}>
-              {STRINGS.RESET}
-            </Button>
-          </div>
+        {/*
+        The day the listing is for, and the only thing chosen above the table:
+        it is the one criterion every request must carry, so it reads the day
+        straight away rather than waiting behind an Apply button. Department and
+        status are optional narrowings, and live in the toolbar's filter panel.
+        */}
+        <div className={styles.field}>
+          <DatePicker
+            label={STRINGS.DATE}
+            value={date}
+            maxDate={maxDate}
+            /* Clearing the field falls back to today — the screen always shows a day. */
+            onChange={(value) => setSelectedDate(value ? String(value) : null)}
+          />
         </div>
 
         <div className={styles.summaryGrid}>
@@ -423,12 +482,42 @@ export default function AttendanceListDashboard({
           rows={rows}
           search={search}
           onSearchChange={setSearch}
+          filterOptions={filterOptions}
+          onFilterChange={setFilterSelection}
           pagination={pagination}
           onPaginationChange={setPagination}
           totalItems={totalItems}
           isLoading={isLoading}
-        />
+        >
+          {/* Nothing to export until the day the file would cover is known. */}
+          <Button
+            variant="secondary"
+            startIcon={Download}
+            className={styles.exportButton}
+            disabled={!date}
+            onClick={handleOpenExportModal}
+          >
+            {STRINGS.EXPORT}
+          </Button>
+        </AttendanceListTable>
       </div>
+
+      {isExportModalOpen && (
+        <ExportConfirmationModal
+          isOpen={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          onConfirm={handleExportAttendance}
+          description={STRINGS.EXPORT_ATTENDANCE_CONFIRMATION}
+          isExporting={isExporting}
+        >
+          <ExportScopeOptions
+            value={exportScope}
+            onChange={setExportScope}
+            allLabel={STRINGS.EXPORT_SCOPE_ALL_ATTENDANCE}
+            disabled={isExporting}
+          />
+        </ExportConfirmationModal>
+      )}
     </div>
   );
 }

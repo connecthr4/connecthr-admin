@@ -15,6 +15,8 @@
  *   rows={rows}
  *   search={search}
  *   onSearchChange={setSearch}
+ *   filterOptions={filterOptions}
+ *   onFilterChange={setFilterSelection}
  *   pagination={pagination}
  *   onPaginationChange={setPagination}
  *   totalItems={totalItems}
@@ -33,6 +35,8 @@ import styles from './AttendanceListTable.module.scss';
 
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 import type { AttendanceSheetRow } from '@/src/lib/types/attendance';
+import type { FilterOptions } from '@/src/lib/types/filters';
+import type { FilterSelection } from '../FilterPopover';
 import type { AttendanceStatusTone } from '@/src/utils/attendance';
 
 /** The class each tone is painted in here — the rule itself is shared. */
@@ -134,6 +138,16 @@ interface AttendanceListTableProps {
   search: string;
   onSearchChange: (value: string) => void;
 
+  /**
+   * The groups the toolbar's filter panel offers — department and status for
+   * this listing. Built by the dashboard from the options endpoint, so the
+   * panel can never offer a value no row could carry.
+   */
+  filterOptions?: FilterOptions;
+
+  /** Called with the whole selection when the panel's "Apply Filter" is pressed. */
+  onFilterChange?: (selection: FilterSelection) => void;
+
   pagination: PaginationState;
   onPaginationChange: (pagination: PaginationState) => void;
 
@@ -141,16 +155,25 @@ interface AttendanceListTableProps {
   totalItems: number;
 
   isLoading?: boolean;
+
+  /**
+   * Actions for the toolbar's right-hand side — the Export button, here.
+   * Handed in rather than built in, so the table stays a table.
+   */
+  children?: React.ReactNode;
 }
 
 export default function AttendanceListTable({
   rows,
   search,
   onSearchChange,
+  filterOptions,
+  onFilterChange,
   pagination,
   onPaginationChange,
   totalItems,
   isLoading = false,
+  children,
 }: AttendanceListTableProps) {
   /* Constant, but `DataTable` takes it as a prop — memoised to keep it identical. */
   const columns = useMemo(() => ATTENDANCE_LIST_COLUMNS, []);
@@ -161,8 +184,11 @@ export default function AttendanceListTable({
         searchValue={search}
         onSearchChange={onSearchChange}
         searchPlaceholder={STRINGS.SEARCH_EMPLOYEE_NAME_OR_ID}
-        showFilter={false}
-      />
+        filterOptions={filterOptions}
+        onFilterChange={onFilterChange}
+      >
+        {children}
+      </TableToolbar>
 
       <div className={styles.tableContainer}>
         <RecordsTable

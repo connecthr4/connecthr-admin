@@ -79,6 +79,13 @@ export const API_ENDPOINTS = {
      * comes back on the sheet wherever it is next opened.
      */
     DRAFT: '/attendance/draft',
+
+    /**
+     * A day's records as an Excel file. Takes the sheet's own criteria plus a
+     * scope, so the file is either the whole roster for the day or exactly the
+     * listing on screen.
+     */
+    EXPORT: '/attendance/export',
   },
 
   SHIFTS: {
