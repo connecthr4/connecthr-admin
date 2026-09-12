@@ -25,9 +25,24 @@ styles specific to the AttendanceListDashboard component
   overflow-y: auto;
 }
 
+/*
+The date keeps a readable width instead of stretching across the panel — it is
+a ten-character field, and a full-width one would read as the panel's heading
+rather than as one input.
+*/
+.field {
+  min-width: 0;
+  max-width: 18rem;
+}
+
+/* Matches the padding the other toolbars' actions are drawn with. */
+.exportButton {
+  padding: 1rem;
+}
+
 .summaryGrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--spacing-5);
 }
 
@@ -59,10 +74,6 @@ outrank `Typography`'s own colour, which is set at the same specificity.
   color: var(--color-green-500);
 }
 
-.danger {
-  color: var(--color-red-500);
-}
-
 .warning {
   color: var(--color-amber-500);
 }
@@ -71,37 +82,23 @@ outrank `Typography`'s own colour, which is set at the same specificity.
   color: var(--color-violet-600);
 }
 
-/* Stands in for the records table, so it fills the panel the table will. */
-.placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  min-height: 0;
-}
-
-/* Scoped under the wrapper to outrank `Typography`'s own colour. */
-.placeholder .placeholderText {
-  color: var(--color-gray-400);
-}
-
 /*
-The panel loses its own gutters as the sidebar does, and the cards drop to
-three then two across — five in a row leaves each one too narrow to hold a
-label like "Total Employees" on a single line.
+The panel loses its own gutters as the sidebar does, and the cards drop to two
+across — four in a row leaves each one too narrow to hold a label like "Total
+Employees" on a single line.
 */
 @media (max-width: 1280px) {
   .content {
     gap: var(--spacing-5);
     padding: var(--spacing-5);
   }
-
-  .summaryGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 1024px) {
+  .field {
+    max-width: none;
+  }
+
   .summaryGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -34,7 +34,6 @@ export interface MarkAttendanceFilters {
 export interface AttendanceSummary {
   totalEmployees: number | null;
   present: number | null;
-  absent: number | null;
   halfDay: number | null;
   onLeave: number | null;
 }
@@ -49,7 +48,6 @@ export const ALL_SHIFTS = 'all';
 export const EMPTY_ATTENDANCE_SUMMARY: AttendanceSummary = {
   totalEmployees: null,
   present: null,
-  absent: null,
   halfDay: null,
   onLeave: null,
 };
@@ -220,9 +218,17 @@ export interface GetAttendanceSheetRequest {
 
   /**
    * Shift *codes* — the `code` half of an option, which is what a sheet row
-   * carries as its `shiftCode`. ORed the same way.
+   * carries as its `shiftCode`. ORed the same way. Named for what it holds:
+   * the endpoint matches on codes and would not recognise a shift's name.
    */
-  shifts?: string[];
+  shiftCodes?: string[];
+
+  /**
+   * Status *values*, as `/attendance/options` offers them — what a row carries
+   * as its `status`. ORed the same way, and left off entirely for a listing
+   * that is not narrowed to one.
+   */
+  statuses?: AttendanceStatus[];
 
   /** Matched against employee name and code. */
   search?: string;
@@ -236,6 +242,39 @@ export interface GetAttendanceSheetRequest {
 }
 
 export type AttendanceSortOrder = 'asc' | 'desc';
+
+/**
+ * `all` exports the whole roster for the day and ignores the listing's
+ * narrowing; `filtered` exports exactly what the table is showing.
+ *
+ * The date is outside this choice on purpose: an attendance export is always
+ * *a day's* export, so "all" means every employee on that day rather than
+ * every day.
+ */
+export type AttendanceExportScope = 'all' | 'filtered';
+
+/**
+ * The body `POST /attendance/export` takes, which answers with an Excel file.
+ *
+ * The criteria are the sheet request's own, so a `filtered` export is the same
+ * query the rows on screen came from — only without the paging, since a file
+ * covers the whole scope rather than a page of it. On `all` they are left off
+ * entirely: sending a narrowing alongside it would contradict the scope.
+ */
+export interface ExportAttendanceRequest {
+  scope: AttendanceExportScope;
+
+  /** "YYYY-MM-DD" — required on both scopes. */
+  date: string;
+
+  departments?: string[];
+  shiftCodes?: string[];
+  statuses?: AttendanceStatus[];
+  search?: string;
+
+  sortBy?: string;
+  sortOrder?: AttendanceSortOrder;
+}
 
 /**
  * How far along a day's marking is. Sent for the sheet as a whole and for each

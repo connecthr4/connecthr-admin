@@ -102,11 +102,6 @@ export const STRINGS = {
   NO_UPCOMING_HOLIDAYS: 'No upcoming holidays',
   LOGOUT: 'Logout',
   SESSION_EXPIRED: 'Your session has expired due to inactivity. Please log in again.',
-  /*
-  For a session that ended without the idle timeout being the known cause — a revoked token,
-  or a backend `/auth/me` that could not be reached. Blaming those on inactivity would be a
-  guess, and during an outage it would be the same wrong guess for every user at once.
-  */
   SESSION_ENDED: 'Please log in again to continue.',
   ACCOUNT_MENU: 'Account menu',
   CREATE_USER: 'Create User',
@@ -169,7 +164,10 @@ export const STRINGS = {
   DATE: 'Date',
   ALL_DEPARTMENTS: 'All Departments',
   ALL_SHIFTS: 'All Shifts',
+  ALL_STATUS: 'All Status',
+  STATUS: 'Status',
   VIEW: 'View',
+  APPLY: 'Apply',
   RESET: 'Reset',
   TOTAL_EMPLOYEES: 'Total Employees',
   PRESENT: 'Present',
@@ -198,22 +196,14 @@ export const STRINGS = {
   ATTENDANCE_DRAFT_SAVE_FAILED: 'Draft could not be saved',
   ATTENDANCE_NOTHING_TO_MARK: 'Nothing has been marked yet',
   ATTENDANCE_INCOMPLETE: 'Some employees are not marked yet',
-
-  /** The count it is missing is prefixed by the caller: "3 of 28 ...". */
   ATTENDANCE_UNMARKED_MESSAGE: 'employees are still unmarked. Mark them, or save what you have as a draft.',
   ATTENDANCE_EXPORTED_SUCCESSFULLY: 'Attendance sheet exported successfully',
+  ATTENDANCE_EXPORT_FAILED: 'Attendance export failed',
+  EXPORT_ATTENDANCE_CONFIRMATION: 'The attendance list will be downloaded as an Excel file. Choose what to include:',
+  EXPORT_SCOPE_ALL_ATTENDANCE: 'All employees for the selected date',
   ATTENDANCE_FETCH_FAILED: 'Failed to load the attendance sheet',
-
-  /**
-   * The heading a submission is reported under. The detail beneath it is the
-   * backend's own message, so what the user reads is what was actually
-   * recorded — these only say which way it went.
-   */
   ATTENDANCE_SUBMITTED: 'Attendance submitted',
   ATTENDANCE_SUBMIT_FAILED: 'Attendance could not be submitted',
-
-  /** Stands in until the attendance endpoints exist for these two screens to read. */
-  ATTENDANCE_COMING_SOON: 'This screen is being built. Attendance records will appear here.',
 };
 
 /**

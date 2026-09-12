@@ -325,7 +325,7 @@ export default function MarkAttendanceDashboard({
       sortOrder: ATTENDANCE_SHEET_SORT_ORDER,
       ...(debouncedSearch ? { search: debouncedSearch } : {}),
       ...(appliedFilters.department !== ALL_DEPARTMENTS ? { departments: [appliedFilters.department] } : {}),
-      ...(appliedFilters.shift !== ALL_SHIFTS ? { shifts: [appliedFilters.shift] } : {}),
+      ...(appliedFilters.shift !== ALL_SHIFTS ? { shiftCodes: [appliedFilters.shift] } : {}),
     })
       .then((result) => {
         // A newer request has since been kicked off — ignore this stale response.
