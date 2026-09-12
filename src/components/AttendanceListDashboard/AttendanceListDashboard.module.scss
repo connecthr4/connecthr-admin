@@ -26,32 +26,18 @@ styles specific to the AttendanceListDashboard component
 }
 
 /*
-The three fields keep a readable width instead of stretching across the panel,
-and the buttons sit at the end of the row — `align-items: end` is what lands
-them on the fields' bottom edge rather than centred against the labels above.
+The date keeps a readable width instead of stretching across the panel — it is
+a ten-character field, and a full-width one would read as the panel's heading
+rather than as one input.
 */
-.filters {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(12rem, 18rem)) auto;
-  align-items: end;
-  gap: var(--spacing-5);
-}
-
 .field {
   min-width: 0;
+  max-width: 18rem;
 }
 
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-}
-
-/* Matches the 48px trigger height of the fields it sits beside. */
-.button {
-  height: 3rem;
-  padding: 0 var(--spacing-8);
-  border-radius: var(--radius-sm);
+/* Matches the padding the other toolbars' actions are drawn with. */
+.exportButton {
+  padding: 1rem;
 }
 
 .summaryGrid {
@@ -109,14 +95,8 @@ Employees" on a single line.
 }
 
 @media (max-width: 1024px) {
-  .filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  /* Back under the fields, where the row has run out of room for them. */
-  .actions {
-    grid-column: 1 / -1;
-    justify-content: flex-end;
+  .field {
+    max-width: none;
   }
 
   .summaryGrid {
