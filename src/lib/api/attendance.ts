@@ -5,6 +5,7 @@ import type {
   GetAttendanceOptionsResponse,
   GetAttendanceSheetRequest,
   GetAttendanceSheetResponse,
+  GetEmployeeAttendanceResponse,
   MarkAttendanceRequest,
   SaveAttendanceDraftResponse,
   SubmitAttendanceResponse,
@@ -60,5 +61,17 @@ export const AttendanceApi = {
    */
   exportSheet(client: ApiClient, data: ExportAttendanceRequest) {
     return client.postRaw(API_ENDPOINTS.ATTENDANCE.EXPORT, data);
+  },
+
+  /**
+   * One employee's attendance history, whole: the employee is the only scope
+   * the endpoint takes, and it answers with every day on record rather than a
+   * page of them.
+   *
+   * @param employeeId - The backend's own employee record id — the one the
+   * details route is keyed on, not the "EMP1001" code the screens display.
+   */
+  getEmployeeAttendance(client: ApiClient, employeeId: string) {
+    return client.get<GetEmployeeAttendanceResponse>(API_ENDPOINTS.ATTENDANCE.BY_EMPLOYEE(employeeId));
   },
 };

@@ -192,13 +192,45 @@ describe('FilterPopover', () => {
     expect(design).not.toBeChecked();
   });
 
-  it('does not call onFilterChange when Clear is clicked', async () => {
+  it('does not call onFilterChange when Clear only discards a draft that was never applied', async () => {
     const user = userEvent.setup();
     const onFilterChange = vi.fn();
 
     render(<FilterPopover filterOptions={FILTER_OPTIONS} onFilterChange={onFilterChange} />);
 
     await user.click(screen.getByLabelText('Design'));
+    await user.click(screen.getByRole('button', { name: 'Clear', hidden: true }));
+
+    expect(onFilterChange).not.toHaveBeenCalled();
+  });
+
+  it('applies the empty selection when Clear is clicked on filters that are in effect', async () => {
+    const user = userEvent.setup();
+    const onFilterChange = vi.fn();
+
+    render(<FilterPopover filterOptions={FILTER_OPTIONS} onFilterChange={onFilterChange} />);
+
+    await user.click(screen.getByLabelText('Design'));
+    await user.click(screen.getByRole('button', { name: 'Apply Filter', hidden: true }));
+    onFilterChange.mockClear();
+
+    await user.click(screen.getByRole('button', { name: 'Clear', hidden: true }));
+
+    expect(onFilterChange).toHaveBeenCalledWith({});
+    expect(screen.getByLabelText('Design')).not.toBeChecked();
+  });
+
+  it('does not re-report an already cleared selection on a second Clear', async () => {
+    const user = userEvent.setup();
+    const onFilterChange = vi.fn();
+
+    render(<FilterPopover filterOptions={FILTER_OPTIONS} onFilterChange={onFilterChange} />);
+
+    await user.click(screen.getByLabelText('Design'));
+    await user.click(screen.getByRole('button', { name: 'Apply Filter', hidden: true }));
+    await user.click(screen.getByRole('button', { name: 'Clear', hidden: true }));
+    onFilterChange.mockClear();
+
     await user.click(screen.getByRole('button', { name: 'Clear', hidden: true }));
 
     expect(onFilterChange).not.toHaveBeenCalled();

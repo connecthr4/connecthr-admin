@@ -71,10 +71,18 @@ styles specific to the EmployeeDetails component
   gap: 24px;
   flex: 1;
   min-height: 0;
+
+  /*
+  How far down the panel beside the menu starts — the height of the stepper the
+  profile section opens with. Shared so the menu and a section that has no
+  stepper of its own line up against the same edge, and so the menu does not
+  jump as the user switches between them.
+  */
+  --details-panel-offset: 58px;
 }
 
 .sidebar {
-  margin-top: 58px;
+  margin-top: var(--details-panel-offset);
   width: 242px;
   flex-shrink: 0;
 }
@@ -168,6 +176,19 @@ styles specific to the EmployeeDetails component
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/*
+The attendance history, which has no stepper above it — it takes the stepper's
+offset instead, so the table's header row starts level with the top of the menu.
+*/
+.attendanceSection {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-height: 0;
+  margin-top: var(--details-panel-offset);
 }
 
 /**

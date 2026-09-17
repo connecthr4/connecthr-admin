@@ -40,6 +40,8 @@ const PeopleTable = DataTable as unknown as (props: {
   onPaginationChange?: (pagination: PaginationState) => void;
   totalItems?: number;
   isLoading?: boolean;
+  paginated?: boolean;
+  emptyMessage?: string;
 }) => React.JSX.Element;
 
 /** The names the table body currently shows, top to bottom. */
@@ -196,6 +198,23 @@ describe('DataTable', () => {
       );
 
       expect(screen.getByText(STRINGS.NO_DATA_FOUND)).toBeInTheDocument();
+    });
+  });
+
+  describe('unpaged', () => {
+    it('renders every row and no footer', () => {
+      render(<PeopleTable data={people(25)} columns={columns} paginated={false} />);
+
+      expect(visibleNames()).toHaveLength(25);
+      expect(screen.queryByText(/out of/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Next page' })).not.toBeInTheDocument();
+    });
+
+    it('shows the caller’s own empty message', () => {
+      render(<PeopleTable data={[]} columns={columns} paginated={false} emptyMessage="Nobody here yet" />);
+
+      expect(screen.getByText('Nobody here yet')).toBeInTheDocument();
+      expect(screen.queryByText(STRINGS.NO_DATA_FOUND)).not.toBeInTheDocument();
     });
   });
 });

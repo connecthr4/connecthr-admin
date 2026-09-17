@@ -19,10 +19,13 @@ import { BriefcaseBusiness, Phone, PencilLine } from 'lucide-react';
 import AppHeader from '../AppHeader';
 import AppImage from '../AppImage';
 import Button from '../Button';
+import EmployeeAttendance from '../EmployeeAttendance';
 import Stepper from '../Stepper';
 import { Heading5, Text1, Text2, Text4 } from '../Typography/Typography';
+import { useEmployeeAttendance } from '@/src/hooks/useEmployeeAttendance';
 import { PROFILE_ITEMS, ROUTES, STEPS, STRINGS } from '@/src/constants/strings';
 import { formatLongDate } from '@/src/utils/date';
+import type { ProfileSectionId } from '@/src/constants/strings';
 import type { EmployeeDetail } from '@/src/lib/types/employees';
 import styles from './EmployeeDetails.module.scss';
 
@@ -170,6 +173,18 @@ function buildSections(sections: SectionConfig[], employee: EmployeeDetail): Det
 export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
   const [currentStep, setCurrentStep] = useState(0);
 
+  /** Which sidebar section is open — the profile the screen lands on, or the attendance history. */
+  const [section, setSection] = useState<ProfileSectionId>(PROFILE_ITEMS[0].id);
+
+  const isAttendanceOpen = section === 'attendance';
+
+  /*
+  Read only once the Attendance section is actually opened, and kept for as long
+  as the screen lives: a visit that stays on the profile costs no attendance
+  request at all, and switching back and forth costs no further ones.
+  */
+  const attendance = useEmployeeAttendance(employee.id, isAttendanceOpen);
+
   const sections = useMemo(
     () => buildSections(SECTIONS_BY_STEP[STEPS[currentStep].id], employee),
     [currentStep, employee]
@@ -186,12 +201,29 @@ export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
         <EmployeeProfileHeader employee={employee} />
 
         <div className={styles.subContent}>
-          <EmployeeProfileSidebar />
+          <EmployeeProfileSidebar selected={section} onSelect={setSection} />
 
           <div className={styles.detailsContent}>
-            <Stepper currentStep={currentStep} steps={STEPS} onStepChange={setCurrentStep} />
+            {isAttendanceOpen ? (
+              /*
+              No stepper above it: the steps belong to the profile's sections,
+              and the history is one listing rather than a set of them.
+              */
+              <div className={styles.attendanceSection}>
+                <EmployeeAttendance
+                  rows={attendance.rows}
+                  isLoading={attendance.isLoading}
+                  errorMessage={attendance.errorMessage}
+                  onRetry={attendance.reload}
+                />
+              </div>
+            ) : (
+              <>
+                <Stepper currentStep={currentStep} steps={STEPS} onStepChange={setCurrentStep} />
 
-            <EmployeeInfoSection data={sections} />
+                <EmployeeInfoSection data={sections} />
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -250,9 +282,17 @@ function EmployeeProfileHeader({ employee }: EmployeeProfileHeaderProps) {
   );
 }
 
-function EmployeeProfileSidebar() {
-  const [selectedItem, setSelectedItem] = useState(PROFILE_ITEMS[0].label);
+interface EmployeeProfileSidebarProps {
+  selected: ProfileSectionId;
+  onSelect: (section: ProfileSectionId) => void;
+}
 
+/**
+ * The section switcher. Controlled rather than holding its own selection: the
+ * panel beside it is what the choice actually changes, so the two would
+ * otherwise be keeping the same answer in two places.
+ */
+function EmployeeProfileSidebar({ selected, onSelect }: EmployeeProfileSidebarProps) {
   return (
     <div className={styles.sidebar}>
       <div className={styles.itemContainer}>
@@ -261,11 +301,11 @@ function EmployeeProfileSidebar() {
 
           return (
             <button
-              key={item.label}
+              key={item.id}
               className={clsx(styles.menuItem, {
-                [styles.active]: selectedItem === item.label,
+                [styles.active]: selected === item.id,
               })}
-              onClick={() => setSelectedItem(item.label)}
+              onClick={() => onSelect(item.id)}
             >
               <Icon size={24} />
               <Text4>{item.label}</Text4>

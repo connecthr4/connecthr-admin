@@ -1,5 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
 import Checkbox from './Checkbox';
@@ -65,6 +67,26 @@ describe('Checkbox', () => {
     expect(screen.getByRole('checkbox', { name: 'Controlled' })).not.toBeChecked();
   });
 
+  it('opts out of browser form-state restoration and re-syncs a controlled box the browser ticked on hydration', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    // Server markup: the box is rendered unchecked, then the browser restores a
+    // stale "checked" from a previous visit before React hydrates.
+    container.innerHTML = renderToString(
+      <Checkbox checked={false} label="Restored" name="restored" onChange={vi.fn()} />
+    );
+    const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement;
+    expect(checkbox).toHaveAttribute('autocomplete', 'off');
+    checkbox.checked = true;
+
+    act(() => {
+      hydrateRoot(container, <Checkbox checked={false} label="Restored" name="restored" onChange={vi.fn()} />);
+    });
+
+    expect(checkbox).not.toBeChecked();
+    container.remove();
+  });
+
   it('supports an uncontrolled defaultChecked state', () => {
     render(<Checkbox defaultChecked label="Uncontrolled" name="uncontrolled" />);
     expect(screen.getByRole('checkbox', { name: 'Uncontrolled' })).toBeChecked();
@@ -81,14 +103,7 @@ describe('Checkbox', () => {
   });
 
   it('applies custom className and style to the root label', () => {
-    render(
-      <Checkbox
-        className="custom-checkbox"
-        label="Styled"
-        name="styled"
-        style={{ marginTop: 8 }}
-      />
-    );
+    render(<Checkbox className="custom-checkbox" label="Styled" name="styled" style={{ marginTop: 8 }} />);
 
     const label = screen.getByText('Styled').closest('label');
     expect(label).toHaveClass('custom-checkbox');

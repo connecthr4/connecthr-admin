@@ -1,4 +1,4 @@
-import { User, BriefcaseBusiness, FileText, Wallet, UserRound } from 'lucide-react';
+import { User, BriefcaseBusiness, CalendarCheck, FileText, Wallet, UserRound } from 'lucide-react';
 import { NotificationType } from '../providers/NotificationProvider';
 import type { EmployeeDocumentType } from '../store/employeeStore/types';
 
@@ -204,6 +204,10 @@ export const STRINGS = {
   ATTENDANCE_FETCH_FAILED: 'Failed to load the attendance sheet',
   ATTENDANCE_SUBMITTED: 'Attendance submitted',
   ATTENDANCE_SUBMIT_FAILED: 'Attendance could not be submitted',
+  SL_NO: 'Sl No',
+  EMPLOYEE_ATTENDANCE_FETCH_FAILED: "Failed to load this employee's attendance",
+  NO_ATTENDANCE_RECORDS: 'No attendance has been recorded for this employee yet',
+  TRY_AGAIN: 'Try again',
 };
 
 /**
@@ -257,10 +261,19 @@ export const STEPS = [
  */
 export const PROFILE_ITEMS = [
   {
+    id: 'profile',
     label: STRINGS.PROFILE,
     icon: UserRound,
   },
+  {
+    id: 'attendance',
+    label: STRINGS.ATTENDANCE,
+    icon: CalendarCheck,
+  },
 ] as const;
+
+/** Which section of the details screen the sidebar has open. */
+export type ProfileSectionId = (typeof PROFILE_ITEMS)[number]['id'];
 
 export const ROUTES = {
   HOME: '/',

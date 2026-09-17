@@ -19,7 +19,7 @@
 
 'use client';
 
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { ChevronDown, SlidersHorizontal } from 'lucide-react';
 import clsx from 'clsx';
 import Button from '../Button';
@@ -38,6 +38,15 @@ export type FilterSelection = Record<string, string[]>;
 const EMPTY_SELECTION: FilterSelection = {};
 
 const EMPTY_OPTIONS: FilterOptions = [];
+
+/**
+ * Whether a selection would actually narrow the list — a group the user
+ * emptied is left behind as `[]` rather than removed, so an "empty" selection
+ * isn't necessarily an empty object.
+ */
+function hasSelectedValues(selection: FilterSelection) {
+  return Object.values(selection).some((values) => values.length > 0);
+}
 
 /**
  * Define the props available for the FilterPopover component.
@@ -75,6 +84,13 @@ export default function FilterPopover({
   const [selection, setSelection] = useState<FilterSelection>(EMPTY_SELECTION);
   const [isOpen, setIsOpen] = useState(false);
 
+  /**
+   * What was last reported to the parent. Only "Clear" needs it, to tell
+   * apart clearing a draft the user never applied (the list is already
+   * unfiltered — nothing to report) from clearing filters that are in effect.
+   */
+  const appliedSelectionRef = useRef<FilterSelection>(EMPTY_SELECTION);
+
   const toggleOption = (group: FilterGroup, value: string, checked: boolean) => {
     setSelection((prev) => {
       if (!checked) {
@@ -88,11 +104,25 @@ export default function FilterPopover({
     });
   };
 
+  /**
+   * Clearing unchecks every option *and* applies that, so the table goes back
+   * to the unfiltered list without the user having to click "Apply Filter"
+   * after it. The panel is left open so they can pick a new set right away.
+   */
   const handleClear = () => {
     setSelection(EMPTY_SELECTION);
+
+    // Nothing is filtering the list yet, so there is nothing to report.
+    if (!hasSelectedValues(appliedSelectionRef.current)) {
+      return;
+    }
+
+    appliedSelectionRef.current = EMPTY_SELECTION;
+    onFilterChange?.(EMPTY_SELECTION);
   };
 
   const handleApply = () => {
+    appliedSelectionRef.current = selection;
     onFilterChange?.(selection);
   };
 

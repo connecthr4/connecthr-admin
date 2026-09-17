@@ -88,6 +88,22 @@ interface DataTableProps<TData extends object> {
    * Dims the table while a new page/search/sort is being fetched.
    */
   isLoading?: boolean;
+
+  /**
+   * Whether the rows are paged at all. `false` renders every row in the one
+   * scrollable area and drops the footer — for a listing the backend answers
+   * whole, where a pager would only be splitting up data the table already has.
+   *
+   * @default true
+   */
+  paginated?: boolean;
+
+  /**
+   * What an empty table says. Defaults to the generic "No data found" — worth
+   * overriding where the table is one specific listing and can say what is
+   * missing.
+   */
+  emptyMessage?: string;
 }
 
 function DataTable<TData extends object>({
@@ -98,6 +114,8 @@ function DataTable<TData extends object>({
   onPaginationChange,
   totalItems,
   isLoading = false,
+  paginated = true,
+  emptyMessage = STRINGS.NO_DATA_FOUND,
 }: DataTableProps<TData>) {
   const [internalPagination, setInternalPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
@@ -120,9 +138,15 @@ function DataTable<TData extends object>({
       handlePaginationChange(next);
     },
     getCoreRowModel: getCoreRowModel(),
-    ...(manualPagination
-      ? { manualPagination: true, pageCount: Math.ceil((totalItems ?? 0) / (pagination.pageSize || 1)) }
-      : { getPaginationRowModel: getPaginationRowModel() }),
+    /*
+    An unpaged table gets neither: without a pagination row model every row the
+    table was handed comes through the core one, which is the whole point of it.
+    */
+    ...(!paginated
+      ? {}
+      : manualPagination
+        ? { manualPagination: true, pageCount: Math.ceil((totalItems ?? 0) / (pagination.pageSize || 1)) }
+        : { getPaginationRowModel: getPaginationRowModel() }),
   });
 
   const totalRows = manualPagination ? (totalItems ?? 0) : data.length;
@@ -156,7 +180,7 @@ function DataTable<TData extends object>({
                     <div className={styles.emptyIcon}>
                       <Inbox size={48} />
                     </div>
-                    <Text2 className={styles.emptyText}>{STRINGS.NO_DATA_FOUND}</Text2>
+                    <Text2 className={styles.emptyText}>{emptyMessage}</Text2>
                   </div>
                 </td>
               </tr>
@@ -173,7 +197,7 @@ function DataTable<TData extends object>({
         </table>
       </div>
 
-      {totalRows > 0 && (
+      {paginated && totalRows > 0 && (
         <div className={styles.footer}>
           <div className={styles.pageSizeControl}>
             <Text2 className={styles.footerLabel}>{STRINGS.SHOWING}</Text2>
