@@ -156,7 +156,6 @@ export const createProfessionalInformationFormConfig = ({
     type: 'dropdown',
     width: FieldWidth.HALF,
     required: true,
-    searchable: true,
     /*
       The options are the shifts the backend defines, so they are read from `/shifts` rather
       than declared here: the create endpoint takes a shift `code` and rejects one it does

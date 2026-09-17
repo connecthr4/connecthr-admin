@@ -86,6 +86,15 @@ export const API_ENDPOINTS = {
      * listing on screen.
      */
     EXPORT: '/attendance/export',
+
+    /**
+     * One employee's whole attendance history — the mirror image of
+     * {@link SHEET}, which is one day of every employee.
+     *
+     * A GET rather than a POST: the employee is the only thing it is scoped by,
+     * and it comes back whole rather than a page at a time.
+     */
+    BY_EMPLOYEE: (employeeId: string) => `/attendance/employees/${encodeURIComponent(employeeId)}`,
   },
 
   SHIFTS: {

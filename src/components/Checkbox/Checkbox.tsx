@@ -121,6 +121,18 @@ export default function Checkbox({
     }
   }, [indeterminate]);
 
+  /**
+   * Keep the DOM in step with the controlled `checked` prop. Browsers restore
+   * form-control state on reload/back-forward before React hydrates, and React
+   * intentionally leaves a hydrated input's `checked` alone — so without this a
+   * box could render ticked while the owning state says it isn't.
+   */
+  useEffect(() => {
+    if (checked !== undefined && inputRef.current && inputRef.current.checked !== checked) {
+      inputRef.current.checked = checked;
+    }
+  }, [checked]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (disabled) {
       return;
@@ -154,6 +166,7 @@ export default function Checkbox({
           defaultChecked={defaultChecked}
           disabled={disabled}
           onChange={handleChange}
+          autoComplete="off"
           className={styles.checkbox}
         />
         {label && <Text4>{getLabelContent()}</Text4>}

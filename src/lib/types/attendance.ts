@@ -372,3 +372,74 @@ export interface GetAttendanceSheetResponse {
  * through this plain, serializable result instead of throwing.
  */
 export type GetAttendanceSheetResult = { success: true; data: AttendanceSheet } | { success: false; message: string };
+
+/**
+ * Who the employee attendance history is for, as the endpoint echoes it back.
+ *
+ * Not read by the details screen — it already knows whose record it opened —
+ * but kept in the shape so the response is typed as it actually arrives, and so
+ * a screen that lists this history on its own has the header it would need.
+ */
+export interface EmployeeAttendanceEmployee {
+  id: string;
+  employeeCode: string;
+  name: string;
+  shiftCode: string | null;
+  shift: string | null;
+}
+
+/**
+ * One day of a single employee's attendance history.
+ *
+ * The counterpart of {@link AttendanceSheetRow}, turned the other way round: a
+ * sheet row is one employee on one day and carries who they are, this is one
+ * day of one employee and carries the day instead. Everything else is already
+ * resolved by the backend — the status label, the shift name and the overtime
+ * label — so nothing here has to be reformatted before it is shown.
+ *
+ * `slNo` is the backend's own one-based numbering of the history, so the column
+ * stays truthful no matter what order the rows arrive in.
+ */
+export interface EmployeeAttendanceRow {
+  slNo: number;
+
+  /** "YYYY-MM-DD" — the day this row records. */
+  date: string;
+
+  shift: string | null;
+
+  /** `null` for a day that was never marked for this employee. */
+  status: AttendanceStatus | null;
+  statusLabel: string | null;
+
+  overtime: AttendanceOvertime;
+  remarks: string | null;
+  state: AttendanceState | null;
+}
+
+/**
+ * One employee's whole attendance history.
+ *
+ * Deliberately no paging meta: the endpoint answers with every day on record in
+ * one read, and the screen shows all of them — so nothing here depends on the
+ * `meta` object the backend still sends alongside them and is dropping.
+ */
+export interface EmployeeAttendance {
+  employee: EmployeeAttendanceEmployee;
+  rows: EmployeeAttendanceRow[];
+}
+
+export interface GetEmployeeAttendanceResponse {
+  success: boolean;
+  message: string;
+  data: EmployeeAttendance;
+}
+
+/**
+ * Reported as a plain result rather than a throw, for the same reason
+ * {@link GetAttendanceSheetResult} is: a Server Function cannot carry a custom
+ * error class across the client/server boundary.
+ */
+export type GetEmployeeAttendanceResult =
+  | { success: true; data: EmployeeAttendance }
+  | { success: false; message: string };

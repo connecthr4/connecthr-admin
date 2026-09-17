@@ -1,0 +1,83 @@
+/**
+------------------------------------------------------
+styles specific to the EmployeeAttendance component
+------------------------------------------------------
+**/
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+
+  /* The history is shown whole, so the table is what scrolls inside the section. */
+  flex: 1;
+  min-height: 0;
+}
+
+/* The two narrow leading columns keep their content on one line. */
+.slNoCell,
+.dateCell {
+  white-space: nowrap;
+}
+
+.dateCell {
+  font-weight: 500;
+}
+
+/*
+The marking as a pill rather than plain text: the history is scanned down the
+status column, and a tinted block is what makes that possible at a glance.
+*/
+.statusPill {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+
+  border-radius: var(--radius-sm);
+
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+
+  /* The floor under a status the tone rule does not recognise. */
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-500);
+}
+
+.statusPill.present {
+  background-color: var(--color-green-50);
+  color: var(--color-green-500);
+}
+
+.statusPill.absent {
+  background-color: var(--color-red-400-10);
+  color: var(--color-red-500);
+}
+
+.statusPill.halfDay {
+  background-color: rgb(245 158 11 / 10%);
+  color: var(--color-amber-500);
+}
+
+/* The dash a day with nothing recorded reads as. */
+.muted {
+  color: var(--color-gray-400);
+}
+
+/*
+Takes the table's place when the history could not be read — centred in the
+section rather than sitting above an empty table that would claim there is
+nothing to show.
+*/
+.errorState {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-5);
+}
+
+.errorMessage {
+  color: var(--color-gray-500);
+  text-align: center;
+}

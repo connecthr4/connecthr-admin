@@ -12,6 +12,7 @@ import type {
   AttendanceWriteResult,
   GetAttendanceSheetRequest,
   GetAttendanceSheetResult,
+  GetEmployeeAttendanceResult,
   MarkAttendanceRequest,
 } from '../types/attendance';
 
@@ -108,6 +109,39 @@ export async function saveAttendanceDraft(request: MarkAttendanceRequest): Promi
     }
 
     logger.error('Error occurred while saving the attendance draft:', error);
+    const { message } = getApiErrorInfo(error);
+
+    return { success: false, message };
+  }
+}
+
+/**
+ * Server Function — one employee's attendance history, read from the details
+ * screen's Attendance section.
+ *
+ * A Server Function rather than a loader on the page: the section is one of
+ * several the sidebar switches between, so the history is only worth a request
+ * once the user actually opens it — and paying for it on every render of the
+ * profile would be a read most visits never look at.
+ *
+ * @param employeeId - The employee's record id, as the details route is keyed on.
+ */
+export async function getEmployeeAttendance(employeeId: string): Promise<GetEmployeeAttendanceResult> {
+  if (await expireIfIdle()) {
+    redirect(LOGIN_SESSION_EXPIRED_URL);
+  }
+
+  try {
+    const client = getServerApiClient();
+    const response = await AttendanceApi.getEmployeeAttendance(client, employeeId);
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(ROUTES.LOGIN);
+    }
+
+    logger.error("Error occurred while fetching the employee's attendance:", error);
     const { message } = getApiErrorInfo(error);
 
     return { success: false, message };
