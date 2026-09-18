@@ -1,0 +1,99 @@
+/**
+------------------------------------------------------
+styles specific to the InitiateSeparationForm component
+------------------------------------------------------
+**/
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  flex: 1;
+  min-height: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  flex: 1;
+  min-height: 0;
+
+  padding: 1.5rem;
+
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+
+  /* The form is taller than the viewport on a laptop, so the card scrolls rather than the page. */
+  overflow-y: auto;
+}
+
+/*
+Wide enough for two fields side by side, and no wider: the dates and the notice period read
+as pairs, and a full-width textarea on a large monitor is a line nobody wants to read.
+*/
+.form {
+  max-width: 56rem;
+}
+
+.employeeCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-5);
+
+  max-width: 56rem;
+  padding: var(--spacing-5);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+
+  /* The one tinted panel on the screen, so the record being separated is read first. */
+  background: var(--color-violet-600-5);
+}
+
+.employeeAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.employeeMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.employeeName {
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.employeeFacts {
+  color: var(--color-gray-500);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  /* Sits under the last field rather than against it, since the form's own gap is 24px. */
+  margin-top: 0.5rem;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+
+  max-width: 32rem;
+}
+
+.emptyStateHint {
+  color: var(--color-gray-500);
+}

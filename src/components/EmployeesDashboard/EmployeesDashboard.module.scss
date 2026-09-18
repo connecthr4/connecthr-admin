@@ -81,9 +81,23 @@ styles specific to the EmployeesDashboard component
 
   transition:
     background-color 0.2s ease,
+    color 0.2s ease,
     transform 0.2s ease;
+
+  &:hover {
+    color: var(--color-violet-600);
+  }
 
   &:active {
     transform: scale(0.95);
   }
+}
+
+/*
+Separation ends an employee's employment, so it is the one row action that
+hovers red instead of in the app's primary colour — the colour is the warning
+that this action is not like the two beside it.
+*/
+.actionIcon.separationIcon:hover {
+  color: var(--color-red-400);
 }

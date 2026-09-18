@@ -23,13 +23,13 @@ import { CirclePlus, Download } from 'lucide-react';
 import styles from './EmployeesDashboard.module.scss';
 import DataTable from '../DataTable';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
-import { Eye, Pencil } from 'lucide-react';
+import { Eye, LogOut, Pencil } from 'lucide-react';
 import clsx from 'clsx';
 import { logger } from '@/src/lib/logger';
 import { getEmployees } from '@/src/lib/actions/employees';
 import { EmployeesClient } from '@/src/lib/api/employeesClient';
 import { getApiErrorInfo } from '@/src/lib/api/helpers';
-import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
+import { NOTIFICATION_TYPES, ROUTES, SEPARATION_EMPLOYEE_QUERY, STRINGS } from '@/src/constants/strings';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { useDebounce } from '@/src/hooks/useDebounce';
 import type {
@@ -139,11 +139,13 @@ interface EmployeeRowActions {
   onViewIntent: (employee: Employee) => void;
 
   onEdit: (employee: Employee) => void;
+
+  onSeparate: (employee: Employee) => void;
 }
 
 function buildEmployeeColumns(
   apiColumns: EmployeeColumn[],
-  { onView, onViewIntent, onEdit }: EmployeeRowActions
+  { onView, onViewIntent, onEdit, onSeparate }: EmployeeRowActions
 ): ColumnDef<Employee>[] {
   const dynamicColumns: ColumnDef<Employee>[] = apiColumns
     .filter((column) => !EXCLUDED_COLUMN_KEYS.has(column.accessorKey))
@@ -193,6 +195,12 @@ function buildEmployeeColumns(
             onMouseEnter={() => onViewIntent(row.original)}
           />
           <Pencil size={20} className={clsx(styles.actionIcon)} onClick={() => onEdit(row.original)} />
+
+          <LogOut
+            size={20}
+            className={clsx(styles.actionIcon, styles.separationIcon)}
+            onClick={() => onSeparate(row.original)}
+          />
         </div>
       ),
     },
@@ -256,14 +264,27 @@ export default function EmployeesDashboard({
     [router]
   );
 
+  /**
+   * The separation screen is one route for every employee, named by a query parameter rather
+   * than a segment, so the same screen also serves the sidebar entry — which opens it without
+   * an employee.
+   */
+  const handleSeparateEmployee = useCallback(
+    (employee: Employee) => {
+      router.push(`${ROUTES.INITIATE_SEPARATION}?${SEPARATION_EMPLOYEE_QUERY}=${encodeURIComponent(employee.id)}`);
+    },
+    [router]
+  );
+
   const employeeColumns = useMemo(
     () =>
       buildEmployeeColumns(initialColumns, {
         onView: handleViewEmployee,
         onViewIntent: handleViewEmployeeIntent,
         onEdit: handleEditEmployee,
+        onSeparate: handleSeparateEmployee,
       }),
-    [initialColumns, handleViewEmployee, handleViewEmployeeIntent, handleEditEmployee]
+    [initialColumns, handleViewEmployee, handleViewEmployeeIntent, handleEditEmployee, handleSeparateEmployee]
   );
 
   const [employees, setEmployees] = useState(initialEmployees);

@@ -6,7 +6,7 @@ import EmployeesDashboard, { DEFAULT_SORT_BY, DEFAULT_SORT_ORDER } from './Emplo
 import { getEmployees } from '@/src/lib/actions/employees';
 import { EmployeesClient } from '@/src/lib/api/employeesClient';
 import { logger } from '@/src/lib/logger';
-import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
+import { NOTIFICATION_TYPES, ROUTES, SEPARATION_EMPLOYEE_QUERY, STRINGS } from '@/src/constants/strings';
 
 import type { Employee, EmployeeColumn, EmployeeListMeta } from '@/src/lib/types/employees';
 import type { FilterOptions } from '@/src/lib/types/filters';
@@ -202,6 +202,15 @@ describe('EmployeesDashboard', () => {
     await user.click(getRow('Floyd Miles').querySelector('.lucide-pencil') as SVGElement);
 
     expect(pushMock).toHaveBeenCalledWith(`${ROUTES.EMPLOYEES}/2/edit`);
+  });
+
+  it('opens the separation screen for the employee when the exit icon is clicked', async () => {
+    const user = userEvent.setup();
+    renderDashboard();
+
+    await user.click(getRow('Floyd Miles').querySelector('.lucide-log-out') as SVGElement);
+
+    expect(pushMock).toHaveBeenCalledWith(`${ROUTES.INITIATE_SEPARATION}?${SEPARATION_EMPLOYEE_QUERY}=2`);
   });
 
   it('navigates to the new-employee wizard from "Add New Employee"', async () => {
