@@ -35,6 +35,8 @@ import { Heading4, TextAlign } from '../Typography/Typography';
 import Checkbox from '../Checkbox';
 import DatePicker from '../DatePicker';
 import Dropdown from '../Dropdown';
+import TextArea from '../TextArea';
+import FileDropzone from '../FileDropzone';
 import { DropdownOption } from '../Dropdown/Dropdown';
 import { logger } from '@/src/lib/logger';
 
@@ -115,6 +117,19 @@ export interface InputFieldConfig<T extends FieldValues> {
   maxLength?: number;
   minDate?: Date;
   maxDate?: Date;
+
+  /** `textarea` only: the lines of text the field opens at. */
+  rows?: number;
+
+  /** `file` only: the MIME types the upload accepts. Defaults to the dropzone's own list. */
+  accept?: readonly string[];
+
+  /** `file` only: the largest upload the field takes, in megabytes. */
+  maxSizeMB?: number;
+
+  /** `file` only: the caption under the instruction, naming what may be uploaded. */
+  hint?: string;
+
   options?: DropdownOption[];
   asyncOptions?: AsyncOptionsConfig<T>;
   searchable?: boolean;
@@ -147,7 +162,7 @@ export interface AsyncOptionsConfig<T extends FieldValues> {
 
 export type FieldConfig<T extends FieldValues> = LabelFieldConfig | InputFieldConfig<T>;
 
-type FieldType = 'label' | 'input' | 'checkbox' | 'datePicker' | 'dropdown';
+type FieldType = 'label' | 'input' | 'textarea' | 'checkbox' | 'datePicker' | 'dropdown' | 'file';
 
 type AsyncOptionsField<T extends FieldValues> = InputFieldConfig<T> & { asyncOptions: AsyncOptionsConfig<T> };
 
@@ -357,6 +372,46 @@ export default function DynamicForm<T extends FieldValues>({
             className={field.className}
             maxLength={field.maxLength}
             error={errors[field.name]?.message as string}
+          />
+        );
+
+      case 'textarea':
+        return (
+          <TextArea
+            {...register(field.name)}
+            label={field.label}
+            placeholder={field.placeholder}
+            disabled={field.disabled || isFieldDisabled(field)}
+            required={field.required}
+            className={field.className}
+            rows={field.rows}
+            maxLength={field.maxLength}
+            error={errors[field.name]?.message as string}
+          />
+        );
+
+      /*
+        A `File`, unlike every other field here, is not a value the user can type — the
+        dropzone owns the picker and reports what it accepted, so the field goes through a
+        Controller rather than `register`.
+      */
+      case 'file':
+        return (
+          <Controller
+            name={field.name}
+            control={control}
+            render={({ field: controllerField, fieldState }) => (
+              <FileDropzone
+                label={field.label as string}
+                file={(controllerField.value as File | null) ?? null}
+                onChange={controllerField.onChange}
+                accept={field.accept}
+                maxSizeMB={field.maxSizeMB}
+                hint={field.hint}
+                disabled={field.disabled || isFieldDisabled(field)}
+                error={fieldState.error?.message}
+              />
+            )}
           />
         );
 

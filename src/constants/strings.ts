@@ -91,7 +91,6 @@ export const STRINGS = {
   EMPLOYEE_FETCH_FAILED: 'Failed to load employee',
   EDIT_PROFILE: 'Edit Profile',
   PROFILE: 'Profile',
-  SEPARATION: 'Separation',
   NO_DOCUMENTS_UPLOADED: 'No documents uploaded yet',
   NOT_AVAILABLE: '--',
   TOTAL_EMPLOYEE: 'Total Employee',
@@ -208,6 +207,22 @@ export const STRINGS = {
   EMPLOYEE_ATTENDANCE_FETCH_FAILED: "Failed to load this employee's attendance",
   NO_ATTENDANCE_RECORDS: 'No attendance has been recorded for this employee yet',
   TRY_AGAIN: 'Try again',
+  INITIATE_SEPARATION: 'Initiate Separation',
+  SEPARATION_DETAILS: 'Separation Details',
+  SEPARATION_TYPE: 'Separation Type',
+  SELECT_SEPARATION_TYPE: 'Select Separation Type',
+  RESIGNATION_DATE: 'Resignation Date',
+  NOTICE_PERIOD_DAYS_LABEL: 'Notice Period (Days)',
+  NOTICE_PERIOD_PLACEHOLDER: 'Enter the notice period in days',
+  LAST_WORKING_DATE: 'Last Working Date',
+  REASON_FOR_LEAVING: 'Reason for Leaving',
+  REASON_FOR_LEAVING_PLACEHOLDER: 'Why is the employee leaving?',
+  ADDITIONAL_NOTES: 'Additional Notes (Optional)',
+  ADDITIONAL_NOTES_PLACEHOLDER: 'Anything else the HR team should know',
+  UPLOAD_RESIGNATION_LETTER: 'Resignation Letter',
+  DATE_OF_JOINING: 'Date of Joining',
+  SEPARATION_INITIATED: 'Separation initiated',
+  SEPARATION_FAILED: 'Separation could not be submitted',
 };
 
 /**
@@ -230,6 +245,15 @@ export const DOCUMENT_FIELDS: readonly { id: EmployeeDocumentType; label: string
   { id: 'relievingLetter', label: STRINGS.UPLOAD_RELIEVING_LETTER },
   { id: 'experienceLetter', label: STRINGS.UPLOAD_EXPERIENCE_LETTER },
 ];
+
+/**
+ * A notice period is entered in days, and these are the bounds the field accepts: zero for
+ * an immediate exit, and a year as the ceiling that catches a mistyped date-like number.
+ */
+export const NOTICE_PERIOD_DAYS = {
+  MIN: 0,
+  MAX: 365,
+} as const;
 
 export const STEPS = [
   {
@@ -291,6 +315,7 @@ export const ROUTES = {
   MARK_ATTENDANCE: '/attendance/mark-attendance',
   ATTENDANCE_LIST: '/attendance/attendance-list',
   HOLIDAYS: '/holidays',
+
   USERS: '/users',
   CREATE_USER: '/create-user',
 } as const;

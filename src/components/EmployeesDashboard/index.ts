@@ -1,3 +1,3 @@
-import EmployeesDashboard from './EmployeesDashboard'
+import EmployeesDashboard from './EmployeesDashboard';
 
-export default EmployeesDashboard
+export default EmployeesDashboard;

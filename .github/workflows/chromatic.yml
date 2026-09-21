@@ -20,10 +20,9 @@ jobs:
         with:
           node-version: 20
 
+      # Version comes from `packageManager` in package.json — see test.yml.
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
