@@ -9,6 +9,7 @@ import { useToday } from '@/src/hooks/useToday';
 import { logger } from '@/src/lib/logger';
 import { ROLES } from '@/src/lib/auth/roles';
 import { NOTIFICATION_TYPES, STRINGS } from '@/src/constants/strings';
+import { formatDisplayDate } from '@/src/utils/date';
 import {
   ATTENDANCE_PAGE_SIZE,
   ATTENDANCE_SHEET_SORT_BY,
@@ -59,12 +60,16 @@ vi.mock('@/src/lib/actions/auth', () => ({
 /*
 The date field is stubbed to two buttons: one that picks a fixed day and one
 that clears the field. `DatePicker` has tests of its own.
+
+`maxDate` is read back through `formatDisplayDate` rather than `toISOString()`:
+the dashboard builds it with `parseLocalDate`, so it is local midnight, and
+serialising that to UTC reports the previous day in any zone ahead of UTC.
 */
 vi.mock('../DatePicker', () => ({
   default: ({ value, maxDate, onChange }: { value?: string; maxDate?: Date; onChange: (value: string) => void }) => (
     <div>
       <span>{`date:${value || 'none'}`}</span>
-      <span>{`max:${maxDate ? maxDate.toISOString().slice(0, 10) : 'none'}`}</span>
+      <span>{`max:${maxDate ? formatDisplayDate(maxDate) : 'none'}`}</span>
       <button onClick={() => onChange('2026-09-10')}>pick-date</button>
       <button onClick={() => onChange('')}>clear-date</button>
     </div>
