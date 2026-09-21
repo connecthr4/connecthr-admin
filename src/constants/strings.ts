@@ -91,7 +91,6 @@ export const STRINGS = {
   EMPLOYEE_FETCH_FAILED: 'Failed to load employee',
   EDIT_PROFILE: 'Edit Profile',
   PROFILE: 'Profile',
-  SEPARATION: 'Separation',
   NO_DOCUMENTS_UPLOADED: 'No documents uploaded yet',
   NOT_AVAILABLE: '--',
   TOTAL_EMPLOYEE: 'Total Employee',
@@ -209,8 +208,6 @@ export const STRINGS = {
   NO_ATTENDANCE_RECORDS: 'No attendance has been recorded for this employee yet',
   TRY_AGAIN: 'Try again',
   INITIATE_SEPARATION: 'Initiate Separation',
-  SEPARATION_LIST: 'Separation List',
-  START_THE_EXIT_PROCESS: 'Start the exit process for an employee',
   SEPARATION_DETAILS: 'Separation Details',
   SEPARATION_TYPE: 'Separation Type',
   SELECT_SEPARATION_TYPE: 'Select Separation Type',
@@ -223,13 +220,9 @@ export const STRINGS = {
   ADDITIONAL_NOTES: 'Additional Notes (Optional)',
   ADDITIONAL_NOTES_PLACEHOLDER: 'Anything else the HR team should know',
   UPLOAD_RESIGNATION_LETTER: 'Resignation Letter',
-  EMPLOYEE_BEING_SEPARATED: 'Employee',
   DATE_OF_JOINING: 'Date of Joining',
-  NO_EMPLOYEE_CHOSEN: 'No employee chosen',
-  CHOOSE_EMPLOYEE_TO_SEPARATE: 'Open an employee from the list and use the separation action to start their exit.',
-  SEPARATION_SAVE_UNAVAILABLE: 'Separation could not be submitted',
-  SEPARATION_SAVE_UNAVAILABLE_MESSAGE:
-    'The separation service is not connected yet, so nothing has been saved. Keep this tab open until it is.',
+  SEPARATION_INITIATED: 'Separation initiated',
+  SEPARATION_FAILED: 'Separation could not be submitted',
 };
 
 /**
@@ -252,28 +245,6 @@ export const DOCUMENT_FIELDS: readonly { id: EmployeeDocumentType; label: string
   { id: 'relievingLetter', label: STRINGS.UPLOAD_RELIEVING_LETTER },
   { id: 'experienceLetter', label: STRINGS.UPLOAD_EXPERIENCE_LETTER },
 ];
-
-/**
- * The separation types the form offers. Values are the display text rather than codes: the
- * separation endpoint does not exist yet, and the employee options the backend already owns
- * ("Full Time", "Active") are all stored this way — swap the values for whatever the API
- * turns out to accept, and nothing else in the form has to change.
- */
-export const SEPARATION_TYPES = [
-  { label: 'Resignation', value: 'Resignation' },
-  { label: 'Termination', value: 'Termination' },
-  { label: 'Retirement', value: 'Retirement' },
-  { label: 'End of Contract', value: 'End of Contract' },
-  { label: 'Absconding', value: 'Absconding' },
-  { label: 'Mutual Separation', value: 'Mutual Separation' },
-] as const;
-
-/**
- * Names the employee the Initiate Separation screen is opened for. A query parameter rather
- * than a route segment, so the same screen serves the sidebar entry — which arrives without
- * an employee — and the row action on the employee list.
- */
-export const SEPARATION_EMPLOYEE_QUERY = 'employeeId';
 
 /**
  * A notice period is entered in days, and these are the bounds the field accepts: zero for
@@ -344,16 +315,6 @@ export const ROUTES = {
   MARK_ATTENDANCE: '/attendance/mark-attendance',
   ATTENDANCE_LIST: '/attendance/attendance-list',
   HOLIDAYS: '/holidays',
-
-  /**
-   * Same shape as the attendance group above: the segment itself has no screen,
-   * it is what the sidebar matches the current path against to decide the group
-   * is the one open. None of the three has a page yet — the nav entries are in
-   * place ahead of the separation screens being built.
-   */
-  SEPARATION: '/separation',
-  SEPARATION_LIST: '/separation/separation-list',
-  INITIATE_SEPARATION: '/separation/initiate-separation',
 
   USERS: '/users',
   CREATE_USER: '/create-user',

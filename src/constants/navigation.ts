@@ -13,7 +13,6 @@ import {
   Settings,
   UserPlus,
   UserCog,
-  LogOut,
 } from 'lucide-react';
 
 import { ROUTES } from './strings';
@@ -107,21 +106,6 @@ export const NAV_ITEMS: NavItem[] = [
   //   href: '/leaves',
   //   icon: FileText,
   // },
-  {
-    label: 'Separation',
-    href: ROUTES.SEPARATION,
-    icon: LogOut,
-    children: [
-      {
-        label: 'Separation List',
-        href: ROUTES.SEPARATION_LIST,
-      },
-      {
-        label: 'Initiate Separation',
-        href: ROUTES.INITIATE_SEPARATION,
-      },
-    ],
-  },
   {
     label: 'Holidays',
     href: '/holidays',

@@ -6,7 +6,7 @@ import EmployeesDashboard, { DEFAULT_SORT_BY, DEFAULT_SORT_ORDER } from './Emplo
 import { getEmployees } from '@/src/lib/actions/employees';
 import { EmployeesClient } from '@/src/lib/api/employeesClient';
 import { logger } from '@/src/lib/logger';
-import { NOTIFICATION_TYPES, ROUTES, SEPARATION_EMPLOYEE_QUERY, STRINGS } from '@/src/constants/strings';
+import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
 
 import type { Employee, EmployeeColumn, EmployeeListMeta } from '@/src/lib/types/employees';
 import type { FilterOptions } from '@/src/lib/types/filters';
@@ -71,6 +71,29 @@ vi.mock('../ExportConfirmationModal', () => ({
         <button onClick={onClose}>mock-cancel-export</button>
       </div>
     ) : null,
+}));
+
+/*
+The form itself is covered by its own test; here only the wiring matters — which employee the
+drawer was handed, and that cancelling closes it. Rendering it for real would drag in the
+calendar modal and the file dropzone for no added coverage.
+*/
+vi.mock('../SeparationForm', () => ({
+  default: ({
+    employee,
+    onCancel,
+    onSuccess,
+  }: {
+    employee: { name: string };
+    onCancel: () => void;
+    onSuccess?: () => void;
+  }) => (
+    <div>
+      <span>{`separating:${employee.name}`}</span>
+      <button onClick={onCancel}>mock-cancel-separation</button>
+      <button onClick={() => onSuccess?.()}>mock-file-separation</button>
+    </div>
+  ),
 }));
 
 vi.mock('../ExportScopeOptions', () => ({
@@ -204,13 +227,50 @@ describe('EmployeesDashboard', () => {
     expect(pushMock).toHaveBeenCalledWith(`${ROUTES.EMPLOYEES}/2/edit`);
   });
 
-  it('opens the separation screen for the employee when the exit icon is clicked', async () => {
+  it('opens the separation drawer for the employee when the exit icon is clicked', async () => {
+    const user = userEvent.setup();
+    renderDashboard();
+
+    expect(screen.queryByText(/^separating:/)).not.toBeInTheDocument();
+
+    await user.click(getRow('Floyd Miles').querySelector('.lucide-log-out') as SVGElement);
+
+    expect(screen.getByTestId('DrawerTest')).toHaveAttribute('open');
+    expect(screen.getByText('separating:Floyd Miles')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: STRINGS.INITIATE_SEPARATION })).toBeInTheDocument();
+
+    // The separation is filed without leaving the list the user was browsing.
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it('hands the drawer the row the exit icon was clicked on', async () => {
+    const user = userEvent.setup();
+    renderDashboard();
+
+    await user.click(getRow('Darlene Robertson').querySelector('.lucide-log-out') as SVGElement);
+
+    expect(screen.getByText('separating:Darlene Robertson')).toBeInTheDocument();
+  });
+
+  it('closes the separation drawer when the form is cancelled', async () => {
     const user = userEvent.setup();
     renderDashboard();
 
     await user.click(getRow('Floyd Miles').querySelector('.lucide-log-out') as SVGElement);
+    await user.click(screen.getByRole('button', { name: 'mock-cancel-separation' }));
 
-    expect(pushMock).toHaveBeenCalledWith(`${ROUTES.INITIATE_SEPARATION}?${SEPARATION_EMPLOYEE_QUERY}=2`);
+    expect(screen.getByTestId('DrawerTest')).not.toHaveAttribute('open');
+  });
+
+  /** The form reports the outcome itself; the list's only job is to get out of the way. */
+  it('closes the separation drawer once the separation has been filed', async () => {
+    const user = userEvent.setup();
+    renderDashboard();
+
+    await user.click(getRow('Floyd Miles').querySelector('.lucide-log-out') as SVGElement);
+    await user.click(screen.getByRole('button', { name: 'mock-file-separation' }));
+
+    expect(screen.getByTestId('DrawerTest')).not.toHaveAttribute('open');
   });
 
   it('navigates to the new-employee wizard from "Add New Employee"', async () => {
