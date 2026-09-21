@@ -16,6 +16,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AppHeader from '../AppHeader';
 import AppImage from '../AppImage';
 import Button from '../Button';
+import Drawer from '../Drawer';
+import SeparationForm from '../SeparationForm';
 import TableToolbar from '../TableToolbar';
 import ExportConfirmationModal from '../ExportConfirmationModal';
 import ExportScopeOptions, { type ExportScope } from '../ExportScopeOptions';
@@ -23,13 +25,14 @@ import { CirclePlus, Download } from 'lucide-react';
 import styles from './EmployeesDashboard.module.scss';
 import DataTable from '../DataTable';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
-import { Eye, Pencil } from 'lucide-react';
+import { Eye, LogOut, Pencil } from 'lucide-react';
 import clsx from 'clsx';
 import { logger } from '@/src/lib/logger';
 import { getEmployees } from '@/src/lib/actions/employees';
 import { EmployeesClient } from '@/src/lib/api/employeesClient';
 import { getApiErrorInfo } from '@/src/lib/api/helpers';
 import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
+import { toSeparationEmployee } from '@/src/lib/types/separation';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { useDebounce } from '@/src/hooks/useDebounce';
 import type {
@@ -139,11 +142,13 @@ interface EmployeeRowActions {
   onViewIntent: (employee: Employee) => void;
 
   onEdit: (employee: Employee) => void;
+
+  onSeparate: (employee: Employee) => void;
 }
 
 function buildEmployeeColumns(
   apiColumns: EmployeeColumn[],
-  { onView, onViewIntent, onEdit }: EmployeeRowActions
+  { onView, onViewIntent, onEdit, onSeparate }: EmployeeRowActions
 ): ColumnDef<Employee>[] {
   const dynamicColumns: ColumnDef<Employee>[] = apiColumns
     .filter((column) => !EXCLUDED_COLUMN_KEYS.has(column.accessorKey))
@@ -193,6 +198,12 @@ function buildEmployeeColumns(
             onMouseEnter={() => onViewIntent(row.original)}
           />
           <Pencil size={20} className={clsx(styles.actionIcon)} onClick={() => onEdit(row.original)} />
+
+          <LogOut
+            size={20}
+            className={clsx(styles.actionIcon, styles.separationIcon)}
+            onClick={() => onSeparate(row.original)}
+          />
         </div>
       ),
     },
@@ -222,6 +233,14 @@ export default function EmployeesDashboard({
 }: EmployeesDashboardProps) {
   const { showNotification } = useNotification();
   const router = useRouter();
+
+  /**
+   * The row whose separation is being filed. Kept apart from the drawer's open state so the
+   * panel still has an employee to render while it animates shut.
+   */
+  const [separationEmployee, setSeparationEmployee] = useState<Employee | null>(null);
+  const [isSeparationDrawerOpen, setIsSeparationDrawerOpen] = useState(false);
+
   /**
    * `router` is referentially stable, so the column definitions are built once per
    * columns payload rather than on every render.
@@ -256,14 +275,44 @@ export default function EmployeesDashboard({
     [router]
   );
 
+  /**
+   * The separation form opens over the list rather than on its own route: the row already
+   * holds everything its summary names, so the drawer opens on the click with nothing to
+   * fetch, and closing it leaves the user on the page and the page they were browsing.
+   *
+   * Only setters are used, so the callback is stable and the column definitions are not
+   * rebuilt on every render.
+   */
+  const handleSeparateEmployee = useCallback((employee: Employee) => {
+    setSeparationEmployee(employee);
+    setIsSeparationDrawerOpen(true);
+  }, []);
+
+  /**
+   * The employee is deliberately left in state: the drawer keeps its content mounted while
+   * it slides shut, and clearing it here would empty the panel mid-animation. The next open
+   * replaces it.
+   */
+  const handleCloseSeparationDrawer = useCallback(() => setIsSeparationDrawerOpen(false), []);
+
+  /**
+   * Narrowed once per employee rather than on every render, so the form is not handed a new
+   * object each time the table around it re-renders.
+   */
+  const separationTarget = useMemo(
+    () => (separationEmployee ? toSeparationEmployee(separationEmployee) : null),
+    [separationEmployee]
+  );
+
   const employeeColumns = useMemo(
     () =>
       buildEmployeeColumns(initialColumns, {
         onView: handleViewEmployee,
         onViewIntent: handleViewEmployeeIntent,
         onEdit: handleEditEmployee,
+        onSeparate: handleSeparateEmployee,
       }),
-    [initialColumns, handleViewEmployee, handleViewEmployeeIntent, handleEditEmployee]
+    [initialColumns, handleViewEmployee, handleViewEmployeeIntent, handleEditEmployee, handleSeparateEmployee]
   );
 
   const [employees, setEmployees] = useState(initialEmployees);
@@ -436,6 +485,25 @@ export default function EmployeesDashboard({
           />
         </div>
       </div>
+
+      {/*
+        Rendered unconditionally so the panel can animate both ways; the drawer unmounts the
+        form itself once it has closed, which is what gives the next employee a blank form.
+      */}
+      <Drawer
+        isOpen={isSeparationDrawerOpen}
+        onClose={handleCloseSeparationDrawer}
+        title={STRINGS.INITIATE_SEPARATION}
+        size="44rem"
+      >
+        {separationTarget && (
+          <SeparationForm
+            employee={separationTarget}
+            onCancel={handleCloseSeparationDrawer}
+            onSuccess={handleCloseSeparationDrawer}
+          />
+        )}
+      </Drawer>
 
       {isExportModalOpen && (
         <ExportConfirmationModal

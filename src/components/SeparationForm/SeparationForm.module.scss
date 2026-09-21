@@ -1,0 +1,59 @@
+/**
+------------------------------------------------------
+styles specific to the SeparationForm component
+
+Only the form's own parts live here. How wide it sits and what surrounds it belongs to
+whatever renders it — the full screen or the drawer — so the same form fits both.
+------------------------------------------------------
+**/
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.employeeCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-5);
+
+  padding: var(--spacing-5);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+
+  /* The one tinted panel on the screen, so the record being separated is read first. */
+  background: var(--color-violet-600-5);
+}
+
+.employeeAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.employeeMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.employeeName {
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.employeeFacts {
+  color: var(--color-gray-500);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  /* Sits under the last field rather than against it, since the form's own gap is 24px. */
+  margin-top: 0.5rem;
+}

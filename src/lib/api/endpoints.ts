@@ -101,6 +101,26 @@ export const API_ENDPOINTS = {
     GET_ALL: '/shifts',
   },
 
+  SEPARATION: {
+    /**
+     * Every option the separation form's dropdowns offer, in one read — today
+     * just the separation types, but shaped as a bag of lists the way
+     * {@link ATTENDANCE.OPTIONS} is, so a second list costs no new endpoint.
+     *
+     * Read from the separation module's own endpoint rather than the shared
+     * `/options/employee/{field}` one: these are the codes {@link CREATE}
+     * accepts, and nothing else may disagree with them.
+     */
+    OPTIONS: '/separations/options',
+
+    /**
+     * Files one separation — the whole record in a single write, since a
+     * half-filed exit is not something the backend or this form could
+     * reconcile afterwards.
+     */
+    CREATE: '/separations',
+  },
+
   OPTIONS: {
     /**
      * The values one employee field may be filled with — department, gender and marital

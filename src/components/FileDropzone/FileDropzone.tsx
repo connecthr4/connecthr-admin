@@ -71,6 +71,13 @@ interface FileDropzoneProps {
   disabled?: boolean;
 
   /**
+   * A message from outside the field — a form validator reporting that a required upload is
+   * missing. A file the field itself refused takes precedence: that one says what the user
+   * just did wrong, which is the more useful of the two.
+   */
+  error?: string;
+
+  /**
    * Additional CSS class names for the field wrapper.
    */
   className?: string;
@@ -115,15 +122,17 @@ export default function FileDropzone({
   maxSizeMB = DOCUMENT_UPLOAD.MAX_SIZE_MB,
   hint = STRINGS.SUPPORTED_FORMATS,
   disabled = false,
+  error,
   className,
 }: FileDropzoneProps) {
   const inputId = useId();
   const labelId = `${inputId}-label`;
   const hintId = `${inputId}-hint`;
   const [isDragging, setIsDragging] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [rejection, setRejection] = useState<string | null>(null);
   const isImage = Boolean(file?.type.startsWith('image/'));
   const imageRef = useImagePreview(file, isImage);
+  const message = rejection ?? error;
 
   /**
    * Reports a picked file, or the reason it was refused. A drop bypasses the input's
@@ -134,14 +143,14 @@ export default function FileDropzone({
     if (!candidate) return;
 
     if (!accept.includes(candidate.type)) {
-      return setError(STRINGS.UNSUPPORTED_FILE_TYPE);
+      return setRejection(STRINGS.UNSUPPORTED_FILE_TYPE);
     }
 
     if (candidate.size > maxSizeMB * BYTES_IN_MB) {
-      return setError(`${STRINGS.FILE_TOO_LARGE} ${maxSizeMB}MB.`);
+      return setRejection(`${STRINGS.FILE_TOO_LARGE} ${maxSizeMB}MB.`);
     }
 
-    setError(null);
+    setRejection(null);
 
     onChange(candidate);
   };
@@ -192,7 +201,7 @@ export default function FileDropzone({
   };
 
   const handleRemove = () => {
-    setError(null);
+    setRejection(null);
 
     onChange(null);
   };
@@ -290,7 +299,7 @@ export default function FileDropzone({
         </label>
       )}
 
-      {error && <ErrorText>{error}</ErrorText>}
+      {message && <ErrorText>{message}</ErrorText>}
     </div>
   );
 }
