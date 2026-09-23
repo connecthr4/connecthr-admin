@@ -106,6 +106,213 @@ export interface InitiateSeparationResult {
 }
 
 /**
+ * Where a filed separation has got to.
+ *
+ * Unlike {@link SeparationType} this *is* a union, and the one place the app reads a
+ * separation's state as a value rather than as text: the badge has to pick a colour per
+ * state, and an unlisted code would have to be given one anyway. The set is taken from the
+ * `statusCounts` the list endpoint returns, which is keyed by exactly these four.
+ *
+ * The *wording* is never derived from it — every response carries its own `statusLabel`
+ * ("Pending Approval", not "Pending"), and that is what is rendered.
+ */
+export type SeparationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN';
+
+/**
+ * What the signed-in user may do with this separation, as decided by the backend.
+ *
+ * Read but not yet acted on: there is no decide or withdraw endpoint wired up here, so these
+ * are carried through the types and left unused rather than turned into buttons that would
+ * have nothing behind them.
+ */
+export interface SeparationPermissions {
+  canDecide: boolean;
+  canWithdraw: boolean;
+}
+
+/**
+ * The employee a separation was filed against, as the list nests them on each row.
+ *
+ * `avatar` and `designation` are nullable — an employee with no photo uploaded, and one
+ * whose designation was never recorded — so everything that renders them has a stand-in.
+ */
+export interface SeparationListEmployee {
+  /** The employee's record id. */
+  id: string;
+
+  /** The "EMP1042" code the user recognises. */
+  employeeId: string;
+  name: string;
+  avatar: string | null;
+  department: string;
+  designation: string | null;
+}
+
+/**
+ * One row of `GET /separations`.
+ *
+ * Deliberately *not* the whole submission: the list omits `reason`, `notes`, `raisedBy` and
+ * the decision, which is what keeps a page of rows small. Those arrive from
+ * {@link SeparationDetail} when a row is opened — see `SeparationsClient`.
+ */
+export interface SeparationListItem {
+  /** The separation's own id — what the list is keyed on, and what the detail read takes. */
+  id: string;
+  employee: SeparationListEmployee;
+  status: SeparationStatus;
+
+  /** The backend's own wording for {@link status}, which is what the badge renders. */
+  statusLabel: string;
+  separationType: SeparationType;
+  separationTypeLabel: string;
+
+  /** "YYYY-MM-DD", as everywhere else in the app. */
+  resignationDate: string;
+  lastWorkingDate: string;
+  noticePeriodDays: number;
+
+  /** ISO timestamp of when the separation was filed. */
+  raisedAt: string;
+
+  /** ISO timestamp of the decision, or null while the separation is still pending. */
+  decidedAt: string | null;
+  permissions: SeparationPermissions;
+}
+
+/**
+ * Same shape as the employee list's meta. Kept as its own type rather than imported from
+ * there: the two endpoints happen to page alike, which is not a reason to couple them.
+ */
+export interface SeparationListMeta {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+/**
+ * How many separations sit in each state, across the whole list rather than the page on
+ * screen.
+ *
+ * `Partial`, because a state with nothing in it may reasonably be omitted rather than sent
+ * as a zero — reading a missing key as "none" is right either way.
+ */
+export type SeparationStatusCounts = Partial<Record<SeparationStatus, number>>;
+
+/**
+ * The list's query string. Page and size only for now: the endpoint documents no search,
+ * sort or status filter, so nothing here invents one.
+ */
+export interface GetSeparationsRequest {
+  page: number;
+  limit: number;
+}
+
+export interface GetSeparationsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    separations: SeparationListItem[];
+    meta: SeparationListMeta;
+    statusCounts: SeparationStatusCounts;
+  };
+}
+
+/**
+ * Mirrors the other Server Function results — a plain, serializable outcome, since a Server
+ * Function cannot carry an `ApiError` across the client/server boundary intact.
+ *
+ * The payload is flattened out of the response's `data` envelope here, so callers read
+ * `result.separations` rather than `result.data.separations`.
+ */
+export type GetSeparationsResult =
+  | {
+      success: true;
+      separations: SeparationListItem[];
+      meta: SeparationListMeta;
+      statusCounts: SeparationStatusCounts;
+    }
+  | { success: false; message: string };
+
+/**
+ * The employee as the *detail* read nests them — the list's fields plus their current
+ * employment status.
+ */
+export interface SeparationDetailEmployee extends SeparationListEmployee {
+  employmentStatus: string;
+}
+
+/**
+ * Whoever filed the separation, or decided it. Not the employee leaving: separations are
+ * filed by an admin from the employee list.
+ */
+export interface SeparationActor {
+  id: string;
+  name: string;
+  role: string;
+}
+
+/**
+ * The outcome of a decided separation.
+ *
+ * Every field is optional and nullable, because the only example of this the API contract
+ * shows is `null` — the shape when a separation *has* been decided is not yet pinned down.
+ * The panel renders whichever of these it is actually given and omits the rest, so a shape
+ * that turns out to differ degrades to showing less rather than to a crash. Worth replacing
+ * with an exact interface once the decided shape is confirmed.
+ */
+export interface SeparationDecision {
+  status?: SeparationStatus;
+  statusLabel?: string;
+  decidedBy?: SeparationActor | null;
+
+  /** ISO timestamp. Also present on the list row as `decidedAt`. */
+  decidedAt?: string | null;
+  comment?: string | null;
+  reason?: string | null;
+}
+
+/**
+ * One separation in full, from `GET /separations/:separationId` — the list row plus
+ * everything the row leaves out.
+ */
+export interface SeparationDetail {
+  id: string;
+  employee: SeparationDetailEmployee;
+  status: SeparationStatus;
+  statusLabel: string;
+  separationType: SeparationType;
+  separationTypeLabel: string;
+  resignationDate: string;
+  noticePeriodDays: number;
+  lastWorkingDate: string;
+
+  /** The free text the form collected. The reason the list cannot show. */
+  reason: string;
+
+  /** Null when the optional notes field was left empty. */
+  notes: string | null;
+  raisedBy: SeparationActor | null;
+
+  /** ISO timestamp of when the separation was filed. */
+  raisedAt: string;
+
+  /** Null while the separation is still pending. */
+  decision: SeparationDecision | null;
+  permissions: SeparationPermissions;
+}
+
+export interface GetSeparationResponse {
+  success: boolean;
+  message: string;
+  data: SeparationDetail;
+}
+
+export type GetSeparationResult = { success: true; data: SeparationDetail } | { success: false; message: string };
+
+/**
  * Narrows a row of the employee list to what the separation form shows.
  *
  * @remarks

@@ -119,6 +119,23 @@ export const API_ENDPOINTS = {
      * reconcile afterwards.
      */
     CREATE: '/separations',
+
+    /**
+     * A page of filed separations, plus the counts per status across the whole
+     * list rather than the page. Paged server-side, so the table asks for one
+     * page at a time.
+     *
+     * Deliberately thin: no `reason`, no notes, no decision. Those come from
+     * {@link GET_BY_ID} when a row is opened, which is what keeps a page of
+     * rows small however long the free text on them runs.
+     */
+    LIST: '/separations',
+
+    /**
+     * One separation in full, keyed by the separation's own id — not the
+     * employee's, and not their "EMP1042" code.
+     */
+    GET_BY_ID: (separationId: string) => `/separations/${encodeURIComponent(separationId)}`,
   },
 
   OPTIONS: {

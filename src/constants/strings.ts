@@ -223,6 +223,27 @@ export const STRINGS = {
   DATE_OF_JOINING: 'Date of Joining',
   SEPARATION_INITIATED: 'Separation initiated',
   SEPARATION_FAILED: 'Separation could not be submitted',
+  SEPARATIONS: 'Separations',
+  ALL_SEPARATION_REQUESTS: 'All separation requests',
+  RESIGNATION_TYPE: 'Resignation Type',
+  CURRENT_STATUS: 'Current Status',
+  ACTION: 'Action',
+  VIEW_SEPARATION_DETAILS: 'View separation details',
+  NO_SEPARATIONS_FOUND: 'No separation requests have been filed yet',
+  NOTICE_PERIOD: 'Notice Period',
+
+  /** The read-only panel's label for the same field the form calls "(Optional)". */
+  ADDITIONAL_NOTES_LABEL: 'Additional Notes',
+
+  /** The API's `raisedAt` — separations are filed by an admin, not by the employee. */
+  RAISED_ON: 'Raised On',
+  RAISED_BY: 'Raised By',
+
+  /** Appended to the notice period, which is stored and entered as a plain number of days. */
+  DAYS: 'days',
+  DAY: 'day',
+  SEPARATIONS_FETCH_FAILED: 'Failed to load separations',
+  SEPARATION_DETAILS_FETCH_FAILED: 'This separation could not be loaded',
 };
 
 /**
@@ -315,6 +336,9 @@ export const ROUTES = {
   MARK_ATTENDANCE: '/attendance/mark-attendance',
   ATTENDANCE_LIST: '/attendance/attendance-list',
   HOLIDAYS: '/holidays',
+
+  /** The separations list. Filing one is still done from the employee list's row action. */
+  SEPARATIONS: '/separations',
 
   USERS: '/users',
   CREATE_USER: '/create-user',
