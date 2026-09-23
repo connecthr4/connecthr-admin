@@ -13,9 +13,10 @@ import {
   Settings,
   UserPlus,
   UserCog,
+  UserRoundMinus,
 } from 'lucide-react';
 
-import { ROUTES } from './strings';
+import { ROUTES, STRINGS } from './strings';
 
 import type { LucideIcon } from 'lucide-react';
 
@@ -85,6 +86,11 @@ export const NAV_ITEMS: NavItem[] = [
         href: ROUTES.ATTENDANCE_LIST,
       },
     ],
+  },
+  {
+    label: STRINGS.SEPARATIONS,
+    href: ROUTES.SEPARATIONS,
+    icon: UserRoundMinus,
   },
   // {
   //   label: 'Payroll',

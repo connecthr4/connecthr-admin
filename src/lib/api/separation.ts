@@ -2,6 +2,9 @@ import { ApiClient } from './client';
 import { API_ENDPOINTS } from './endpoints';
 import type {
   GetSeparationOptionsResponse,
+  GetSeparationResponse,
+  GetSeparationsRequest,
+  GetSeparationsResponse,
   InitiateSeparationRequest,
   InitiateSeparationResponse,
 } from '../types/separation';
@@ -28,5 +31,24 @@ export const SeparationApi = {
    */
   initiateSeparation(client: ApiClient, data: InitiateSeparationRequest) {
     return client.post<InitiateSeparationResponse>(API_ENDPOINTS.SEPARATION.CREATE, data);
+  },
+
+  /**
+   * A page of filed separations.
+   *
+   * A GET with the paging in the query string, unlike the employee list's POST: this one is
+   * scoped by nothing but a page number, so there is no body of criteria to carry.
+   */
+  getSeparations(client: ApiClient, data: GetSeparationsRequest) {
+    return client.get<GetSeparationsResponse>(API_ENDPOINTS.SEPARATION.LIST, {
+      query: { page: data.page, limit: data.limit },
+    });
+  },
+
+  /**
+   * One separation in full — the reason, the notes and the decision the list leaves out.
+   */
+  getSeparation(client: ApiClient, separationId: string) {
+    return client.get<GetSeparationResponse>(API_ENDPOINTS.SEPARATION.GET_BY_ID(separationId));
   },
 };
