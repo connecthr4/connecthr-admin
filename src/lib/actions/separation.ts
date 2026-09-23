@@ -10,6 +10,9 @@ import { logger } from '../logger';
 import { LOGIN_SESSION_EXPIRED_URL, ROUTES } from '../../constants/strings';
 import type {
   GetSeparationOptionsResult,
+  GetSeparationResult,
+  GetSeparationsRequest,
+  GetSeparationsResult,
   InitiateSeparationRequest,
   InitiateSeparationResult,
 } from '../types/separation';
@@ -74,6 +77,74 @@ export async function initiateSeparation(request: InitiateSeparationRequest): Pr
     }
 
     logger.error('Error occurred while initiating the separation:', error);
+    const { message } = getApiErrorInfo(error);
+
+    return { success: false, message };
+  }
+}
+
+/**
+ * Server Function — a page of filed separations, called straight from `SeparationsDashboard`
+ * when the user pages the table. The route renders the first page itself, so this is only
+ * reached from page two onwards.
+ */
+export async function getSeparations(request: GetSeparationsRequest): Promise<GetSeparationsResult> {
+  if (await expireIfIdle()) {
+    redirect(LOGIN_SESSION_EXPIRED_URL);
+  }
+
+  try {
+    const client = getServerApiClient();
+    const response = await SeparationApi.getSeparations(client, request);
+
+    /*
+    Flattened out of the response's `data` envelope, so the dashboard reads
+    `result.separations` rather than reaching through two wrappers for it.
+    */
+    return {
+      success: true,
+      separations: response.data.separations,
+      meta: response.data.meta,
+      statusCounts: response.data.statusCounts,
+    };
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(ROUTES.LOGIN);
+    }
+
+    logger.error('Error occurred while fetching the separations:', error);
+    const { message } = getApiErrorInfo(error);
+
+    return { success: false, message };
+  }
+}
+
+/**
+ * Server Function — one separation in full, for the details drawer.
+ *
+ * Read on open rather than with the list: the reason and the notes are free text that only
+ * one row at a time is ever looked at, so fetching them for every row of every page would be
+ * paying for them a page at a time and showing one. Callers go through `SeparationsClient`,
+ * which keeps what it has already read for the life of the page.
+ *
+ * @param separationId - The separation's own id, from the row that was opened.
+ */
+export async function getSeparation(separationId: string): Promise<GetSeparationResult> {
+  if (await expireIfIdle()) {
+    redirect(LOGIN_SESSION_EXPIRED_URL);
+  }
+
+  try {
+    const client = getServerApiClient();
+    const response = await SeparationApi.getSeparation(client, separationId);
+
+    return { success: true, data: response.data };
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(ROUTES.LOGIN);
+    }
+
+    logger.error('Error occurred while fetching the separation:', error);
     const { message } = getApiErrorInfo(error);
 
     return { success: false, message };
