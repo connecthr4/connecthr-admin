@@ -19,6 +19,17 @@ export const API_ENDPOINTS = {
     LIST: '/users',
 
     ASSIGNABLE_ROLES: '/users/assignable-roles',
+
+    /**
+     * Permanent — there is no restore. What the account *did* survives it: the
+     * attendance it marked and the separations it raised or decided stay on
+     * the record with the actor left unresolved, so deleting an account never
+     * rewrites history.
+     *
+     * Rejected outright for an `IT` target, for the caller's own account, and
+     * for anyone the caller does not outrank.
+     */
+    DELETE: (userId: string) => `/users/${encodeURIComponent(userId)}`,
   },
 
   DASHBOARD: {

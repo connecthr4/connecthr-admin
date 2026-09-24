@@ -113,8 +113,24 @@ export const STRINGS = {
   USER_STATUS: 'Status',
   USER_LAST_LOGIN: 'Last Login',
   USER_CREATED_BY: 'Created By',
+  USER_ACTIONS: 'Actions',
   NEVER: 'Never',
   USERS_FETCH_FAILED: 'Failed to load users',
+  /** Also the verb the row action puts in front of a name: "Delete Priya Nair". */
+  DELETE: 'Delete',
+  DELETE_USER: 'Delete User',
+
+  /*
+  Says the two things a reader cannot get back by trying it: that there is no
+  undo, and that deleting the account does not delete what it did. Both belong
+  in front of the confirm button rather than in a message after it.
+  */
+  DELETE_USER_CONFIRMATION:
+    'This account will be permanently deleted and cannot be restored. Attendance they marked and separations they raised or decided are kept, shown against an unknown user.',
+  USER_DELETED_SUCCESSFULLY: 'User deleted successfully',
+  USER_DELETION_FAILED: 'User deletion failed',
+  USER_DELETION_NOT_PERMITTED: 'Your account cannot delete users.',
+  CANNOT_DELETE_OWN_ACCOUNT: 'You cannot delete your own account.',
   FULL_NAME: 'Full Name',
   FULL_NAME_PLACEHOLDER: 'Enter full name',
   NAME_REQUIRED: 'Name is required',
