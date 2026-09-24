@@ -58,12 +58,42 @@ export interface CreateUserResponse {
 }
 
 /**
- * Drives the create-user dropdown. `["SUPER_ADMIN", "ADMIN"]` for IT and
- * `["ADMIN"]` for a Super Admin — fetched rather than hardcoded so the
- * backend stays the source of truth on who may create whom.
+ * Drives the create-user dropdown and the users table's delete action.
+ * `["SUPER_ADMIN", "ADMIN"]` for IT and `["ADMIN"]` for a Super Admin —
+ * fetched rather than hardcoded so the backend stays the source of truth on
+ * who may act on whom.
  */
 export interface GetAssignableRolesResponse {
   success: boolean;
   message: string;
   data: Role[];
+}
+
+/**
+ * The deleted account, echoed back by the endpoint. Enough to name in the
+ * confirmation without holding on to the row that has just gone.
+ */
+export interface DeletedUser {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+}
+
+export interface DeleteUserResponse {
+  success: boolean;
+  message: string;
+  data: DeletedUser;
+}
+
+/**
+ * What the delete Server Function hands back. A failure is returned rather
+ * than thrown so the table can report it and leave the confirmation open —
+ * an uncaught throw in a Server Function reaches the client as an opaque
+ * "an error occurred", with nothing to show the user.
+ */
+export interface DeleteUserResult {
+  success: boolean;
+  message: string;
+  data?: DeletedUser;
 }

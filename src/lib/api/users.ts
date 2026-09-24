@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from './endpoints';
 import type {
   CreateUserRequest,
   CreateUserResponse,
+  DeleteUserResponse,
   GetAssignableRolesResponse,
   GetUsersResponse,
 } from '../types/users';
@@ -32,5 +33,13 @@ export const UsersApi = {
 
   getAssignableRoles(client: ApiClient) {
     return client.get<GetAssignableRolesResponse>(API_ENDPOINTS.USERS.ASSIGNABLE_ROLES);
+  },
+
+  /**
+   * Permanent, and not offered for every row — see {@link API_ENDPOINTS.USERS.DELETE}
+   * for what the backend refuses and what it keeps.
+   */
+  deleteUser(client: ApiClient, userId: string) {
+    return client.delete<DeleteUserResponse>(API_ENDPOINTS.USERS.DELETE(userId));
   },
 };

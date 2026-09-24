@@ -1,0 +1,81 @@
+/**
+------------------------------------------------------
+styles specific to the DeleteConfirmationModal component
+------------------------------------------------------
+**/
+
+.modal {
+  min-width: 450px;
+}
+
+/*
+  The modal renders no header here — the heading sits with the icon — so the
+  block carries its own breathing room above the icon.
+*/
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-8) var(--spacing-5) 0;
+}
+
+/* Tinted disc behind the icon, in the colour of the action it is warning about. */
+.iconBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--color-red-400-10);
+  margin-bottom: var(--spacing-2);
+}
+
+.icon {
+  color: var(--color-red-500);
+}
+
+.title {
+  margin: 0;
+}
+
+.description {
+  max-width: 26rem;
+  color: var(--color-gray-500);
+}
+
+.extras {
+  margin-top: var(--spacing-8);
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  margin-top: var(--spacing-10);
+}
+
+.action {
+  min-width: 8.75rem;
+  padding: 0.875rem var(--spacing-8);
+  border-radius: var(--radius-md);
+}
+
+/*
+  The primary button, recoloured rather than restyled: this is still the
+  action the modal is here to offer, so it keeps the shape of one — it just
+  says destructive rather than inviting.
+
+  Doubled selector on purpose. `Button` applies its own `.primary` background
+  as a single class, so a single class here would win or lose on stylesheet
+  order alone; this settles it on specificity instead.
+*/
+.confirm.confirm {
+  background-color: var(--color-red-500);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-red-400);
+  }
+}

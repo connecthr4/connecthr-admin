@@ -1,11 +1,13 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import UsersDashboard from './UsersDashboard';
+import { deleteUser } from '@/src/lib/actions/users';
 import { ROLES } from '@/src/lib/auth/roles';
-import { ROUTES } from '@/src/constants/strings';
+import { ROUTES, STRINGS } from '@/src/constants/strings';
 
+import type { Role } from '@/src/lib/auth/roles';
 import type { User } from '@/src/lib/types/auth';
 import type { ManagedUser } from '@/src/lib/types/users';
 
@@ -24,6 +26,22 @@ vi.mock('@/src/lib/actions/auth', () => ({
   logoutAction: vi.fn(),
 }));
 
+/* Same reason — and here the test only needs to know what the action was asked to delete. */
+vi.mock('@/src/lib/actions/users', () => ({
+  deleteUser: vi.fn(),
+}));
+
+const showNotificationMock = vi.fn();
+
+vi.mock('@/src/providers/NotificationProvider', () => ({
+  useNotification: () => ({ showNotification: showNotificationMock }),
+}));
+
+const deleteUserMock = vi.mocked(deleteUser);
+
+/* What IT is handed by `/users/assignable-roles`. */
+const IT_ASSIGNABLE_ROLES: Role[] = [ROLES.SUPER_ADMIN, ROLES.ADMIN];
+
 const currentUser: User = {
   id: 'clx-current',
   name: 'Jane Doe',
@@ -34,6 +52,28 @@ const currentUser: User = {
 };
 
 const users: ManagedUser[] = [
+  {
+    /* The signed-in account's own row. */
+    id: 'clx-current',
+    name: 'Jane Doe',
+    email: 'jane@example.com',
+    role: ROLES.IT,
+    status: 'ACTIVE',
+    lastLoginAt: '2026-08-15T07:02:00.000Z',
+    createdAt: '2026-06-01T09:00:00.000Z',
+    createdBy: null,
+  },
+  {
+    /* Another IT account — nothing outranks IT, so no caller may delete it. */
+    id: 'clx-it',
+    name: 'Dev Ops',
+    email: 'devops@example.com',
+    role: ROLES.IT,
+    status: 'ACTIVE',
+    lastLoginAt: '2026-08-10T12:00:00.000Z',
+    createdAt: '2026-06-01T09:05:00.000Z',
+    createdBy: null,
+  },
   {
     id: 'clx-1',
     name: 'Asha R',
@@ -83,8 +123,19 @@ function manyUsers(count: number): ManagedUser[] {
   }));
 }
 
-function renderDashboard(initialUsers: ManagedUser[] = users, user: User | null = currentUser) {
-  return render(<UsersDashboard initialUsers={initialUsers} currentUser={user} />);
+function renderDashboard(
+  initialUsers: ManagedUser[] = users,
+  user: User | null = currentUser,
+  assignableRoles: Role[] = IT_ASSIGNABLE_ROLES
+) {
+  return render(<UsersDashboard initialUsers={initialUsers} assignableRoles={assignableRoles} currentUser={user} />);
+}
+
+/**
+ * The delete control on a given row, or `null` where the row offers none.
+ */
+function deleteActionFor(email: string) {
+  return within(rowFor(email)).queryByRole('button', { name: /^Delete / });
 }
 
 /**
@@ -115,7 +166,16 @@ describe('UsersDashboard', () => {
 
       const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
 
+      expect(headers).toEqual(['Name', 'Email', 'Role', 'Status', 'Last Login', 'Created By', 'Actions']);
+    });
+
+    it('drops the actions column for an account that can delete nobody', () => {
+      renderDashboard(users, currentUser, []);
+
+      const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+
       expect(headers).toEqual(['Name', 'Email', 'Role', 'Status', 'Last Login', 'Created By']);
+      expect(screen.queryByRole('button', { name: /^Delete / })).not.toBeInTheDocument();
     });
 
     it('navigates to the create-user page from the top bar', async () => {
@@ -231,9 +291,124 @@ describe('UsersDashboard', () => {
     it('leaves a single page unpaginated', () => {
       renderDashboard();
 
-      expect(screen.getByText('Showing 1 to 3 out of 3 records')).toBeInTheDocument();
+      expect(screen.getByText(`Showing 1 to ${users.length} out of ${users.length} records`)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+    });
+  });
+
+  describe('delete action', () => {
+    it('offers a delete on the rows whose role the caller may act on', () => {
+      renderDashboard();
+
+      expect(deleteActionFor('asha@example.com')).toBeInTheDocument();
+      expect(deleteActionFor('meera@example.com')).toBeInTheDocument();
+      expect(deleteActionFor('ravi@example.com')).toBeInTheDocument();
+    });
+
+    it('names the account in the action so the control is not just a bin', () => {
+      renderDashboard();
+
+      expect(deleteActionFor('asha@example.com')).toHaveAccessibleName('Delete Asha R');
+    });
+
+    it('hides the action on IT rows, which nothing outranks', () => {
+      renderDashboard();
+
+      expect(deleteActionFor('devops@example.com')).not.toBeInTheDocument();
+    });
+
+    it('hides the action on the signed-in account own row', () => {
+      renderDashboard();
+
+      expect(deleteActionFor('jane@example.com')).not.toBeInTheDocument();
+    });
+
+    it('hides the action on a peer, since a role is never in its own assignable list', () => {
+      /* Signed in as Ravi, a Super Admin, who may act on Admins alone. */
+      const superAdmin: User = { ...currentUser, id: 'clx-2', name: 'Ravi K', role: ROLES.SUPER_ADMIN };
+
+      renderDashboard(users, superAdmin, [ROLES.ADMIN]);
+
+      expect(deleteActionFor('asha@example.com')).toBeInTheDocument();
+      expect(deleteActionFor('ravi@example.com')).not.toBeInTheDocument();
+      expect(deleteActionFor('devops@example.com')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('delete confirmation', () => {
+    beforeEach(() => {
+      deleteUserMock.mockResolvedValue({ success: true, message: 'User deleted successfully.' });
+    });
+
+    it('asks before deleting, naming the account and what survives it', async () => {
+      const user = userEvent.setup();
+      renderDashboard();
+
+      await user.click(deleteActionFor('asha@example.com')!);
+
+      const dialog = within(screen.getByRole('dialog'));
+
+      expect(dialog.getByRole('heading', { name: STRINGS.DELETE_USER })).toBeInTheDocument();
+      expect(dialog.getByText(STRINGS.DELETE_USER_CONFIRMATION)).toBeInTheDocument();
+      expect(dialog.getByText('Asha R')).toBeInTheDocument();
+      expect(dialog.getByText('asha@example.com · Admin')).toBeInTheDocument();
+      expect(deleteUserMock).not.toHaveBeenCalled();
+    });
+
+    it('deletes nothing when the confirmation is dismissed', async () => {
+      const user = userEvent.setup();
+      renderDashboard();
+
+      await user.click(deleteActionFor('asha@example.com')!);
+      await user.click(screen.getByRole('button', { name: STRINGS.CANCEL }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(deleteUserMock).not.toHaveBeenCalled();
+    });
+
+    it('deletes the confirmed account and reports it', async () => {
+      const user = userEvent.setup();
+      renderDashboard();
+
+      await user.click(deleteActionFor('asha@example.com')!);
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: STRINGS.DELETE }));
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      expect(deleteUserMock).toHaveBeenCalledWith('clx-1');
+      expect(showNotificationMock).toHaveBeenCalledWith(
+        STRINGS.USER_DELETED_SUCCESSFULLY,
+        'Asha R',
+        'success',
+        5000,
+        'top-right',
+        false
+      );
+    });
+
+    it('keeps the confirmation open and reports the reason when the delete fails', async () => {
+      const user = userEvent.setup();
+
+      deleteUserMock.mockResolvedValue({ success: false, message: 'You cannot delete this user.' });
+      renderDashboard();
+
+      await user.click(deleteActionFor('ravi@example.com')!);
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: STRINGS.DELETE }));
+
+      await waitFor(() =>
+        expect(showNotificationMock).toHaveBeenCalledWith(
+          STRINGS.USER_DELETION_FAILED,
+          'You cannot delete this user.',
+          'error',
+          5000,
+          'top-right',
+          false
+        )
+      );
+
+      /* The row is still there, and so is the decision the user came to make. */
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
   });
 
