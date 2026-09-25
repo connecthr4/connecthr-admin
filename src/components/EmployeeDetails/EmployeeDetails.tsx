@@ -20,11 +20,14 @@ import AppHeader from '../AppHeader';
 import AppImage from '../AppImage';
 import Button from '../Button';
 import EmployeeAttendance from '../EmployeeAttendance';
+import SeparationDetails from '../SeparationDetails';
 import Stepper from '../Stepper';
 import { Heading5, Text1, Text2, Text4 } from '../Typography/Typography';
 import { useEmployeeAttendance } from '@/src/hooks/useEmployeeAttendance';
+import { useEmployeeSeparation } from '@/src/hooks/useEmployeeSeparation';
 import { PROFILE_ITEMS, ROUTES, STEPS, STRINGS } from '@/src/constants/strings';
 import { formatLongDate } from '@/src/utils/date';
+import type { EmployeeSeparationState } from '@/src/hooks/useEmployeeSeparation';
 import type { ProfileSectionId } from '@/src/constants/strings';
 import type { EmployeeDetail } from '@/src/lib/types/employees';
 import styles from './EmployeeDetails.module.scss';
@@ -177,6 +180,7 @@ export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
   const [section, setSection] = useState<ProfileSectionId>(PROFILE_ITEMS[0].id);
 
   const isAttendanceOpen = section === 'attendance';
+  const isSeparationOpen = section === 'separation';
 
   /*
   Read only once the Attendance section is actually opened, and kept for as long
@@ -184,6 +188,13 @@ export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
   request at all, and switching back and forth costs no further ones.
   */
   const attendance = useEmployeeAttendance(employee.id, isAttendanceOpen);
+
+  /*
+  The same bargain for the separation, and on the same terms — but keyed on the
+  "EMP1042" code rather than the record id above, because that is what
+  `/separations/employee/:employeeId` matches on.
+  */
+  const separation = useEmployeeSeparation(employee.employeeId, isSeparationOpen);
 
   const sections = useMemo(
     () => buildSections(SECTIONS_BY_STEP[STEPS[currentStep].id], employee),
@@ -203,12 +214,24 @@ export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
         <div className={styles.subContent}>
           <EmployeeProfileSidebar selected={section} onSelect={setSection} />
 
+          {/*
+          One branch per section rather than a chain of ternaries: only the
+          profile carries a stepper, and the other two are each a single panel.
+          */}
           <div className={styles.detailsContent}>
-            {isAttendanceOpen ? (
-              /*
-              No stepper above it: the steps belong to the profile's sections,
-              and the history is one listing rather than a set of them.
-              */
+            {section === 'profile' && (
+              <>
+                <Stepper currentStep={currentStep} steps={STEPS} onStepChange={setCurrentStep} />
+
+                <EmployeeInfoSection data={sections} />
+              </>
+            )}
+
+            {/*
+            No stepper above it: the steps belong to the profile's sections,
+            and the history is one listing rather than a set of them.
+            */}
+            {isAttendanceOpen && (
               <div className={styles.attendanceSection}>
                 <EmployeeAttendance
                   rows={attendance.rows}
@@ -217,12 +240,12 @@ export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
                   onRetry={attendance.reload}
                 />
               </div>
-            ) : (
-              <>
-                <Stepper currentStep={currentStep} steps={STEPS} onStepChange={setCurrentStep} />
+            )}
 
-                <EmployeeInfoSection data={sections} />
-              </>
+            {isSeparationOpen && (
+              <div className={styles.separationSection}>
+                <EmployeeSeparationSection separation={separation} />
+              </div>
             )}
           </div>
         </div>
@@ -314,6 +337,39 @@ function EmployeeProfileSidebar({ selected, onSelect }: EmployeeProfileSidebarPr
         })}
       </div>
     </div>
+  );
+}
+
+interface EmployeeSeparationSectionProps {
+  separation: EmployeeSeparationState;
+}
+
+/**
+ * The employee's separation, or a line saying there isn't one.
+ *
+ * The empty state is deliberately not `SeparationDetails`' business: a panel built to show a
+ * record has nothing useful to say about the absence of one, and "none filed" is the answer
+ * for most employees rather than an edge of this screen. It is also told apart from a failed
+ * read — that keeps its error and its retry, which an empty section must not offer.
+ */
+function EmployeeSeparationSection({ separation }: EmployeeSeparationSectionProps) {
+  const hasNoSeparation = !separation.isLoading && !separation.errorMessage && !separation.separation;
+
+  if (hasNoSeparation) {
+    return (
+      <div className={styles.emptyState}>
+        <Text2>{STRINGS.NO_SEPARATION_FILED}</Text2>
+      </div>
+    );
+  }
+
+  return (
+    <SeparationDetails
+      detail={separation.separation}
+      isLoading={separation.isLoading}
+      error={separation.errorMessage || null}
+      onRetry={separation.reload}
+    />
   );
 }
 

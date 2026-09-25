@@ -116,6 +116,14 @@ export interface Employee {
   designation: string;
   type: string;
   status: string;
+
+  /**
+   * Where the employee stands — "Active", "On Notice", "Inactive" or "Exited", in the
+   * backend's own wording rather than a code. It is what the list's status pill is keyed on,
+   * and what decides whether the row offers the separation action: only an active employee
+   * has employment left to end.
+   */
+  employmentStatus: string;
 }
 
 /**

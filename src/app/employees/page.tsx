@@ -8,6 +8,7 @@ import { DEFAULT_SORT_BY, DEFAULT_SORT_ORDER } from '@/src/components/EmployeesD
 import { getServerApiClient } from '@/src/lib/api/getServerApiClient';
 import { EmployeesApi } from '@/src/lib/api/employees';
 import { UnauthorizedError } from '@/src/lib/api/errors';
+import { getCurrentUser } from '@/src/lib/server/currentUser';
 import { ROUTES } from '@/src/constants/strings';
 import type { Employee, EmployeeColumn, EmployeeListMeta } from '@/src/lib/types/employees';
 import type { FilterOptions } from '@/src/lib/types/filters';
@@ -41,6 +42,12 @@ export const dynamic = 'force-dynamic';
  * @returns The page UI for the route.
  */
 export default async function EmployeesPage() {
+  /*
+  Memoized for the render pass, so this shares the request `BaseLayout` already made for the
+  nav rather than asking `/auth/me` a second time.
+  */
+  const currentUser = await getCurrentUser();
+
   let initialColumns: EmployeeColumn[] = [];
   let initialEmployees: Employee[] = [];
   let initialMeta: EmployeeListMeta = {
@@ -86,6 +93,7 @@ export default async function EmployeesPage() {
       initialEmployees={initialEmployees}
       initialMeta={initialMeta}
       filterOptions={filterOptions}
+      currentUser={currentUser}
     />
   );
 }

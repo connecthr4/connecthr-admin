@@ -7,6 +7,7 @@ import HolidaysDashboard from '@/src/components/HolidaysDashboard';
 import { getServerApiClient } from '@/src/lib/api/getServerApiClient';
 import { HolidaysApi } from '@/src/lib/api/holidays';
 import { UnauthorizedError } from '@/src/lib/api/errors';
+import { getCurrentUser } from '@/src/lib/server/currentUser';
 import { ROUTES } from '@/src/constants/strings';
 import type { HolidayMonthGroup } from '@/src/lib/types/holidays';
 
@@ -26,6 +27,12 @@ export const dynamic = 'force-dynamic';
  * @returns The page UI for the route.
  */
 export default async function HolidaysPage() {
+  /*
+  Memoized for the render pass, so this shares the request `BaseLayout` already made for the
+  nav rather than asking `/auth/me` a second time.
+  */
+  const currentUser = await getCurrentUser();
+
   let initialHolidaysList: HolidayMonthGroup[] = [];
 
   try {
@@ -41,5 +48,5 @@ export default async function HolidaysPage() {
     throw error;
   }
 
-  return <HolidaysDashboard initialHolidaysList={initialHolidaysList} />;
+  return <HolidaysDashboard initialHolidaysList={initialHolidaysList} currentUser={currentUser} />;
 }

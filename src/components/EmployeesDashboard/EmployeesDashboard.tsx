@@ -43,6 +43,7 @@ import type {
   ExportEmployeesRequest,
 } from '@/src/lib/types/employees';
 import type { FilterOptions } from '@/src/lib/types/filters';
+import type { User } from '@/src/lib/types/auth';
 import type { FilterSelection } from '../FilterPopover';
 import { useRouter } from 'next/navigation';
 
@@ -115,6 +116,57 @@ function toExportRequest(
 const EXCLUDED_COLUMN_KEYS = new Set(['name', 'status', 'designation']);
 
 /**
+ * A colour per employment status, so a row's state is readable at a glance instead of every
+ * pill looking alike: green for someone currently employed, amber for a notice period still
+ * running, red for someone who has left, and grey for an account switched off but still on
+ * the books — the same reading `UsersDashboard` gives those colours.
+ *
+ * Keyed by status rather than typed as a union because the backend sends its own wording
+ * ("On Notice") rather than a code, and the set of statuses is its to extend.
+ */
+const STATUS_CLASS: Record<string, string> = {
+  ACTIVE: styles.statusActive,
+  ON_NOTICE: styles.statusOnNotice,
+  EXITED: styles.statusExited,
+  INACTIVE: styles.statusInactive,
+};
+
+/**
+ * Folds the backend's wording onto a `STATUS_CLASS` key, so "On Notice", "on notice" and
+ * "ON_NOTICE" all reach the same colour and a change of casing upstream doesn't quietly
+ * grey out a column.
+ *
+ * Coalesced first because no response is validated on the way in: a row that arrives without
+ * a status should render a blank pill, not take the whole table down.
+ */
+const normalizeStatus = (status: string) =>
+  (status ?? '')
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, '_');
+
+/**
+ * Whether the row still has employment to end, which is the one thing separation needs: an
+ * employee already on notice has a separation in flight, and an exited or inactive record has
+ * nothing left to file against.
+ *
+ * Read off the same normalised status as the pill, so the icon can never disagree with the
+ * colour beside it.
+ */
+const isActiveEmployee = (status: string) => normalizeStatus(status) === 'ACTIVE';
+
+/**
+ * A status nobody has given a colour to keeps the primary-coloured pill the list has always
+ * shown: still legible, and visibly "not one of the four" rather than looking like a mistake.
+ *
+ * Exported for the test — the mapping is the point of the badge, and it is worth asserting
+ * without a table around it.
+ */
+export function getEmploymentStatusClass(status: string) {
+  return STATUS_CLASS[normalizeStatus(status)] ?? styles.statusUnknown;
+}
+
+/**
  * `DataTable` is generic and wrapped in `memo()`, which TypeScript can't
  * instantiate per call site — cast once here so this file stays typed for `Employee`.
  */
@@ -181,7 +233,12 @@ function buildEmployeeColumns(
     {
       accessorKey: 'employmentStatus',
       header: 'Status',
-      cell: ({ getValue }) => <span className={styles.statusBadge}>{getValue() as string}</span>,
+
+      cell: ({ row }) => {
+        const status = row.original.employmentStatus;
+
+        return <span className={clsx(styles.statusBadge, getEmploymentStatusClass(status))}>{status}</span>;
+      },
     },
 
     {
@@ -199,11 +256,18 @@ function buildEmployeeColumns(
           />
           <Pencil size={20} className={clsx(styles.actionIcon)} onClick={() => onEdit(row.original)} />
 
-          <LogOut
-            size={20}
-            className={clsx(styles.actionIcon, styles.separationIcon)}
-            onClick={() => onSeparate(row.original)}
-          />
+          {/*
+            Left out rather than disabled for anyone who isn't active: a greyed icon on most of
+            the list would read as something broken, where its absence reads as "not applicable
+            to this row" — which the status pill in the cell before it already explains.
+          */}
+          {isActiveEmployee(row.original.employmentStatus) && (
+            <LogOut
+              size={20}
+              className={clsx(styles.actionIcon, styles.separationIcon)}
+              onClick={() => onSeparate(row.original)}
+            />
+          )}
         </div>
       ),
     },
@@ -223,6 +287,12 @@ interface EmployeesDashboardProps {
    * `/filters/employee`. Drives the accordion sections in the filter popover.
    */
   filterOptions: FilterOptions;
+
+  /**
+   * The signed-in user, for the header chip. Passed from the server render so the name is
+   * there in the first paint rather than after the auth store has hydrated.
+   */
+  currentUser: User | null;
 }
 
 export default function EmployeesDashboard({
@@ -230,6 +300,7 @@ export default function EmployeesDashboard({
   initialEmployees,
   initialMeta,
   filterOptions,
+  currentUser,
 }: EmployeesDashboardProps) {
   const { showNotification } = useNotification();
   const router = useRouter();
@@ -454,7 +525,7 @@ export default function EmployeesDashboard({
 
   return (
     <div className={styles.container}>
-      <AppHeader title={STRINGS.ALL_EMPLOYEES} subtitle={STRINGS.ALL_EMPLOYEE_INFORMATION} />
+      <AppHeader title={STRINGS.ALL_EMPLOYEES} subtitle={STRINGS.ALL_EMPLOYEE_INFORMATION} userDetails={currentUser} />
 
       <div className={styles.content}>
         <TableToolbar

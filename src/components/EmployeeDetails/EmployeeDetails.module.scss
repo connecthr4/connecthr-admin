@@ -191,6 +191,24 @@ offset instead, so the table's header row starts level with the top of the menu.
   margin-top: var(--details-panel-offset);
 }
 
+/*
+Takes the same offset as the attendance history, so the two stepper-less sections start
+level with each other and with the top of the menu beside them.
+
+Scrolls on its own rather than growing the page: a long reason for leaving is the one field
+here with no upper bound on its length.
+*/
+.separationSection {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+  min-height: 0;
+  margin-top: var(--details-panel-offset);
+
+  overflow-y: auto;
+}
+
 /**
 ------------------------------------------------------
 skeleton styles (loading state, see EmployeeDetailsSkeleton)

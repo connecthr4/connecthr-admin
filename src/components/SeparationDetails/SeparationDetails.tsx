@@ -12,6 +12,13 @@
  * notes, who raised it) wait on `detail`. The panel therefore opens full and fills in, rather
  * than opening empty.
  *
+ * `summary` is optional, for the second place this renders: the Separation section of an
+ * employee's profile, which reaches the record by employee rather than from a table row and
+ * so has no row to open with. There every field waits on the one read, and the employee card
+ * is dropped — the profile already names the employee directly above the panel, so repeating
+ * their photo, id and department here would only say it twice. The status badge stays, on a
+ * header of its own.
+ *
  * Shows what was *filed*, and nothing about what became of it: the employee's employment
  * status and the decision are deliberately left out, so the panel answers one question rather
  * than two. The status badge at the top is the whole of where the separation stands.
@@ -49,10 +56,11 @@ import type { SeparationDetail, SeparationListItem } from '@/src/lib/types/separ
  */
 interface SeparationDetailsProps {
   /**
-   * The row the drawer was opened from. Always present, which is what lets the panel render
-   * in full before the detail read has come back.
+   * The row the drawer was opened from, when there was one. Present from the separations
+   * table, which is what lets the panel render in full before the detail read has come back;
+   * omitted on the employee profile, where the same fields arrive with `detail`.
    */
-  summary: SeparationListItem;
+  summary?: SeparationListItem;
 
   /**
    * The rest of the submission, once `GET /separations/:id` has answered. Null while it is
@@ -89,7 +97,11 @@ interface SeparationDetailsProps {
  * "30 days", "1 day", "0 days" — an immediate exit is a real value the form accepts, so it
  * is spelled out rather than shown as a dash that would read as missing.
  */
-function formatNoticePeriod(days: number): string {
+function formatNoticePeriod(days?: number): string {
+  if (days === undefined) {
+    return '';
+  }
+
   return `${days} ${days === 1 ? STRINGS.DAY : STRINGS.DAYS}`;
 }
 
@@ -101,44 +113,94 @@ export default function SeparationDetails({
   onRetry,
   className,
 }: SeparationDetailsProps) {
-  const { employee } = summary;
+  /*
+  Where the fields the list also carries are read from. The row when there is one, so the
+  drawer paints them before the read lands; the detail otherwise, which is the profile's
+  only source for them.
+  */
+  const record = summary ?? detail;
+
+  /* Those same fields are pending exactly when there was no row to draw them from. */
+  const isRecordLoading = isLoading && !summary;
+
+  const employee = summary?.employee;
 
   return (
     <div data-testid="SeparationDetailsTest" className={clsx(styles.container, className)}>
-      <div className={styles.employeeCard}>
-        <EmployeeAvatar src={employee.avatar} name={employee.name} />
+      {employee ? (
+        <div className={styles.employeeCard}>
+          <EmployeeAvatar src={employee.avatar} name={employee.name} />
 
-        <div className={styles.employeeMeta}>
-          <Text1 className={styles.employeeName}>{employee.name}</Text1>
+          <div className={styles.employeeMeta}>
+            <Text1 className={styles.employeeName}>{employee.name}</Text1>
 
-          {/* The designation is nullable, so the line collapses to the id and department
-          rather than showing a dangling separator. */}
-          <Caption className={styles.employeeFacts}>
-            {[employee.employeeId, employee.department].filter(Boolean).join(' · ')}
-          </Caption>
+            {/* The designation is nullable, so the line collapses to the id and department
+            rather than showing a dangling separator. */}
+            <Caption className={styles.employeeFacts}>
+              {[employee.employeeId, employee.department].filter(Boolean).join(' · ')}
+            </Caption>
+          </div>
+
+          {/* On the card rather than in the drawer's title bar, so it reads as this
+          separation's status and not the panel's. */}
+          <SeparationStatusBadge status={summary.status} label={summary.statusLabel} className={styles.status} />
         </div>
+      ) : (
+        /*
+        No employee card on the profile — the screen already names them above. A heading
+        instead, matching the "Personal Details" and "Bank Account Details" headings the
+        profile's other sections carry, so the panel starts the same way they do. Where the
+        separation stands moves into the fields below, as a value like any other.
 
-        {/* On the card rather than in the drawer's title bar, so it reads as this
-        separation's status and not the panel's. */}
-        <SeparationStatusBadge status={summary.status} label={summary.statusLabel} className={styles.status} />
-      </div>
+        Static, so it needs no placeholder: the panel is headed from the first render, and
+        only the values below it wait on the read.
+        */
+        <Text1>{STRINGS.SEPARATION_DETAILS}</Text1>
+      )}
 
       {/*
       A description list rather than a grid of divs: every row here is a label and its value,
       which is what `dl` is for, and it is what lets a screen reader announce the two together.
       */}
       <dl className={styles.fields}>
-        {/* Everything down to here comes off the row, so it is on screen the moment the
-        drawer opens. */}
-        <Field label={STRINGS.SEPARATION_TYPE}>{summary.separationTypeLabel}</Field>
+        {/*
+        Only where there is no employee card, which is the one place the badge used to sit:
+        in the drawer the card still carries it, and a Status row there would say the same
+        thing twice. First in the list either way — where the separation stands is the first
+        thing asked of it.
+        */}
+        {!summary && (
+          /*
+          Spans the row, which is what keeps the pairs below it intact: an odd field in a
+          two-column grid would push every later one across, splitting the notice period
+          from the last working date it produces, and leaving the gap mid-list instead.
+          */
+          <Field label={STRINGS.STATUS} wide bare isLoading={isRecordLoading}>
+            {record && <SeparationStatusBadge status={record.status} label={record.statusLabel} />}
+          </Field>
+        )}
 
-        <Field label={STRINGS.RESIGNATION_DATE}>{formatLongDate(summary.resignationDate)}</Field>
+        {/* Everything down to here comes off the row when there is one, so it is on screen
+        the moment the drawer opens — and off the detail read when there is not. */}
+        <Field label={STRINGS.SEPARATION_TYPE} isLoading={isRecordLoading}>
+          {record?.separationTypeLabel}
+        </Field>
 
-        <Field label={STRINGS.NOTICE_PERIOD}>{formatNoticePeriod(summary.noticePeriodDays)}</Field>
+        <Field label={STRINGS.RESIGNATION_DATE} isLoading={isRecordLoading}>
+          {formatLongDate(record?.resignationDate)}
+        </Field>
 
-        <Field label={STRINGS.LAST_WORKING_DATE}>{formatLongDate(summary.lastWorkingDate)}</Field>
+        <Field label={STRINGS.NOTICE_PERIOD} isLoading={isRecordLoading}>
+          {formatNoticePeriod(record?.noticePeriodDays)}
+        </Field>
 
-        <Field label={STRINGS.RAISED_ON}>{formatTimestampDate(summary.raisedAt) || STRINGS.NOT_AVAILABLE}</Field>
+        <Field label={STRINGS.LAST_WORKING_DATE} isLoading={isRecordLoading}>
+          {formatLongDate(record?.lastWorkingDate)}
+        </Field>
+
+        <Field label={STRINGS.RAISED_ON} isLoading={isRecordLoading}>
+          {formatTimestampDate(record?.raisedAt) || STRINGS.NOT_AVAILABLE}
+        </Field>
 
         {/* Only on the detail read — the list does not say who filed it. */}
         <Field label={STRINGS.RAISED_BY} isLoading={isLoading}>
@@ -222,6 +284,9 @@ function EmployeeAvatar({ src, name }: { src: string | null; name: string }) {
  * @param wide - Spans both columns, for the free-text fields.
  * @param isLoading - Draws a placeholder bar in place of the value.
  * @param lines - How many placeholder bars to draw, for a field that holds a paragraph.
+ * @param bare - Renders the value as given, without the `Text2` wrapper. For a value that
+ *   brings its own presentation — the status pill — where a paragraph around it would be
+ *   the wrong shape and would impose a line height the pill then has to fight.
  */
 function Field({
   label,
@@ -229,12 +294,14 @@ function Field({
   wide = false,
   isLoading = false,
   lines = 1,
+  bare = false,
 }: {
   label: string;
   children: ReactNode;
   wide?: boolean;
   isLoading?: boolean;
   lines?: number;
+  bare?: boolean;
 }) {
   return (
     <div className={clsx(styles.field, { [styles.fieldWide]: wide })}>
@@ -244,11 +311,13 @@ function Field({
 
       <dd className={styles.fieldValue}>
         {isLoading ? (
-          <span aria-hidden className={styles.bones}>
+          <span aria-hidden className={clsx(styles.bones, { [styles.bonePill]: bare })}>
             {Array.from({ length: lines }).map((_, index) => (
               <span key={index} className={styles.bone} />
             ))}
           </span>
+        ) : bare ? (
+          children
         ) : (
           <Text2>{children}</Text2>
         )}

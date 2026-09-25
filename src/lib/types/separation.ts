@@ -365,6 +365,30 @@ export interface GetSeparationResponse {
 export type GetSeparationResult = { success: true; data: SeparationDetail } | { success: false; message: string };
 
 /**
+ * `GET /separations/employee/:employeeId` — the same record as
+ * {@link GetSeparationResponse}, for an employee who may not have one.
+ *
+ * `data` is nullable here and not there: asking by separation id is asking after a record
+ * that was already known to exist, while asking by employee is also asking *whether* there
+ * is one. Most employees have never had a separation filed, so "none" is the ordinary
+ * answer rather than an edge case.
+ */
+export interface GetEmployeeSeparationResponse {
+  success: boolean;
+  message: string;
+  data: SeparationDetail | null;
+}
+
+/**
+ * Three outcomes rather than two, because "this employee has no separation" is not a
+ * failure and must not be shown as one: `data: null` is an empty section, while
+ * `success: false` is the panel that offers a retry.
+ */
+export type GetEmployeeSeparationResult =
+  | { success: true; data: SeparationDetail | null }
+  | { success: false; message: string };
+
+/**
  * Narrows a row of the employee list to what the separation form shows.
  *
  * @remarks

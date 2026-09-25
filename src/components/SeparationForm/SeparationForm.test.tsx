@@ -81,6 +81,7 @@ const row: Employee = {
   designation: 'Designer',
   type: 'Office',
   status: 'Permanent',
+  employmentStatus: 'Active',
 };
 
 /**

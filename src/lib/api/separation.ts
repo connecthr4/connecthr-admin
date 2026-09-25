@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from './endpoints';
 import type {
   DecideSeparationRequest,
   DecideSeparationResponse,
+  GetEmployeeSeparationResponse,
   GetSeparationOptionsResponse,
   GetSeparationResponse,
   GetSeparationsRequest,
@@ -52,6 +53,16 @@ export const SeparationApi = {
    */
   getSeparation(client: ApiClient, separationId: string) {
     return client.get<GetSeparationResponse>(API_ENDPOINTS.SEPARATION.GET_BY_ID(separationId));
+  },
+
+  /**
+   * One employee's current separation, for the profile screen's Separation section.
+   *
+   * Takes the "EMP1042" code rather than the employee's record id — the same identifier
+   * {@link initiateSeparation} files against.
+   */
+  getEmployeeSeparation(client: ApiClient, employeeId: string) {
+    return client.get<GetEmployeeSeparationResponse>(API_ENDPOINTS.SEPARATION.GET_BY_EMPLOYEE(employeeId));
   },
 
   /**

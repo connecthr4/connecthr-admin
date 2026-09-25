@@ -1,4 +1,4 @@
-import { User, BriefcaseBusiness, CalendarCheck, FileText, Wallet, UserRound } from 'lucide-react';
+import { User, BriefcaseBusiness, CalendarCheck, FileText, Wallet, UserRound, UserRoundMinus } from 'lucide-react';
 import { NotificationType } from '../providers/NotificationProvider';
 import type { EmployeeDocumentType } from '../store/employeeStore/types';
 
@@ -261,6 +261,13 @@ export const STRINGS = {
   SEPARATIONS_FETCH_FAILED: 'Failed to load separations',
   SEPARATION_DETAILS_FETCH_FAILED: 'This separation could not be loaded',
 
+  /** Singular, for the employee profile's own section — the nav's plural entry is a listing. */
+  SEPARATION: 'Separation',
+  EMPLOYEE_SEPARATION_FETCH_FAILED: "Failed to load this employee's separation",
+
+  /** Not an error: most employees have never had one filed. */
+  NO_SEPARATION_FILED: 'No separation has been filed for this employee',
+
   /* The decision an approver takes on a pending separation, from the details drawer. */
   APPROVE: 'Approve',
   REJECT: 'Reject',
@@ -358,6 +365,18 @@ export const PROFILE_ITEMS = [
     id: 'attendance',
     label: STRINGS.ATTENDANCE,
     icon: CalendarCheck,
+  },
+
+  /*
+  Always listed, like Attendance, rather than shown only for employees who have one: whether
+  a separation exists is only known once it has been read, and reading it for every profile
+  visit would pay for the section on the majority of screens that never open it. The section
+  answers "none filed" itself.
+  */
+  {
+    id: 'separation',
+    label: STRINGS.SEPARATION,
+    icon: UserRoundMinus,
   },
 ] as const;
 

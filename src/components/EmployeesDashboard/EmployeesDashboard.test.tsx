@@ -2,13 +2,20 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import EmployeesDashboard, { DEFAULT_SORT_BY, DEFAULT_SORT_ORDER } from './EmployeesDashboard';
+import EmployeesDashboard, {
+  DEFAULT_SORT_BY,
+  DEFAULT_SORT_ORDER,
+  getEmploymentStatusClass,
+} from './EmployeesDashboard';
+import styles from './EmployeesDashboard.module.scss';
 import { getEmployees } from '@/src/lib/actions/employees';
 import { EmployeesClient } from '@/src/lib/api/employeesClient';
 import { logger } from '@/src/lib/logger';
+import { ROLES } from '@/src/lib/auth/roles';
 import { NOTIFICATION_TYPES, ROUTES, STRINGS } from '@/src/constants/strings';
 
 import type { Employee, EmployeeColumn, EmployeeListMeta } from '@/src/lib/types/employees';
+import type { User } from '@/src/lib/types/auth';
 import type { FilterOptions } from '@/src/lib/types/filters';
 import type { ExportScope } from '../ExportScopeOptions';
 
@@ -114,7 +121,7 @@ const columns: EmployeeColumn[] = [
   { accessorKey: 'status', header: 'Status' },
 ];
 
-const employee = (id: string, name: string): Employee => ({
+const employee = (id: string, name: string, employmentStatus = 'Active'): Employee => ({
   id,
   avatar: `https://i.pravatar.cc/150?u=${id}`,
   name,
@@ -123,6 +130,7 @@ const employee = (id: string, name: string): Employee => ({
   designation: 'Designer',
   type: 'Office',
   status: 'Permanent',
+  employmentStatus,
 });
 
 const employees = [employee('1', 'Darlene Robertson'), employee('2', 'Floyd Miles')];
@@ -146,6 +154,16 @@ const filterOptions: FilterOptions = [
   },
 ];
 
+/** As the page resolves them on the server, for the header's profile chip. */
+const currentUser: User = {
+  id: 'clx-current',
+  name: 'Shailesh',
+  email: 'shailesh@example.com',
+  role: ROLES.SUPER_ADMIN,
+  status: 'ACTIVE',
+  mustChangePassword: false,
+};
+
 const baseRequest = {
   page: 1,
   limit: 10,
@@ -165,13 +183,14 @@ const errorNotification = (title: string, message: string) => [
 /** The body row for the employee named `name`. */
 const getRow = (name: string) => screen.getByText(name).closest('tr') as HTMLTableRowElement;
 
-function renderDashboard(initialMeta = meta()) {
+function renderDashboard(initialMeta = meta(), initialEmployees = employees) {
   return render(
     <EmployeesDashboard
       initialColumns={columns}
-      initialEmployees={employees}
+      initialEmployees={initialEmployees}
       initialMeta={initialMeta}
       filterOptions={filterOptions}
+      currentUser={currentUser}
     />
   );
 }
@@ -193,11 +212,78 @@ describe('EmployeesDashboard', () => {
     expect(getEmployees).not.toHaveBeenCalled();
   });
 
+  it('names the signed-in user in the header chip rather than the placeholder', () => {
+    renderDashboard();
+
+    const accountMenu = screen.getByRole('button', { name: STRINGS.ACCOUNT_MENU });
+
+    expect(within(accountMenu).getByText('Shailesh')).toBeInTheDocument();
+    expect(within(accountMenu).getByText('Super Admin')).toBeInTheDocument();
+    expect(within(accountMenu).queryByText('User')).not.toBeInTheDocument();
+  });
+
   it('builds the columns as name, the API’s own columns, status and actions', () => {
     renderDashboard();
 
     const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
     expect(headers).toEqual(['Employee Name', 'Employee ID', 'Department', 'Status', 'Action']);
+  });
+
+  it('gives every employment status its own colour, so they are told apart by more than wording', () => {
+    const classNames = ['Active', 'On Notice', 'Exited', 'Inactive'].map(getEmploymentStatusClass);
+
+    expect(new Set(classNames).size).toBe(classNames.length);
+    expect(classNames).toEqual([
+      styles.statusActive,
+      styles.statusOnNotice,
+      styles.statusExited,
+      styles.statusInactive,
+    ]);
+  });
+
+  it('reads a status whatever casing or separator the backend sends it in', () => {
+    expect(getEmploymentStatusClass('ON_NOTICE')).toBe(styles.statusOnNotice);
+    expect(getEmploymentStatusClass('on notice')).toBe(styles.statusOnNotice);
+    expect(getEmploymentStatusClass(' On-Notice ')).toBe(styles.statusOnNotice);
+  });
+
+  it('falls back to the primary-coloured pill for a status it has no colour for', () => {
+    expect(getEmploymentStatusClass('Sabbatical')).toBe(styles.statusUnknown);
+    expect(getEmploymentStatusClass('')).toBe(styles.statusUnknown);
+  });
+
+  it('colours each row’s pill by that row’s own status', () => {
+    renderDashboard(meta(), [employee('1', 'Darlene Robertson'), employee('2', 'Floyd Miles', 'On Notice')]);
+
+    expect(within(getRow('Darlene Robertson')).getByText('Active')).toHaveClass(
+      styles.statusBadge,
+      styles.statusActive
+    );
+    expect(within(getRow('Floyd Miles')).getByText('On Notice')).toHaveClass(styles.statusBadge, styles.statusOnNotice);
+  });
+
+  it('offers the exit icon only on an active employee’s row', () => {
+    renderDashboard(meta({ totalItems: 4 }), [
+      employee('1', 'Still Employed'),
+      employee('2', 'Serving Notice', 'On Notice'),
+      employee('3', 'Already Gone', 'Exited'),
+      employee('4', 'Switched Off', 'Inactive'),
+    ]);
+
+    expect(getRow('Still Employed').querySelector('.lucide-log-out')).toBeInTheDocument();
+
+    for (const name of ['Serving Notice', 'Already Gone', 'Switched Off']) {
+      expect(getRow(name).querySelector('.lucide-log-out')).not.toBeInTheDocument();
+    }
+  });
+
+  it('keeps view and edit on a row that can no longer be separated', () => {
+    renderDashboard(meta({ totalItems: 1 }), [employee('1', 'Already Gone', 'Exited')]);
+
+    const row = getRow('Already Gone');
+
+    expect(row.querySelector('.lucide-eye')).toBeInTheDocument();
+    expect(row.querySelector('.lucide-pencil')).toBeInTheDocument();
   });
 
   it('renders each employee’s avatar beside their name', () => {

@@ -3,13 +3,14 @@
 import { redirect } from 'next/navigation';
 import { getServerApiClient } from '../api/getServerApiClient';
 import { SeparationApi } from '../api/separation';
-import { UnauthorizedError } from '../api/errors';
+import { NotFoundError, UnauthorizedError } from '../api/errors';
 import { getApiErrorInfo } from '../api/helpers';
 import { expireIfIdle } from '../auth/idleGate';
 import { logger } from '../logger';
 import { LOGIN_SESSION_EXPIRED_URL, ROUTES, STRINGS } from '../../constants/strings';
 import type {
   DecideSeparationResult,
+  GetEmployeeSeparationResult,
   GetSeparationOptionsResult,
   GetSeparationResult,
   GetSeparationsRequest,
@@ -147,6 +148,49 @@ export async function getSeparation(separationId: string): Promise<GetSeparation
     }
 
     logger.error('Error occurred while fetching the separation:', error);
+    const { message } = getApiErrorInfo(error);
+
+    return { success: false, message };
+  }
+}
+
+/**
+ * Server Function — one employee's current separation, for the Separation section of their
+ * profile.
+ *
+ * Keyed by the employee's "EMP1042" code, not their record id: the screen is looking for
+ * whichever separation is theirs, which is a different question from
+ * {@link getSeparation}'s "show me this row".
+ *
+ * A 404 is read as "nothing filed" rather than as an error. The endpoint answers 404 for
+ * two reasons — no such employee, and an employee with no separation — and only the second
+ * can happen here, since the profile has already rendered the employee's record by the time
+ * this section can be opened. Most employees have never had a separation filed, so
+ * surfacing that as a failure with a retry button would make the ordinary case look broken.
+ *
+ * @param employeeId - The "EMP1042" code, from the employee the profile is showing.
+ */
+export async function getEmployeeSeparation(employeeId: string): Promise<GetEmployeeSeparationResult> {
+  if (await expireIfIdle()) {
+    redirect(LOGIN_SESSION_EXPIRED_URL);
+  }
+
+  try {
+    const client = getServerApiClient();
+    const response = await SeparationApi.getEmployeeSeparation(client, employeeId);
+
+    /* `data` is already nullable on this endpoint, so a body saying "none" needs no mapping. */
+    return { success: true, data: response.data ?? null };
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      redirect(ROUTES.LOGIN);
+    }
+
+    if (error instanceof NotFoundError) {
+      return { success: true, data: null };
+    }
+
+    logger.error("Error occurred while fetching the employee's separation:", error);
     const { message } = getApiErrorInfo(error);
 
     return { success: false, message };
