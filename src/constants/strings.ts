@@ -260,6 +260,34 @@ export const STRINGS = {
   DAY: 'day',
   SEPARATIONS_FETCH_FAILED: 'Failed to load separations',
   SEPARATION_DETAILS_FETCH_FAILED: 'This separation could not be loaded',
+
+  /* The decision an approver takes on a pending separation, from the details drawer. */
+  APPROVE: 'Approve',
+  REJECT: 'Reject',
+  APPROVE_SEPARATION: 'Approve Separation',
+  REJECT_SEPARATION: 'Reject Separation',
+  APPROVE_SEPARATION_CONFIRMATION:
+    "The exit will be approved and the employee's last working date confirmed. This cannot be undone.",
+  REJECT_SEPARATION_CONFIRMATION: 'The request will be refused and the employee will stay on. This cannot be undone.',
+  SEPARATION_APPROVED: 'Separation approved',
+  SEPARATION_REJECTED: 'Separation rejected',
+  SEPARATION_DECISION_FAILED: 'The decision could not be recorded',
+
+  /*
+  The grounds for the decision — `remarks` on both endpoints, optional when approving and
+  required when refusing, which is why only the rejection modal asks for them.
+  */
+  REJECTION_REMARKS: 'Reason for Rejection',
+  REJECTION_REMARKS_PLACEHOLDER: 'Why is this request being refused?',
+  REJECTION_REMARKS_REQUIRED: 'Give a reason for refusing this request',
+
+  /**
+   * Stand-in wording for a row just decided from this screen, used only when the decide
+   * response does not carry a `statusLabel` of its own. Every read of a separation supplies
+   * its own label, so these are overwritten by the next one.
+   */
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected',
 };
 
 /**

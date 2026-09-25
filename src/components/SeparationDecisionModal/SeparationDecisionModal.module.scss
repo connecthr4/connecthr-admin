@@ -1,0 +1,152 @@
+/**
+------------------------------------------------------
+styles specific to the SeparationDecisionModal component
+
+Laid out like DeleteConfirmationModal — icon, heading, warning, actions — because both are
+the same moment: a decision that cannot be taken back, confirmed against a named record.
+What differs is the tone, which is a pair of custom properties the `.approve` and `.reject`
+classes set and everything else reads.
+------------------------------------------------------
+**/
+
+.modal {
+  min-width: 450px;
+}
+
+/*
+  Green for granting the exit, red for refusing it — the same reading
+  `SeparationStatusBadge` gives those two states, so the modal is already the colour of the
+  pill the row is about to show.
+
+  Set as custom properties rather than as separate rules per element: the badge, the icon and
+  the confirm button all take their colour from one of these three, so a tone is defined once
+  instead of in three places that could disagree.
+*/
+.approve {
+  --decision-tint: var(--color-green-50);
+  --decision-color: var(--color-green-500);
+  --decision-color-hover: color-mix(in srgb, var(--color-green-500) 85%, black);
+}
+
+.reject {
+  --decision-tint: var(--color-red-400-10);
+  --decision-color: var(--color-red-500);
+  --decision-color-hover: var(--color-red-400);
+}
+
+/*
+  The modal renders no header — the heading sits with the icon — so the block carries its own
+  breathing room above it.
+*/
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-8) var(--spacing-5) 0;
+}
+
+/* Tinted disc behind the icon, in the colour of the decision it is confirming. */
+.iconBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--decision-tint);
+  margin-bottom: var(--spacing-2);
+}
+
+.icon {
+  color: var(--decision-color);
+}
+
+.title {
+  margin: 0;
+}
+
+.description {
+  max-width: 26rem;
+  color: var(--color-gray-500);
+}
+
+/*
+  The row being decided. Boxed and centred under the warning so it reads as the subject of the
+  sentence above it rather than as more of the warning.
+*/
+.target {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+
+  margin-top: var(--spacing-6);
+  padding: var(--spacing-4) var(--spacing-5);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+
+  background: var(--color-gray-50);
+}
+
+.targetName {
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.targetMeta {
+  color: var(--color-gray-500);
+  text-align: center;
+}
+
+/*
+  The grounds for a rejection. Left-aligned against the centred block above it, because it is
+  a field to fill in rather than more of the warning to read.
+*/
+.remarks {
+  margin-top: var(--spacing-6);
+  text-align: left;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+  margin-top: var(--spacing-8);
+}
+
+.action {
+  min-width: 8.75rem;
+  padding: 0.875rem var(--spacing-8);
+  border-radius: var(--radius-md);
+}
+
+/*
+  Doubled selector on purpose. `Button` applies its own `.primary` background as a single
+  class, so a single class here would win or lose on stylesheet order alone; this settles it
+  on specificity instead.
+*/
+.confirm.confirm {
+  background-color: var(--decision-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--decision-color-hover);
+  }
+}
+
+/* Stacked once the viewport is too narrow for two buttons at their minimum width. */
+@media (max-width: 30rem) {
+  .modal {
+    min-width: 0;
+  }
+
+  .buttonContainer {
+    flex-direction: column-reverse;
+  }
+
+  .action {
+    width: 100%;
+  }
+}

@@ -147,6 +147,29 @@ export const API_ENDPOINTS = {
      * employee's, and not their "EMP1042" code.
      */
     GET_BY_ID: (separationId: string) => `/separations/${encodeURIComponent(separationId)}`,
+
+    /**
+     * Grants a pending separation. Takes optional `remarks`.
+     *
+     * Its own endpoint rather than a status field on {@link GET_BY_ID}'s
+     * record: approving and rejecting are the two things that may be done to a
+     * pending separation, and neither is a general-purpose edit.
+     *
+     * Restricted to the roles above ADMIN, and refused with
+     * `CANNOT_DECIDE_OWN_SEPARATION` for a separation the caller raised
+     * themselves. Both rules are already answered by the `permissions.canDecide`
+     * flag the list and the detail read carry, so nothing re-derives them.
+     */
+    APPROVE: (separationId: string) => `/separations/${encodeURIComponent(separationId)}/approve`,
+
+    /**
+     * Refuses a pending separation.
+     *
+     * Unlike {@link APPROVE}, `remarks` are mandatory here and must run to
+     * between 1 and 1000 characters: a refusal should always say on what
+     * grounds.
+     */
+    REJECT: (separationId: string) => `/separations/${encodeURIComponent(separationId)}/reject`,
   },
 
   OPTIONS: {

@@ -1,6 +1,8 @@
 import { ApiClient } from './client';
 import { API_ENDPOINTS } from './endpoints';
 import type {
+  DecideSeparationRequest,
+  DecideSeparationResponse,
   GetSeparationOptionsResponse,
   GetSeparationResponse,
   GetSeparationsRequest,
@@ -50,5 +52,26 @@ export const SeparationApi = {
    */
   getSeparation(client: ApiClient, separationId: string) {
     return client.get<GetSeparationResponse>(API_ENDPOINTS.SEPARATION.GET_BY_ID(separationId));
+  },
+
+  /**
+   * Grants a pending separation. `remarks` are optional here.
+   */
+  approveSeparation(client: ApiClient, separationId: string, data: DecideSeparationRequest = {}) {
+    return client.patch<DecideSeparationResponse, DecideSeparationRequest>(
+      API_ENDPOINTS.SEPARATION.APPROVE(separationId),
+      data
+    );
+  },
+
+  /**
+   * Refuses a pending separation. `remarks` are mandatory, and the endpoint rejects a body
+   * without them — a refusal should always say on what grounds.
+   */
+  rejectSeparation(client: ApiClient, separationId: string, data: DecideSeparationRequest) {
+    return client.patch<DecideSeparationResponse, DecideSeparationRequest>(
+      API_ENDPOINTS.SEPARATION.REJECT(separationId),
+      data
+    );
   },
 };
