@@ -71,6 +71,39 @@ styles specific to the EmployeesDashboard component
   font-size: 0.875rem;
   font-weight: 500;
 
+  /* The pill sits in a table cell, where a wrapped two-line badge would push the row. */
+  white-space: nowrap;
+}
+
+/* Currently employed. */
+.statusActive {
+  background: var(--color-green-50);
+  color: var(--color-green-500);
+}
+
+/*
+Serving notice — on the way out but still working, so amber rather than red. No amber
+background token exists yet, so the tint is mixed from the amber the styleguide does define.
+*/
+.statusOnNotice {
+  background: color-mix(in srgb, var(--color-amber-500) 12%, transparent);
+  color: var(--color-amber-500);
+}
+
+/* Employment has ended — the one status that is final. */
+.statusExited {
+  background: var(--color-red-400-10);
+  color: var(--color-red-500);
+}
+
+/* Still on the books, just not active — grey reads as switched off rather than as a problem. */
+.statusInactive {
+  background: var(--color-gray-100);
+  color: var(--color-gray-500);
+}
+
+/* A status the map doesn't know yet: the primary-coloured pill this column always showed. */
+.statusUnknown {
   background: var(--color-violet-600-40);
   color: var(--color-violet-600);
 }

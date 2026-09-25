@@ -150,3 +150,46 @@ export const Empty: Story = {
     initialMeta: { ...meta_, totalItems: 0, totalPages: 0, hasNextPage: false },
   },
 };
+
+/**
+ * The decision flow end to end, against a decide call that always succeeds.
+ *
+ * Open EMP1042 — the one pending row this user may decide — and the drawer's footer offers
+ * Approve and Reject. Either hands over to the confirmation, and confirming moves the row's
+ * badge without the list being re-read. The other three rows are already decided or
+ * withdrawn, so they open with no footer at all.
+ *
+ * Worth trying both ways round: approving takes one click, while rejecting will not go
+ * through until a reason has been given, which is what the two endpoints ask for.
+ *
+ * The delay is there to be seen — it is the window in which both buttons and the reason field
+ * are locked, since a decision recorded twice is not something an approver can undo.
+ */
+export const Decidable: Story = {
+  args: {
+    onDecide: async (_separationId, outcome, remarks) => {
+      await new Promise((resolve) => setTimeout(resolve, 900));
+
+      return {
+        success: true,
+        message: remarks ?? (outcome === 'APPROVED' ? 'Separation approved.' : 'Separation rejected.'),
+      };
+    },
+  },
+};
+
+/**
+ * The same flow when the backend refuses — a decision another approver got to first, say, or
+ * a 403 for a separation the approver raised themselves.
+ *
+ * The confirmation stays open and the row does not move: the approver is told what happened,
+ * in the API's own words, while still looking at the decision they were making.
+ */
+export const DecisionRefused: Story = {
+  args: {
+    onDecide: async () => ({
+      success: false,
+      message: 'This separation has already been decided.',
+    }),
+  },
+};

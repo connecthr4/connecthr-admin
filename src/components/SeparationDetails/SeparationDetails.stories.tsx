@@ -125,6 +125,30 @@ export const Approved: Story = {
 };
 
 /**
+ * The Separation section of an employee's profile, which reaches the record by employee and
+ * so opens with no list row. The employee card is dropped — the profile names them directly
+ * above — leaving a heading in its place, and where the separation stands becomes a Status
+ * field rather than a badge floating over the panel.
+ */
+export const OnEmployeeProfile: Story = {
+  args: {
+    summary: undefined,
+  },
+};
+
+/**
+ * The same section while its one read is in flight. Nothing was known up front, so every
+ * field is on a placeholder — the labels still hold the panel's height.
+ */
+export const OnEmployeeProfileLoading: Story = {
+  args: {
+    summary: undefined,
+    detail: null,
+    isLoading: true,
+  },
+};
+
+/**
  * A reason long enough to wrap, which is why the panel shows it as a paragraph.
  */
 export const LongReason: Story = {

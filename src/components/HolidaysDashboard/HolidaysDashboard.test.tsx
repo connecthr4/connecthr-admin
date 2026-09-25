@@ -1,11 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import HolidaysDashboard from './HolidaysDashboard';
 import { HolidaysClient } from '@/src/lib/api/holidaysClient';
+import { ROLES } from '@/src/lib/auth/roles';
 import { NOTIFICATION_TYPES, STRINGS } from '@/src/constants/strings';
 import type { CreateHolidayRequest, Holiday, HolidayMonthGroup } from '@/src/lib/types/holidays';
+import type { User } from '@/src/lib/types/auth';
 
 vi.mock('@/src/lib/logger', () => ({
   logger: {
@@ -107,22 +109,45 @@ const initialHolidaysList: HolidayMonthGroup[] = [
   { month: 'February', holidays: [] },
 ];
 
+/** As the page resolves them on the server, for the header's profile chip. */
+const currentUser: User = {
+  id: 'clx-current',
+  name: 'Shailesh',
+  email: 'shailesh@example.com',
+  role: ROLES.SUPER_ADMIN,
+  status: 'ACTIVE',
+  mustChangePassword: false,
+};
+
+const renderDashboard = () =>
+  render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} currentUser={currentUser} />);
+
 describe('HolidaysDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders a card for every month in the initial list', () => {
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
 
     expect(screen.getByText('January')).toBeInTheDocument();
     expect(screen.getByText('February')).toBeInTheDocument();
     expect(screen.getByText('delete-Republic Day')).toBeInTheDocument();
   });
 
+  it('names the signed-in user in the header chip rather than the placeholder', () => {
+    renderDashboard();
+
+    const accountMenu = screen.getByRole('button', { name: STRINGS.ACCOUNT_MENU });
+
+    expect(within(accountMenu).getByText('Shailesh')).toBeInTheDocument();
+    expect(within(accountMenu).getByText('Super Admin')).toBeInTheDocument();
+    expect(within(accountMenu).queryByText('User')).not.toBeInTheDocument();
+  });
+
   it('opens the add holiday modal when clicking "Add New Holiday"', async () => {
     const user = userEvent.setup();
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
 
     expect(screen.queryByText('mock-submit')).not.toBeInTheDocument();
 
@@ -133,7 +158,7 @@ describe('HolidaysDashboard', () => {
 
   it('closes the modal via its onclose callback', async () => {
     const user = userEvent.setup();
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
 
     await user.click(screen.getByRole('button', { name: STRINGS.ADD_NEW_HOLIDAY }));
     await user.click(screen.getByText('mock-close'));
@@ -150,7 +175,7 @@ describe('HolidaysDashboard', () => {
     vi.mocked(HolidaysClient.createHoliday).mockResolvedValue({ success: true, message: 'ok' });
     vi.mocked(HolidaysClient.getHolidaysList).mockResolvedValue({ success: true, message: 'ok', data: updatedList });
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     await user.click(screen.getByRole('button', { name: STRINGS.ADD_NEW_HOLIDAY }));
     await user.click(screen.getByText('mock-submit'));
 
@@ -182,7 +207,7 @@ describe('HolidaysDashboard', () => {
       data: initialHolidaysList,
     });
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     await user.click(screen.getByRole('button', { name: STRINGS.ADD_NEW_HOLIDAY }));
     expect(screen.getByText('idle')).toBeInTheDocument();
 
@@ -199,7 +224,7 @@ describe('HolidaysDashboard', () => {
     error.details = { message: 'Name already exists', success: false };
     vi.mocked(HolidaysClient.createHoliday).mockRejectedValue(error);
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     await user.click(screen.getByRole('button', { name: STRINGS.ADD_NEW_HOLIDAY }));
     await user.click(screen.getByText('mock-submit'));
 
@@ -226,7 +251,7 @@ describe('HolidaysDashboard', () => {
     vi.mocked(HolidaysClient.deleteHoliday).mockResolvedValue({ success: true, message: 'ok' });
     vi.mocked(HolidaysClient.getHolidaysList).mockResolvedValue({ success: true, message: 'ok', data: updatedList });
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     await user.click(screen.getByText('delete-Republic Day'));
 
     expect(HolidaysClient.deleteHoliday).toHaveBeenCalledWith({ id: '1' });
@@ -256,7 +281,7 @@ describe('HolidaysDashboard', () => {
       data: initialHolidaysList,
     });
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     expect(screen.getAllByText('deleting:none')).toHaveLength(2);
 
     await user.click(screen.getByText('delete-Republic Day'));
@@ -272,7 +297,7 @@ describe('HolidaysDashboard', () => {
     error.details = { message: 'Cannot delete', success: false };
     vi.mocked(HolidaysClient.deleteHoliday).mockRejectedValue(error);
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     await user.click(screen.getByText('delete-Republic Day'));
 
     await waitFor(() =>
@@ -291,7 +316,7 @@ describe('HolidaysDashboard', () => {
 
   it('opens the export confirmation modal when clicking "Export"', async () => {
     const user = userEvent.setup();
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
 
     expect(screen.queryByText('mock-confirm-export')).not.toBeInTheDocument();
 
@@ -304,7 +329,7 @@ describe('HolidaysDashboard', () => {
 
   it('closes the export modal without downloading when cancelled', async () => {
     const user = userEvent.setup();
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
 
     await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
     await user.click(screen.getByText('mock-cancel-export'));
@@ -317,7 +342,7 @@ describe('HolidaysDashboard', () => {
     const user = userEvent.setup();
     vi.mocked(HolidaysClient.exportHolidays).mockResolvedValue(undefined);
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
     await user.click(screen.getByText('mock-confirm-export'));
 
@@ -343,7 +368,7 @@ describe('HolidaysDashboard', () => {
         })
     );
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
     expect(screen.getByText('export-idle')).toBeInTheDocument();
 
@@ -360,7 +385,7 @@ describe('HolidaysDashboard', () => {
     error.details = { message: 'Export unavailable', success: false };
     vi.mocked(HolidaysClient.exportHolidays).mockRejectedValue(error);
 
-    render(<HolidaysDashboard initialHolidaysList={initialHolidaysList} />);
+    renderDashboard();
     await user.click(screen.getByRole('button', { name: STRINGS.EXPORT }));
     await user.click(screen.getByText('mock-confirm-export'));
 

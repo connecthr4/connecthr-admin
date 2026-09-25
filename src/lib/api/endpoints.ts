@@ -147,6 +147,45 @@ export const API_ENDPOINTS = {
      * employee's, and not their "EMP1042" code.
      */
     GET_BY_ID: (separationId: string) => `/separations/${encodeURIComponent(separationId)}`,
+
+    /**
+     * That employee's *current* separation, keyed by their "EMP1042" code —
+     * the counterpart to {@link GET_BY_ID}, which is keyed by the separation's
+     * own id.
+     *
+     * Which read to use follows from what the caller already holds: the
+     * separations table has the row, so it asks by separation id and can never
+     * be ambiguous; the employee profile only has the employee, so it asks
+     * here and lets the backend decide which of their separations is current.
+     *
+     * Answers for an employee who has never had one — see
+     * `getEmployeeSeparation`, which reads that as an empty section rather
+     * than as a failure.
+     */
+    GET_BY_EMPLOYEE: (employeeId: string) => `/separations/employee/${encodeURIComponent(employeeId)}`,
+
+    /**
+     * Grants a pending separation. Takes optional `remarks`.
+     *
+     * Its own endpoint rather than a status field on {@link GET_BY_ID}'s
+     * record: approving and rejecting are the two things that may be done to a
+     * pending separation, and neither is a general-purpose edit.
+     *
+     * Restricted to the roles above ADMIN, and refused with
+     * `CANNOT_DECIDE_OWN_SEPARATION` for a separation the caller raised
+     * themselves. Both rules are already answered by the `permissions.canDecide`
+     * flag the list and the detail read carry, so nothing re-derives them.
+     */
+    APPROVE: (separationId: string) => `/separations/${encodeURIComponent(separationId)}/approve`,
+
+    /**
+     * Refuses a pending separation.
+     *
+     * Unlike {@link APPROVE}, `remarks` are mandatory here and must run to
+     * between 1 and 1000 characters: a refusal should always say on what
+     * grounds.
+     */
+    REJECT: (separationId: string) => `/separations/${encodeURIComponent(separationId)}/reject`,
   },
 
   OPTIONS: {

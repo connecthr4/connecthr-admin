@@ -28,14 +28,22 @@ import { useNotification } from '@/src/providers/NotificationProvider';
 import { CreateHolidayRequest, HolidayMonthGroup } from '@/src/lib/types/holidays';
 import styles from './HolidaysDashboard.module.scss';
 
+import type { User } from '@/src/lib/types/auth';
+
 /**
  * Define the props available for the HolidaysDashboard component.
  */
 interface HolidaysDashboardProps {
   initialHolidaysList: HolidayMonthGroup[];
+
+  /**
+   * The signed-in user, for the header chip. Passed from the server render so the name is
+   * there in the first paint rather than after the auth store has hydrated.
+   */
+  currentUser: User | null;
 }
 
-export default function HolidaysDashboard({ initialHolidaysList }: HolidaysDashboardProps) {
+export default function HolidaysDashboard({ initialHolidaysList, currentUser }: HolidaysDashboardProps) {
   const { showNotification } = useNotification();
   const [holidaysList, setHolidaysList] = useState(initialHolidaysList);
   const [isAddHolidayModalOpen, setIsAddHolidayModalOpen] = useState(false);
@@ -105,7 +113,7 @@ export default function HolidaysDashboard({ initialHolidaysList }: HolidaysDashb
   return (
     <>
       <div className={styles.container}>
-        <AppHeader title={STRINGS.HOLIDAYS} subtitle={STRINGS.ALL_HOLIDAY_LISTS} />
+        <AppHeader title={STRINGS.HOLIDAYS} subtitle={STRINGS.ALL_HOLIDAY_LISTS} userDetails={currentUser} />
 
         <div className={styles.content}>
           <div className={styles.topBar}>

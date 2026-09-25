@@ -229,5 +229,98 @@ describe('SeparationDetails', () => {
       expect(screen.queryByText('Employment Status')).not.toBeInTheDocument();
       expect(screen.queryByText('ACTIVE')).not.toBeInTheDocument();
     });
+
+    it('adds no Status row where the card already carries the badge', () => {
+      render(<SeparationDetails summary={summary} detail={detail} />);
+
+      expect(screen.queryByText('Status')).not.toBeInTheDocument();
+
+      /* Said once, on the badge. */
+      expect(screen.getAllByText('Pending Approval')).toHaveLength(1);
+    });
+
+    it('adds no heading where the drawer already has a title', () => {
+      render(<SeparationDetails summary={summary} detail={detail} />);
+
+      expect(screen.queryByText('Separation Details')).not.toBeInTheDocument();
+    });
+  });
+
+  /* The employee profile's Separation section, which reaches the record by employee and so
+  has no list row to open with. */
+  describe('without a row to open from', () => {
+    it('renders every field from the detail read alone', () => {
+      render(<SeparationDetails detail={detail} />);
+
+      expect(valueFor('Separation Type')).toHaveTextContent('Resignation');
+      expect(valueFor('Resignation Date')).toHaveTextContent('20 Sept 2026');
+      expect(valueFor('Last Working Date')).toHaveTextContent('20 Oct 2026');
+      expect(valueFor('Notice Period')).toHaveTextContent('30 days');
+      expect(valueFor('Raised On')).toHaveTextContent('September 20, 2026');
+      expect(valueFor('Raised By')).toHaveTextContent('Anita Rao');
+      expect(screen.getByText('Relocating to another city.')).toBeInTheDocument();
+    });
+
+    it('drops the employee card, which the profile already shows above it', () => {
+      render(<SeparationDetails detail={detail} />);
+
+      expect(screen.queryByText('Priya Sharma')).not.toBeInTheDocument();
+      expect(screen.queryByText(/EMP1042/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('SeparationAvatarFallbackTest')).not.toBeInTheDocument();
+    });
+
+    it('heads the panel, since there is no card to say what it is', () => {
+      render(<SeparationDetails detail={detail} />);
+
+      expect(screen.getByText('Separation Details')).toBeInTheDocument();
+    });
+
+    it('carries the status as a labelled field rather than as a floating badge', () => {
+      render(<SeparationDetails detail={detail} />);
+
+      expect(valueFor('Status')).toHaveTextContent('Pending Approval');
+    });
+
+    it('keeps the colour coding by rendering that value as the pill', () => {
+      render(<SeparationDetails detail={detail} />);
+
+      /* The pill itself, not a copy of its wording — so the colour still reads at a glance. */
+      expect(valueFor('Status')).toContainElement(screen.getByTestId('SeparationStatusBadgeTest'));
+    });
+
+    it('renders the pill unwrapped, so no paragraph imposes a line height on it', () => {
+      render(<SeparationDetails detail={detail} />);
+
+      expect(screen.getByTestId('SeparationStatusBadgeTest').parentElement?.tagName).toBe('DD');
+    });
+
+    it('places every field on placeholders while the one read is in flight', () => {
+      render(<SeparationDetails detail={null} isLoading />);
+
+      /* Labels are on screen from the first render, so the panel has its full height... */
+      expect(screen.getByText('Separation Type')).toBeInTheDocument();
+      expect(screen.getByText('Last Working Date')).toBeInTheDocument();
+
+      /* ...as is the heading, which never depended on the read. */
+      expect(screen.getByText('Separation Details')).toBeInTheDocument();
+
+      /* ...but no values, since there was no row to draw them from. */
+      expect(valueFor('Separation Type')).not.toHaveTextContent('Resignation');
+      expect(screen.queryByTestId('SeparationStatusBadgeTest')).not.toBeInTheDocument();
+    });
+
+    it('offers a retry when the read failed', async () => {
+      const user = userEvent.setup();
+      const onRetry = vi.fn();
+
+      render(<SeparationDetails detail={null} error="Network error." onRetry={onRetry} />);
+
+      expect(screen.getByText('Network error.')).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /Try again/i }));
+
+      expect(onRetry).toHaveBeenCalledTimes(1);
+    });
   });
 });

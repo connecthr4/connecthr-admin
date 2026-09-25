@@ -39,6 +39,76 @@ styles specific to the SeparationsDashboard component
   min-height: 0;
 }
 
+/*
+  The drawer's pinned footer: the decision, always in reach however far down the submission
+  the approver has scrolled.
+*/
+.decisionActions {
+  display: flex;
+  gap: var(--spacing-3);
+
+  /* Each button takes half the footer, so neither reads as the safer one to reach for. */
+  > * {
+    flex: 1;
+  }
+}
+
+.decisionButton {
+  padding: 0.75rem var(--spacing-5);
+  border-radius: var(--radius-md);
+}
+
+/*
+  Coloured to the state each one leads to — the same green and red the status badge will show
+  once the decision lands.
+
+  Both are solid rather than one solid and one outlined. Approving and rejecting carry equal
+  weight here, and an outlined Reject beside a filled Approve would read as the cancel button
+  of the pair. It is also the only treatment `Button` can actually carry: its label is a
+  `Typography` span with a colour of its own, which only the `.primary` variant overrides — an
+  outlined red button would end up red-bordered with a near-black label.
+
+  Doubled selectors on purpose, for the same reason `DeleteConfirmationModal` uses them:
+  `Button` applies its own `.primary` background as a single class, so a single class here
+  would win or lose on stylesheet order alone.
+
+  Both are scoped to `:not(:disabled)` so that a button disabled mid-decision falls through to
+  `Button`'s own grey rather than tying with it on specificity.
+*/
+.approveButton.approveButton:not(:disabled) {
+  background-color: var(--color-green-500);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--color-green-500) 85%, black);
+  }
+}
+
+.rejectButton.rejectButton:not(:disabled) {
+  background-color: var(--color-red-500);
+
+  &:hover {
+    background-color: var(--color-red-400);
+  }
+}
+
+/*
+  Optical correction for the tick, which reads smaller than the cross beside it at the same
+  nominal size.
+
+  The two glyphs are built differently: lucide's `X` is two crossing strokes filling a 12×12
+  square, while its `Check` is a single stroke. One thin diagonal carries less weight than two
+  crossing ones, which is what the eye reads as "smaller".
+
+  Thickened rather than scaled up, because the tick's bounding box is already the wider of the
+  two (16×11 units against 12×12) — enlarging it would widen the gap rather than close it.
+  Lucide sets `stroke-width` as a presentation attribute, which any author rule outranks, so
+  this lands without the shared `Button` needing a prop for it. The only `svg` in the button
+  is the icon; the loading spinner is a `span`.
+*/
+.approveButton svg {
+  stroke-width: 2.5;
+}
+
 .actionButton {
   display: inline-flex;
   align-items: center;

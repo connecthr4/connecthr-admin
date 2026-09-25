@@ -1,4 +1,4 @@
-import { User, BriefcaseBusiness, CalendarCheck, FileText, Wallet, UserRound } from 'lucide-react';
+import { User, BriefcaseBusiness, CalendarCheck, FileText, Wallet, UserRound, UserRoundMinus } from 'lucide-react';
 import { NotificationType } from '../providers/NotificationProvider';
 import type { EmployeeDocumentType } from '../store/employeeStore/types';
 
@@ -260,6 +260,41 @@ export const STRINGS = {
   DAY: 'day',
   SEPARATIONS_FETCH_FAILED: 'Failed to load separations',
   SEPARATION_DETAILS_FETCH_FAILED: 'This separation could not be loaded',
+
+  /** Singular, for the employee profile's own section — the nav's plural entry is a listing. */
+  SEPARATION: 'Separation',
+  EMPLOYEE_SEPARATION_FETCH_FAILED: "Failed to load this employee's separation",
+
+  /** Not an error: most employees have never had one filed. */
+  NO_SEPARATION_FILED: 'No separation has been filed for this employee',
+
+  /* The decision an approver takes on a pending separation, from the details drawer. */
+  APPROVE: 'Approve',
+  REJECT: 'Reject',
+  APPROVE_SEPARATION: 'Approve Separation',
+  REJECT_SEPARATION: 'Reject Separation',
+  APPROVE_SEPARATION_CONFIRMATION:
+    "The exit will be approved and the employee's last working date confirmed. This cannot be undone.",
+  REJECT_SEPARATION_CONFIRMATION: 'The request will be refused and the employee will stay on. This cannot be undone.',
+  SEPARATION_APPROVED: 'Separation approved',
+  SEPARATION_REJECTED: 'Separation rejected',
+  SEPARATION_DECISION_FAILED: 'The decision could not be recorded',
+
+  /*
+  The grounds for the decision — `remarks` on both endpoints, optional when approving and
+  required when refusing, which is why only the rejection modal asks for them.
+  */
+  REJECTION_REMARKS: 'Reason for Rejection',
+  REJECTION_REMARKS_PLACEHOLDER: 'Why is this request being refused?',
+  REJECTION_REMARKS_REQUIRED: 'Give a reason for refusing this request',
+
+  /**
+   * Stand-in wording for a row just decided from this screen, used only when the decide
+   * response does not carry a `statusLabel` of its own. Every read of a separation supplies
+   * its own label, so these are overwritten by the next one.
+   */
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected',
 };
 
 /**
@@ -330,6 +365,18 @@ export const PROFILE_ITEMS = [
     id: 'attendance',
     label: STRINGS.ATTENDANCE,
     icon: CalendarCheck,
+  },
+
+  /*
+  Always listed, like Attendance, rather than shown only for employees who have one: whether
+  a separation exists is only known once it has been read, and reading it for every profile
+  visit would pay for the section on the majority of screens that never open it. The section
+  answers "none filed" itself.
+  */
+  {
+    id: 'separation',
+    label: STRINGS.SEPARATION,
+    icon: UserRoundMinus,
   },
 ] as const;
 

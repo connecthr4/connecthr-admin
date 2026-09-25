@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import SeparationsDashboard from './SeparationsDashboard';
-import { getSeparations } from '@/src/lib/actions/separation';
+import { decideSeparation, getSeparations } from '@/src/lib/actions/separation';
 import { SeparationsClient } from '@/src/lib/api/separationClient';
 import { STRINGS } from '@/src/constants/strings';
 
@@ -21,6 +21,7 @@ vi.mock('@/src/lib/actions/auth', () => ({
 
 vi.mock('@/src/lib/actions/separation', () => ({
   getSeparations: vi.fn(),
+  decideSeparation: vi.fn(),
 }));
 
 vi.mock('@/src/lib/api/separationClient', () => ({
@@ -132,8 +133,19 @@ const DETAILS_BY_ID: Record<string, SeparationDetail> = {
   'sep-2': secondDetail,
 };
 
-function renderDashboard(rows: SeparationListItem[] = separations, listMeta: SeparationListMeta = meta) {
-  return render(<SeparationsDashboard initialSeparations={rows} initialMeta={listMeta} currentUser={currentUser} />);
+function renderDashboard(
+  rows: SeparationListItem[] = separations,
+  listMeta: SeparationListMeta = meta,
+  onDecide?: React.ComponentProps<typeof SeparationsDashboard>['onDecide']
+) {
+  return render(
+    <SeparationsDashboard
+      initialSeparations={rows}
+      initialMeta={listMeta}
+      currentUser={currentUser}
+      onDecide={onDecide}
+    />
+  );
 }
 
 function rowFor(employeeId: string) {
@@ -433,6 +445,217 @@ describe('SeparationsDashboard', () => {
       );
 
       expect(screen.getByRole('cell', { name: 'EMP1042' })).toBeInTheDocument();
+    });
+  });
+
+  describe('deciding', () => {
+    /** The confirmation modal, which portals to the body rather than into the drawer. */
+    function decisionModal() {
+      return screen.getByRole('dialog', { name: new RegExp(`${STRINGS.APPROVE}|${STRINGS.REJECT}`) });
+    }
+
+    /**
+     * Opens a row and clicks its way through to the confirmation for one outcome, filling in
+     * the reason where one was given — which the reject panel requires before it will confirm.
+     */
+    async function decide(
+      user: ReturnType<typeof userEvent.setup>,
+      employeeId: string,
+      action: string,
+      remarks?: string
+    ) {
+      await user.click(openRow(employeeId));
+      await user.click(drawer().getByRole('button', { name: action }));
+
+      if (remarks) {
+        await user.type(within(decisionModal()).getByRole('textbox'), remarks);
+      }
+    }
+
+    it('offers the decision on a pending row the approver may decide', async () => {
+      const user = userEvent.setup();
+      renderDashboard();
+
+      await user.click(openRow('EMP1042'));
+
+      expect(drawer().getByRole('button', { name: STRINGS.APPROVE })).toBeInTheDocument();
+      expect(drawer().getByRole('button', { name: STRINGS.REJECT })).toBeInTheDocument();
+    });
+
+    /*
+    Hidden rather than disabled, and for both reasons at once: this row is already approved,
+    and the backend says this account may not decide it either way.
+    */
+    it('offers no decision on a row that has already been decided', async () => {
+      const user = userEvent.setup();
+      renderDashboard();
+
+      await user.click(openRow('EMP1007'));
+
+      expect(drawer().queryByRole('button', { name: STRINGS.APPROVE })).not.toBeInTheDocument();
+      expect(drawer().queryByRole('button', { name: STRINGS.REJECT })).not.toBeInTheDocument();
+    });
+
+    /*
+    The drawer is a native dialog in the top layer, which nothing portalled to the body can
+    cover — so the confirmation replaces it rather than stacking on it.
+    */
+    it('closes the drawer as the confirmation opens', async () => {
+      const user = userEvent.setup();
+      renderDashboard();
+
+      await decide(user, 'EMP1042', STRINGS.APPROVE);
+
+      expect(screen.getByTestId('DrawerTest')).not.toHaveAttribute('open');
+      expect(screen.getByRole('heading', { name: STRINGS.APPROVE_SEPARATION })).toBeInTheDocument();
+      expect(within(decisionModal()).getByText('Priya Sharma')).toBeInTheDocument();
+    });
+
+    it('puts the submission back when the decision is cancelled', async () => {
+      const user = userEvent.setup();
+      const onDecide = vi.fn();
+      renderDashboard(separations, meta, onDecide);
+
+      await decide(user, 'EMP1042', STRINGS.REJECT);
+      await user.click(within(decisionModal()).getByRole('button', { name: STRINGS.CANCEL }));
+
+      expect(screen.getByTestId('DrawerTest')).toHaveAttribute('open');
+      expect(screen.queryByRole('heading', { name: STRINGS.REJECT_SEPARATION })).not.toBeInTheDocument();
+      expect(onDecide).not.toHaveBeenCalled();
+    });
+
+    it('records an approval and moves the row to its new status', async () => {
+      const user = userEvent.setup();
+      const onDecide = vi.fn().mockResolvedValue({
+        success: true,
+        message: 'Separation approved.',
+        data: {
+          ...detail,
+          status: 'APPROVED',
+          statusLabel: 'Approved',
+          decision: { decidedAt: '2026-09-24T10:00:00.000Z' },
+        },
+      });
+
+      renderDashboard(separations, meta, onDecide);
+
+      await decide(user, 'EMP1042', STRINGS.APPROVE);
+      await user.click(within(decisionModal()).getByRole('button', { name: STRINGS.APPROVE }));
+
+      /* Remarks are optional on the approve endpoint, so none are sent. */
+      await waitFor(() => expect(onDecide).toHaveBeenCalledWith('sep-1', 'APPROVED', undefined));
+
+      /* The badge moves without the page being re-read. */
+      await waitFor(() => expect(within(rowFor('EMP1042')).getByText('Approved')).toBeInTheDocument());
+      expect(within(rowFor('EMP1042')).queryByText('Pending Approval')).not.toBeInTheDocument();
+
+      /* The cached detail still said PENDING, so it must not survive the decision. */
+      expect(SeparationsClient.invalidate).toHaveBeenCalledWith('sep-1');
+
+      expect(showNotificationMock).toHaveBeenCalledWith(
+        STRINGS.SEPARATION_APPROVED,
+        'Separation approved.',
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        expect.anything()
+      );
+    });
+
+    it('sends the rejection with its reason, as the status the row ends up in', async () => {
+      const user = userEvent.setup();
+      const onDecide = vi.fn().mockResolvedValue({ success: true, message: 'Separation rejected.' });
+
+      renderDashboard(separations, meta, onDecide);
+
+      await decide(user, 'EMP1042', STRINGS.REJECT, 'Notice period is too short.');
+      await user.click(within(decisionModal()).getByRole('button', { name: STRINGS.REJECT }));
+
+      await waitFor(() => expect(onDecide).toHaveBeenCalledWith('sep-1', 'REJECTED', 'Notice period is too short.'));
+
+      /* Nothing came back to read a label off, so the screen stands one in until the next read. */
+      await waitFor(() => expect(within(rowFor('EMP1042')).getByText(STRINGS.REJECTED)).toBeInTheDocument());
+    });
+
+    /* The endpoint refuses a rejection with no remarks, so the modal never gets that far. */
+    it('does not send a rejection that has been given no reason', async () => {
+      const user = userEvent.setup();
+      const onDecide = vi.fn();
+
+      renderDashboard(separations, meta, onDecide);
+
+      await decide(user, 'EMP1042', STRINGS.REJECT);
+      await user.click(within(decisionModal()).getByRole('button', { name: STRINGS.REJECT }));
+
+      expect(onDecide).not.toHaveBeenCalled();
+      expect(within(decisionModal()).getByText(STRINGS.REJECTION_REMARKS_REQUIRED)).toBeInTheDocument();
+      expect(within(rowFor('EMP1042')).getByText('Pending Approval')).toBeInTheDocument();
+    });
+
+    /*
+    The row has not moved and neither has the decision the approver came to make, so the modal
+    stays where it is rather than handing back a screen that looks untouched.
+    */
+    it('keeps the confirmation open when the decision is refused', async () => {
+      const user = userEvent.setup();
+      const onDecide = vi.fn().mockResolvedValue({ success: false, message: 'You may not decide this separation.' });
+
+      renderDashboard(separations, meta, onDecide);
+
+      await decide(user, 'EMP1042', STRINGS.APPROVE);
+      await user.click(within(decisionModal()).getByRole('button', { name: STRINGS.APPROVE }));
+
+      await waitFor(() =>
+        expect(showNotificationMock).toHaveBeenCalledWith(
+          STRINGS.SEPARATION_DECISION_FAILED,
+          'You may not decide this separation.',
+          expect.anything(),
+          expect.anything(),
+          expect.anything(),
+          expect.anything()
+        )
+      );
+
+      expect(screen.getByRole('heading', { name: STRINGS.APPROVE_SEPARATION })).toBeInTheDocument();
+      expect(within(rowFor('EMP1042')).getByText('Pending Approval')).toBeInTheDocument();
+    });
+
+    /* The prop exists for stories and tests; the app gets the Server Function by default. */
+    it('goes through the decideSeparation Server Function when given no handler', async () => {
+      const user = userEvent.setup();
+      vi.mocked(decideSeparation).mockResolvedValue({ success: true, message: 'Separation approved.' });
+
+      renderDashboard();
+
+      await decide(user, 'EMP1042', STRINGS.APPROVE);
+      await user.click(within(decisionModal()).getByRole('button', { name: STRINGS.APPROVE }));
+
+      await waitFor(() => expect(decideSeparation).toHaveBeenCalledWith('sep-1', 'APPROVED', undefined));
+      await waitFor(() => expect(within(rowFor('EMP1042')).getByText(STRINGS.APPROVED)).toBeInTheDocument());
+    });
+
+    it('reports a decide call that threw rather than leaving the spinner running', async () => {
+      const user = userEvent.setup();
+      const onDecide = vi.fn().mockRejectedValue(new Error('Network unreachable.'));
+
+      renderDashboard(separations, meta, onDecide);
+
+      await decide(user, 'EMP1042', STRINGS.APPROVE);
+      await user.click(within(decisionModal()).getByRole('button', { name: STRINGS.APPROVE }));
+
+      await waitFor(() =>
+        expect(showNotificationMock).toHaveBeenCalledWith(
+          STRINGS.SEPARATION_DECISION_FAILED,
+          'Network unreachable.',
+          expect.anything(),
+          expect.anything(),
+          expect.anything(),
+          expect.anything()
+        )
+      );
+
+      /* Released, so the approver can try again. */
+      await waitFor(() => expect(within(decisionModal()).getByRole('button', { name: STRINGS.CANCEL })).toBeEnabled());
     });
   });
 });

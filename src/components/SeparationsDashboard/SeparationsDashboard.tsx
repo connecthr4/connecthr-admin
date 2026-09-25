@@ -1,9 +1,13 @@
 /**
  * The separations list: every separation that has been filed, and what each one said.
  *
- * Read-only. Separations are filed from the employee list's exit action, and the decide and
- * withdraw endpoints the rows carry permissions for are not wired up here — so the single
- * row action opens the submission rather than acting on it.
+ * Separations are filed from the employee list's exit action; this screen is where they are
+ * read and decided. The row action opens the submission, and the drawer it opens is the only
+ * place a decision can be taken — an approver reads what was actually filed before approving
+ * it, which a pair of buttons in the table row would let them skip.
+ *
+ * Only the rows the backend says are decidable offer the buttons: `permissions.canDecide`,
+ * and a status still `PENDING`. Withdrawal is still not wired up.
  *
  * @example
  * ```tsx
@@ -17,13 +21,16 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Eye } from 'lucide-react';
+import clsx from 'clsx';
+import { Check, Eye, X } from 'lucide-react';
 import AppHeader from '../AppHeader';
+import Button from '../Button';
 import DataTable from '../DataTable';
 import Drawer from '../Drawer';
+import SeparationDecisionModal from '../SeparationDecisionModal';
 import SeparationDetails from '../SeparationDetails';
 import SeparationStatusBadge from '../SeparationStatusBadge';
-import { getSeparations } from '@/src/lib/actions/separation';
+import { decideSeparation, getSeparations } from '@/src/lib/actions/separation';
 import { SeparationsClient } from '@/src/lib/api/separationClient';
 import { logger } from '@/src/lib/logger';
 import { useNotification } from '@/src/providers/NotificationProvider';
@@ -32,8 +39,50 @@ import { NOTIFICATION_TYPES, STRINGS } from '@/src/constants/strings';
 import styles from './SeparationsDashboard.module.scss';
 
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
+import type { PendingSeparationDecision } from '../SeparationDecisionModal';
 import type { User } from '@/src/lib/types/auth';
-import type { SeparationDetail, SeparationListItem, SeparationListMeta } from '@/src/lib/types/separation';
+import type {
+  DecideSeparationResult,
+  SeparationDecisionOutcome,
+  SeparationDetail,
+  SeparationListItem,
+  SeparationListMeta,
+} from '@/src/lib/types/separation';
+
+/**
+ * Wording for a row this screen has just decided, covering the gap between the decision
+ * landing and the next read of the list. Only reached when the decide response does not carry
+ * the decided record — the contract does not promise it, so nothing here depends on it.
+ */
+const DECIDED_STATUS_LABEL: Record<SeparationDecisionOutcome, string> = {
+  APPROVED: STRINGS.APPROVED,
+  REJECTED: STRINGS.REJECTED,
+};
+
+/**
+ * A decided copy of a row.
+ *
+ * Takes the backend's own wording and timestamp where the response carried the decided
+ * record, and stands them in where it did not — the `decidedAt` a list row holds flat lives
+ * under `decision` on the detail shape, which is the one field that has to be reached for.
+ *
+ * `canDecide` is cleared whatever the backend said before: the decision is made, so the
+ * buttons must not come back if the drawer is reopened on this row before the list is read
+ * again.
+ */
+function withDecision(
+  separation: SeparationListItem,
+  outcome: SeparationDecisionOutcome,
+  decided?: SeparationDetail
+): SeparationListItem {
+  return {
+    ...separation,
+    status: decided?.status ?? outcome,
+    statusLabel: decided?.statusLabel ?? DECIDED_STATUS_LABEL[outcome],
+    decidedAt: decided?.decision?.decidedAt ?? new Date().toISOString(),
+    permissions: { ...separation.permissions, canDecide: false, canWithdraw: false },
+  };
+}
 
 /**
  * `DataTable` is generic and wrapped in `memo()`, which TypeScript can't instantiate per
@@ -156,12 +205,31 @@ interface SeparationsDashboardProps {
    * doesn't blank it out.
    */
   currentUser: User | null;
+
+  /**
+   * Records an approver's decision on one separation.
+   *
+   * Defaults to the `decideSeparation` Server Function, which is what it is in the app. It is
+   * a prop at all so the confirmation flow can be driven from a story or a test without a
+   * backend behind it.
+   *
+   * @param separationId - The separation being decided.
+   * @param outcome - Which way, which is also the status the row ends up in.
+   * @param remarks - The grounds. Optional on an approval, required on a rejection.
+   * @returns Whether it was recorded, and what to tell the user.
+   */
+  onDecide?: (
+    separationId: string,
+    outcome: SeparationDecisionOutcome,
+    remarks?: string
+  ) => Promise<DecideSeparationResult>;
 }
 
 export default function SeparationsDashboard({
   initialSeparations,
   initialMeta,
   currentUser,
+  onDecide = decideSeparation,
 }: SeparationsDashboardProps) {
   const { showNotification } = useNotification();
 
@@ -203,6 +271,44 @@ export default function SeparationsDashboard({
   const [detailAttempt, setDetailAttempt] = useState(0);
 
   /**
+   * The decision the confirmation modal is asking about — which row, and which way — or null
+   * when it is closed.
+   *
+   * One piece of state rather than an open flag beside an outcome, so there is no way to be
+   * open without knowing what is being confirmed.
+   */
+  const [pendingDecision, setPendingDecision] = useState<PendingSeparationDecision | null>(null);
+  const [isDeciding, setIsDeciding] = useState(false);
+
+  /**
+   * Hands the screen over from the drawer to the confirmation modal.
+   *
+   * The drawer closes as the modal opens, and they are not stacked: `Drawer` is a native
+   * `<dialog>` opened with `showModal()`, which puts it in the browser's top layer — above
+   * anything `Modal` can reach by portalling into `document.body`, whatever its z-index. A
+   * confirmation rendered over the open drawer would sit behind its backdrop and take no
+   * clicks.
+   *
+   * Nothing is lost in the handover: the modal restates the employee and the last working
+   * date, and cancelling puts the drawer back exactly as it was — `selectedSeparation` never
+   * changed, and the detail read is still cached.
+   */
+  const handleOpenDecision = (outcome: SeparationDecisionOutcome) => {
+    if (!selectedSeparation) {
+      return;
+    }
+
+    setPendingDecision({ separation: selectedSeparation, outcome });
+    setIsDetailsDrawerOpen(false);
+  };
+
+  /** Cancelled, so the submission the approver was reading comes back. */
+  const handleCancelDecision = () => {
+    setPendingDecision(null);
+    setIsDetailsDrawerOpen(true);
+  };
+
+  /**
    * The drawer opens on the row the user clicked, already showing everything that row
    * carries; the effect below fills in the reason, the notes and the decision.
    *
@@ -228,6 +334,107 @@ export default function SeparationsDashboard({
   const handleRetryDetail = useCallback(() => setDetailAttempt((attempt) => attempt + 1), []);
 
   const columns = useMemo(() => buildSeparationColumns(handleViewSeparation), [handleViewSeparation]);
+
+  /**
+   * Records the decision the modal is confirming.
+   *
+   * The modal is left open on a failure: the row has not moved, and neither has the decision
+   * the approver came to make — closing it would hand back a screen that looks like nothing
+   * was attempted.
+   */
+  const handleConfirmDecision = async (remarks: string) => {
+    if (!pendingDecision || isDeciding) {
+      return;
+    }
+
+    const { separation, outcome } = pendingDecision;
+
+    setIsDeciding(true);
+
+    try {
+      /*
+      Empty remarks are left off entirely rather than sent as `""`. The approval endpoint
+      treats the field as optional, and an empty string is not the same thing as not saying
+      anything — the modal only ever hands back an empty one from the approval panel, which
+      asks for nothing.
+      */
+      const result = await onDecide(separation.id, outcome, remarks || undefined);
+
+      if (!result.success) {
+        showNotification(
+          STRINGS.SEPARATION_DECISION_FAILED,
+          result.message,
+          NOTIFICATION_TYPES.ERROR,
+          5000,
+          'top-right',
+          false
+        );
+
+        return;
+      }
+
+      /*
+      Patched in place rather than re-read: the list is paged, and re-fetching the page to
+      move one badge would blank the table the approver is working down. The next page turn
+      reads the list afresh anyway.
+      */
+      const decided = withDecision(separation, outcome, result.data);
+
+      setSeparations((rows) => rows.map((row) => (row.id === separation.id ? decided : row)));
+      setSelectedSeparation((current) => (current?.id === separation.id ? decided : current));
+
+      /*
+      The cached detail still says PENDING. Dropping it is not enough on its own — the read is
+      keyed on the row and the attempt, so reopening this row would otherwise re-run nothing
+      and show what is already in state. Bumping the attempt re-reads the record, which also
+      leaves the cache warm with the decided one.
+      */
+      SeparationsClient.invalidate(separation.id);
+      setDetailAttempt((attempt) => attempt + 1);
+
+      /* The drawer was closed on the way in, so there is only the modal left to dismiss. */
+      setPendingDecision(null);
+
+      showNotification(
+        outcome === 'APPROVED' ? STRINGS.SEPARATION_APPROVED : STRINGS.SEPARATION_REJECTED,
+        result.message,
+        NOTIFICATION_TYPES.SUCCESS,
+        5000,
+        'top-right',
+        false
+      );
+    } catch (error) {
+      logger.error('Error occurred while recording the separation decision:', error);
+
+      const message = error instanceof Error ? error.message : '';
+
+      showNotification(STRINGS.SEPARATION_DECISION_FAILED, message, NOTIFICATION_TYPES.ERROR, 5000, 'top-right', false);
+    } finally {
+      setIsDeciding(false);
+    }
+  };
+
+  /**
+   * Whether the drawer should offer the decision buttons at all.
+   *
+   * Read off `permissions.canDecide` rather than worked out from the signed-in user's role.
+   * The backend computes that flag with the same predicates its endpoints enforce, so it
+   * already answers both rules at once — that deciding is restricted to the roles above
+   * ADMIN, and that nobody may decide a separation they raised themselves. Re-deriving either
+   * here would be a second opinion that could only ever disagree with the one that counts.
+   *
+   * The status is checked too, since `canDecide` speaks to who the caller is rather than to
+   * whether there is anything left to decide.
+   *
+   * Preferring the detail read's copy of the flag matters for one case: a row the list
+   * fetched as pending that somebody else has decided since. The detail read happens on open,
+   * so the buttons disappear as it lands rather than sending the approver into a 403. It is
+   * matched on id so that a response for the previous row can never answer for this one.
+   */
+  const selectedDetail = detailState.detail?.id === selectedSeparation?.id ? detailState.detail : null;
+  const decidable = selectedDetail ?? selectedSeparation;
+
+  const canDecideSelected = Boolean(decidable?.permissions.canDecide && decidable.status === 'PENDING');
 
   const selectedSeparationId = selectedSeparation?.id ?? null;
 
@@ -380,6 +587,42 @@ export default function SeparationsDashboard({
         onClose={handleCloseDetailsDrawer}
         title={STRINGS.SEPARATION_DETAILS}
         size="34rem"
+        /*
+        Pinned to the bottom of the drawer rather than placed after the fields: the panel
+        scrolls, and a decision that can be scrolled out of sight is one an approver has to go
+        looking for. A row with nothing to decide gets no footer at all — greyed-out buttons
+        would read as "not yet" where the answer is "not ever".
+        */
+        footer={
+          canDecideSelected && selectedSeparation ? (
+            <div className={styles.decisionActions}>
+              {/*
+              Reject sits on the left, Approve on the right where a primary action is expected.
+              Both are the same button recoloured, so the pair reads as the two states it leads
+              to rather than as an action and its cancel.
+              */}
+              <Button
+                startIcon={X}
+                iconSize={18}
+                className={clsx(styles.decisionButton, styles.rejectButton)}
+                disabled={isDeciding}
+                onClick={() => handleOpenDecision('REJECTED')}
+              >
+                {STRINGS.REJECT}
+              </Button>
+
+              <Button
+                startIcon={Check}
+                iconSize={18}
+                className={clsx(styles.decisionButton, styles.approveButton)}
+                disabled={isDeciding}
+                onClick={() => handleOpenDecision('APPROVED')}
+              >
+                {STRINGS.APPROVE}
+              </Button>
+            </div>
+          ) : undefined
+        }
       >
         {selectedSeparation && (
           <SeparationDetails
@@ -391,6 +634,14 @@ export default function SeparationsDashboard({
           />
         )}
       </Drawer>
+
+      {/* Takes over from the drawer rather than stacking on it — see `handleOpenDecision`. */}
+      <SeparationDecisionModal
+        decision={pendingDecision}
+        onClose={handleCancelDecision}
+        onConfirm={handleConfirmDecision}
+        isSubmitting={isDeciding}
+      />
     </div>
   );
 }

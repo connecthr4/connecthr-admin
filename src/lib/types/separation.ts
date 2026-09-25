@@ -121,13 +121,65 @@ export type SeparationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'
 /**
  * What the signed-in user may do with this separation, as decided by the backend.
  *
- * Read but not yet acted on: there is no decide or withdraw endpoint wired up here, so these
- * are carried through the types and left unused rather than turned into buttons that would
- * have nothing behind them.
+ * `canDecide` is what the details drawer renders its Approve and Reject buttons off. It is
+ * computed by the same predicates the write path enforces, so it already answers both rules
+ * the endpoints apply — that deciding is restricted to the roles above ADMIN, and that nobody
+ * may decide a separation they raised themselves. Nothing on this side re-derives either, and
+ * a UI that tried to would only be a second opinion that could disagree.
+ *
+ * `canWithdraw` is carried through and still unused: there is no withdraw endpoint wired up.
  */
 export interface SeparationPermissions {
   canDecide: boolean;
   canWithdraw: boolean;
+}
+
+/**
+ * The body both decide endpoints take.
+ *
+ * One shape for the two, because it is one field either way — what differs is whether it may
+ * be left out, which is {@link SeparationDecisionOutcome}'s business rather than the type's:
+ * `PATCH /separations/:id/approve` treats `remarks` as optional, and
+ * `PATCH /separations/:id/reject` requires between 1 and 1000 characters of it.
+ */
+export interface DecideSeparationRequest {
+  remarks?: string;
+}
+
+/**
+ * Which way a separation was decided, and so also the status it ends up in.
+ *
+ * Narrowed from {@link SeparationStatus} rather than written as its own `'APPROVE' | 'REJECT'`
+ * pair, so the outcome picked in the UI *is* the status the row lands on — nothing has to be
+ * mapped between the button and the badge.
+ */
+export type SeparationDecisionOutcome = Extract<SeparationStatus, 'APPROVED' | 'REJECTED'>;
+
+/**
+ * What the decide endpoints answer with.
+ *
+ * `data` is optional: the contract does not pin down whether the decided record comes back,
+ * so the screen uses it when it is there and stands the row in for itself when it is not,
+ * rather than depending on a field that may not arrive.
+ */
+export interface DecideSeparationResponse {
+  success: boolean;
+  message: string;
+  data?: SeparationDetail;
+}
+
+/**
+ * Mirrors the other Server Function results — a plain, serializable outcome, since a Server
+ * Function cannot carry an `ApiError` across the client/server boundary intact.
+ *
+ * The message is carried on both paths, so the backend's own wording is what the approver is
+ * shown — including the wording behind a refused decision, which is the case most worth
+ * reporting verbatim.
+ */
+export interface DecideSeparationResult {
+  success: boolean;
+  message: string;
+  data?: SeparationDetail;
 }
 
 /**
@@ -311,6 +363,30 @@ export interface GetSeparationResponse {
 }
 
 export type GetSeparationResult = { success: true; data: SeparationDetail } | { success: false; message: string };
+
+/**
+ * `GET /separations/employee/:employeeId` — the same record as
+ * {@link GetSeparationResponse}, for an employee who may not have one.
+ *
+ * `data` is nullable here and not there: asking by separation id is asking after a record
+ * that was already known to exist, while asking by employee is also asking *whether* there
+ * is one. Most employees have never had a separation filed, so "none" is the ordinary
+ * answer rather than an edge case.
+ */
+export interface GetEmployeeSeparationResponse {
+  success: boolean;
+  message: string;
+  data: SeparationDetail | null;
+}
+
+/**
+ * Three outcomes rather than two, because "this employee has no separation" is not a
+ * failure and must not be shown as one: `data: null` is an empty section, while
+ * `success: false` is the panel that offers a retry.
+ */
+export type GetEmployeeSeparationResult =
+  | { success: true; data: SeparationDetail | null }
+  | { success: false; message: string };
 
 /**
  * Narrows a row of the employee list to what the separation form shows.
