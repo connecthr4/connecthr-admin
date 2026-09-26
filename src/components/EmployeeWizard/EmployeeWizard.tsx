@@ -40,6 +40,7 @@ import { createEmployee, updateEmployee } from '@/src/lib/actions/employees';
 import { useNotification } from '@/src/providers/NotificationProvider';
 import { logger } from '@/src/lib/logger';
 import type { CreateEmployeeRequest, EmployeeDetail, EmployeeSummary } from '@/src/lib/types/employees';
+import type { User } from '@/src/lib/types/auth';
 
 /**
  * Define the props available for the EmployeeWizard component.
@@ -52,6 +53,9 @@ interface EmployeeWizardProps {
    * so this is seeded into it rather than threaded through the steps as props.
    */
   employee?: EmployeeDetail;
+
+  /** The signed-in user, shown in the header's profile section. */
+  currentUser: User | null;
 }
 
 /**
@@ -282,7 +286,7 @@ async function submitUpdate(employeeId: string, original: EmployeeDraft): Promis
   return { status: 'saved', message: result.message, employee: toEmployeeSummary(result.data) };
 }
 
-export default function EmployeeWizard({ mode, employee }: EmployeeWizardProps) {
+export default function EmployeeWizard({ mode, employee, currentUser }: EmployeeWizardProps) {
   const router = useRouter();
   const { showNotification } = useNotification();
   const [currentStep, setCurrentStep] = useState(0);
@@ -458,6 +462,7 @@ export default function EmployeeWizard({ mode, employee }: EmployeeWizardProps) 
           ...(employee ? [{ label: employee.name, href: `${ROUTES.EMPLOYEES}/${employee.id}` }] : []),
           { label: isEditing ? STRINGS.EDIT_EMPLOYEE : STRINGS.ADD_NEW_EMPLOYEE },
         ]}
+        userDetails={currentUser}
       />
 
       <div className={styles.content}>

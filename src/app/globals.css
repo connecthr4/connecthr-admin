@@ -52,6 +52,16 @@ html {
   and every `rem` in the app scales with it as a result.
   */
   font-size: 100%;
+
+  /*
+  The app ships one theme, and it is a light one: `body` is `--color-white` on
+  `--color-gray-900`, and no token has a dark counterpart. Declared so that a
+  reader whose OS prefers dark does not get the UA's dark *system colors* on
+  those light surfaces — `buttontext` turning white is what made dropdown
+  options invisible, since a `button` takes that color rather than inheriting.
+  Restore this to `light dark` only alongside an actual dark palette.
+  */
+  color-scheme: light;
   scroll-behavior: smooth;
   min-height: 100%;
 
@@ -125,10 +135,4 @@ select {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }

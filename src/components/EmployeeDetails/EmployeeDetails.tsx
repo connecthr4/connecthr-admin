@@ -30,6 +30,7 @@ import { formatLongDate } from '@/src/utils/date';
 import type { EmployeeSeparationState } from '@/src/hooks/useEmployeeSeparation';
 import type { ProfileSectionId } from '@/src/constants/strings';
 import type { EmployeeDetail } from '@/src/lib/types/employees';
+import type { User } from '@/src/lib/types/auth';
 import styles from './EmployeeDetails.module.scss';
 
 /**
@@ -37,6 +38,9 @@ import styles from './EmployeeDetails.module.scss';
  */
 interface EmployeeDetailsProps {
   employee: EmployeeDetail;
+
+  /** The signed-in user, shown in the header's profile section. */
+  currentUser: User | null;
 }
 
 const EMPTY_VALUE = '-';
@@ -173,7 +177,7 @@ function buildSections(sections: SectionConfig[], employee: EmployeeDetail): Det
   }));
 }
 
-export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
+export default function EmployeeDetails({ employee, currentUser }: EmployeeDetailsProps) {
   const [currentStep, setCurrentStep] = useState(0);
 
   /** Which sidebar section is open — the profile the screen lands on, or the attendance history. */
@@ -206,6 +210,7 @@ export default function EmployeeDetails({ employee }: EmployeeDetailsProps) {
       <AppHeader
         title={employee.name}
         breadcrumbs={[{ label: STRINGS.ALL_EMPLOYEES, href: ROUTES.EMPLOYEES }, { label: employee.name }]}
+        userDetails={currentUser}
       />
 
       <div className={styles.content}>

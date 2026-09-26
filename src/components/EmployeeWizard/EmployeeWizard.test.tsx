@@ -192,14 +192,14 @@ describe('EmployeeWizard', () => {
 
   describe('creating', () => {
     it('renders the "Add New Employee" header with its breadcrumb trail', () => {
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
 
       expect(screen.getByRole('heading', { name: STRINGS.ADD_NEW_EMPLOYEE })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: STRINGS.ALL_EMPLOYEES })).toHaveAttribute('href', ROUTES.EMPLOYEES);
     });
 
     it('opens on the first step with every step listed and no Back button', () => {
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
 
       expect(screen.getByText('step:personal')).toBeInTheDocument();
       for (const step of STEPS) {
@@ -211,7 +211,7 @@ describe('EmployeeWizard', () => {
 
     it('stores each step’s values and advances through the wizard', async () => {
       const user = userEvent.setup();
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
 
       await submitStep(user);
       expect(screen.getByText('step:professional')).toBeInTheDocument();
@@ -229,7 +229,7 @@ describe('EmployeeWizard', () => {
 
     it('goes back a step, keeping the values typed on the step being left', async () => {
       const user = userEvent.setup();
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
 
       await submitStep(user);
       expect(screen.getByText('step:professional')).toBeInTheDocument();
@@ -243,7 +243,7 @@ describe('EmployeeWizard', () => {
 
     it('goes back from the document step to payroll', async () => {
       const user = userEvent.setup();
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
       await reachDocuments(user);
 
       await user.click(screen.getByText('documents-back'));
@@ -258,7 +258,7 @@ describe('EmployeeWizard', () => {
         message: 'Employee created successfully.',
         data: createdEmployee,
       });
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
       await reachDocuments(user);
 
       await user.click(screen.getByRole('button', { name: STRINGS.CREATE_EMPLOYEE }));
@@ -285,7 +285,7 @@ describe('EmployeeWizard', () => {
     it('clears the draft and returns to the list when the saved modal is dismissed', async () => {
       const user = userEvent.setup();
       vi.mocked(createEmployee).mockResolvedValue({ success: true, message: 'Created', data: createdEmployee });
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
       await reachDocuments(user);
       await user.click(screen.getByRole('button', { name: STRINGS.CREATE_EMPLOYEE }));
       await screen.findByRole('dialog');
@@ -305,7 +305,7 @@ describe('EmployeeWizard', () => {
             resolveCreate = resolve;
           })
       );
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
       await reachDocuments(user);
       expect(screen.getByText('idle')).toBeInTheDocument();
 
@@ -319,7 +319,7 @@ describe('EmployeeWizard', () => {
     it('reports a refused creation with the backend’s wording and stays on the step', async () => {
       const user = userEvent.setup();
       vi.mocked(createEmployee).mockResolvedValue({ success: false, message: 'Email already exists' });
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
       await reachDocuments(user);
 
       await user.click(screen.getByRole('button', { name: STRINGS.CREATE_EMPLOYEE }));
@@ -341,7 +341,7 @@ describe('EmployeeWizard', () => {
     it('logs and reports an unexpected error while creating', async () => {
       const user = userEvent.setup();
       vi.mocked(createEmployee).mockRejectedValue(new Error('boom'));
-      render(<EmployeeWizard mode="create" />);
+      render(<EmployeeWizard mode="create" currentUser={null} />);
       await reachDocuments(user);
 
       await user.click(screen.getByRole('button', { name: STRINGS.CREATE_EMPLOYEE }));
@@ -362,7 +362,7 @@ describe('EmployeeWizard', () => {
 
     it('discards the draft when the wizard unmounts', async () => {
       const user = userEvent.setup();
-      const { unmount } = render(<EmployeeWizard mode="create" />);
+      const { unmount } = render(<EmployeeWizard mode="create" currentUser={null} />);
       await submitStep(user);
       expect(useEmployeeStore.getState().personalInformation.firstName).toBe('Jane');
 
@@ -374,14 +374,14 @@ describe('EmployeeWizard', () => {
 
   describe('editing', () => {
     it('renders the "Edit Employee" header with the employee in the breadcrumb trail', () => {
-      render(<EmployeeWizard mode="edit" employee={employee} />);
+      render(<EmployeeWizard mode="edit" employee={employee} currentUser={null} />);
 
       expect(screen.getByRole('heading', { name: STRINGS.EDIT_EMPLOYEE })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Katrina Flores' })).toHaveAttribute('href', `${ROUTES.EMPLOYEES}/clx-1`);
     });
 
     it('seeds the draft from the employee record', () => {
-      render(<EmployeeWizard mode="edit" employee={employee} />);
+      render(<EmployeeWizard mode="edit" employee={employee} currentUser={null} />);
 
       const state = useEmployeeStore.getState();
       expect(state.personalInformation).toMatchObject({ firstName: 'Katrina', lastName: 'Flores' });
@@ -391,7 +391,7 @@ describe('EmployeeWizard', () => {
 
     it('labels the final action "Update Employee"', async () => {
       const user = userEvent.setup();
-      render(<EmployeeWizard mode="edit" employee={employee} />);
+      render(<EmployeeWizard mode="edit" employee={employee} currentUser={null} />);
       await reachDocuments(user);
 
       expect(screen.getByRole('button', { name: STRINGS.UPDATE_EMPLOYEE })).toBeInTheDocument();
@@ -404,7 +404,7 @@ describe('EmployeeWizard', () => {
         message: 'Employee updated successfully.',
         data: { ...employee, name: 'Jane Doe' },
       });
-      render(<EmployeeWizard mode="edit" employee={employee} />);
+      render(<EmployeeWizard mode="edit" employee={employee} currentUser={null} />);
       await reachDocuments(user);
 
       await user.click(screen.getByRole('button', { name: STRINGS.UPDATE_EMPLOYEE }));
@@ -424,7 +424,7 @@ describe('EmployeeWizard', () => {
 
     it('tells the user when nothing was changed instead of calling the backend', async () => {
       const user = userEvent.setup();
-      render(<EmployeeWizard mode="edit" employee={employee} />);
+      render(<EmployeeWizard mode="edit" employee={employee} currentUser={null} />);
 
       /*
       The stubbed forms each submit a patch that differs from the record, so
@@ -458,7 +458,7 @@ describe('EmployeeWizard', () => {
         data: employee,
         meta: { changed: false },
       });
-      render(<EmployeeWizard mode="edit" employee={employee} />);
+      render(<EmployeeWizard mode="edit" employee={employee} currentUser={null} />);
       await reachDocuments(user);
 
       await user.click(screen.getByRole('button', { name: STRINGS.UPDATE_EMPLOYEE }));
@@ -479,7 +479,7 @@ describe('EmployeeWizard', () => {
     it('reports a refused update with the backend’s wording', async () => {
       const user = userEvent.setup();
       vi.mocked(updateEmployee).mockResolvedValue({ success: false, message: 'Record locked' });
-      render(<EmployeeWizard mode="edit" employee={employee} />);
+      render(<EmployeeWizard mode="edit" employee={employee} currentUser={null} />);
       await reachDocuments(user);
 
       await user.click(screen.getByRole('button', { name: STRINGS.UPDATE_EMPLOYEE }));
