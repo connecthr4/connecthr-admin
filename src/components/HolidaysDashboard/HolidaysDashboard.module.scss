@@ -12,7 +12,13 @@ styles specific to the HolidaysDashboard component
   min-height: 0;
 }
 
+/*
+The size container the month grid answers to — see `.cardsGrid`. Its width, not the
+viewport's, is what decides how many months fit: the same screen gives the grid
+~240px less beside a docked sidebar than with the tablet drawer.
+*/
 .content {
+  container: holidays / inline-size;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--color-border);
@@ -24,14 +30,17 @@ styles specific to the HolidaysDashboard component
 
 .topBar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   padding: 1.5rem;
   // border-bottom: 1px solid var(--color-border);
 }
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
 }
@@ -70,12 +79,48 @@ styles specific to the HolidaysDashboard component
   width: 400px;
 }
 
+/*
+Twelve month cards, so the column count only ever steps between divisors of twelve —
+4, 3, 2 — and every row is full. `auto-fit` would reach 5 on a wide screen and leave
+two orphans on the last row.
+
+Each step is taken only once every card still gets `$card-min`: the width a month
+name, a "10 Holidays" badge and a dated holiday row need side by side. The fixed
+`repeat(4, 1fr)` this replaces gave a tablet ~150px cards, which clipped the badge
+and ran holiday names under their dates.
+*/
+$card-min: 18rem;
+$grid-gap: 1.5rem;
+$grid-padding: 1.5rem;
+
+@function grid-width($columns) {
+  @return $columns * $card-min + ($columns - 1) * $grid-gap + 2 * $grid-padding;
+}
+
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  padding: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: $grid-gap;
+  padding: $grid-padding;
   overflow-y: auto;
+}
+
+@container holidays (width >= #{grid-width(2)}) {
+  .cardsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container holidays (width >= #{grid-width(3)}) {
+  .cardsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container holidays (width >= #{grid-width(4)}) {
+  .cardsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /**

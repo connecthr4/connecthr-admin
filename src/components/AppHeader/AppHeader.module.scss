@@ -8,12 +8,26 @@ styles specific to the AppHeader component
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--spacing-5);
   background: var(--color-white);
+}
+
+/*
+The menu button (tablet widths only) sits beside the title rather than above it.
+`min-width: 0` lets a long title or breadcrumb trail give way to the user chip
+instead of pushing it off the edge.
+*/
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  min-width: 0;
 }
 
 .leftSection {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .subtitle {

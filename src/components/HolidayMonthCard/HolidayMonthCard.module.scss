@@ -18,12 +18,16 @@ styles specific to the HolidayMonthCard component
 
 .header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--spacing-3) 1rem;
 }
 
+/* One line always — it drops below the month name before it breaks or clips. */
 .count {
+  flex-shrink: 0;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,6 +62,7 @@ styles specific to the HolidayMonthCard component
   align-items: flex-start;
   gap: var(--spacing-3);
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .dot {
@@ -69,10 +74,17 @@ styles specific to the HolidayMonthCard component
   flex-shrink: 0;
 }
 
+/*
+`min-width: 0` lets a long holiday name wrap inside its own column; without it the
+name's longest word set a floor the row couldn't shrink past, and it ran on under
+the date beside it.
+*/
 .content {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .day {
@@ -88,6 +100,7 @@ styles specific to the HolidayMonthCard component
 
 .date {
   color: var(--color-black);
+  white-space: nowrap;
 }
 
 .deleteButton {

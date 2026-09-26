@@ -25,6 +25,26 @@ const preview: Preview = {
       },
     },
 
+    // The supported range, one preset per side of each breakpoint in `_mixins.scss`.
+    // Below 768px is out of scope, so the phone presets are left out on purpose.
+    viewport: {
+      options: {
+        tabletPortrait: { name: 'Tablet portrait (768)', styles: { width: '768px', height: '1024px' }, type: 'tablet' },
+        tabletLandscape: {
+          name: 'Tablet landscape (1024)',
+          styles: { width: '1024px', height: '768px' },
+          type: 'tablet',
+        },
+        laptopSmall: {
+          name: 'Laptop, Windows 150% (1280)',
+          styles: { width: '1280px', height: '720px' },
+          type: 'desktop',
+        },
+        laptop: { name: 'Laptop (1440)', styles: { width: '1440px', height: '900px' }, type: 'desktop' },
+        desktop: { name: 'Desktop (1920)', styles: { width: '1920px', height: '1080px' }, type: 'desktop' },
+      },
+    },
+
     a11y: {
       // 'todo' - show a11y violations in the test UI only
       // 'error' - fail CI on a11y violations
