@@ -15,6 +15,14 @@ styles specific to the UserMenu component
   border: 1px solid var(--color-gray-200);
   border-radius: 14px;
   background: var(--color-white);
+
+  /*
+  A `button` takes the UA's `buttontext` rather than inheriting, so this is
+  stated to give the chip's `currentColor` icons a base tied to the palette
+  instead of to the system's light/dark guess.
+  */
+  color: var(--color-gray-900);
+
   text-align: left;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -39,8 +47,16 @@ styles specific to the UserMenu component
   }
 }
 
+/*
+Both trigger icons draw with `stroke="currentColor"`, so each states its own
+colour rather than riding on whatever the button happens to inherit. `gray-500`
+and not the `gray-400` used for `.role`: at icon sizes the lighter token is only
+~2.5:1 on these backgrounds, short of the 3:1 WCAG asks for non-text content,
+while this clears it on all three trigger states (rest, hover, open).
+*/
 .avatar {
   flex-shrink: 0;
+  color: var(--color-gray-500);
 }
 
 .info {
@@ -61,6 +77,7 @@ styles specific to the UserMenu component
 
 .chevron {
   flex-shrink: 0;
+  color: var(--color-gray-500);
   transition: transform 0.15s ease;
 
   .triggerOpen & {

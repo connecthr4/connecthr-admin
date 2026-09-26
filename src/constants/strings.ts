@@ -307,6 +307,20 @@ export const STRINGS = {
   NOT_FOUND_GO_BACK: 'Go Back',
   NOT_FOUND_BACK_TO_DASHBOARD: 'Back to Dashboard',
   NOT_FOUND_SUPPORT_NOTE: 'Error code: 404 · If this keeps happening, contact your HR administrator',
+
+  /* ==========================
+     Unexpected error
+  ========================== */
+  ERROR_TITLE: 'Something went wrong',
+
+  /*
+  Says what failed, that the user is not at fault, and that nothing was lost — the three
+  things someone staring at a broken screen actually wants answered.
+  */
+  ERROR_DESCRIPTION:
+    'An unexpected error stopped this page from loading. Nothing you did caused this, and no data has been lost — please try again.',
+  ERROR_RELOAD_PAGE: 'Reload Page',
+  ERROR_TRY_AGAIN: 'Try Again',
 };
 
 /**

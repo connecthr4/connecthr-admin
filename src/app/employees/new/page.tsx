@@ -3,6 +3,7 @@
  */
 
 import EmployeeWizard from '@/src/components/EmployeeWizard';
+import { getCurrentUser } from '@/src/lib/server/currentUser';
 
 /**
  * The surrounding layout resolves the signed-in user from the session cookie
@@ -20,6 +21,9 @@ export const dynamic = 'force-dynamic';
  *
  * @returns The page UI for the route.
  */
-export default function EmployeesNewPage() {
-  return <EmployeeWizard mode="create" />;
+export default async function EmployeesNewPage() {
+  // Memoized for the render pass, so this shares the `/auth/me` request `BaseLayout` already made.
+  const currentUser = await getCurrentUser();
+
+  return <EmployeeWizard mode="create" currentUser={currentUser} />;
 }

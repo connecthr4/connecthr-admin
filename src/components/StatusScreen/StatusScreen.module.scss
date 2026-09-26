@@ -1,12 +1,12 @@
 /**
 ------------------------------------------------------
-styles specific to the NotFoundScreen component
+styles specific to the StatusScreen component
 ------------------------------------------------------
 **/
 
 .container {
   /*
-  Three tints that exist only on this canvas: the faint lavender wash behind an empty state
+  Three tints that exist only on this canvas: the faint lavender wash behind a status screen
   and the two shades its ornaments are drawn in. Declared here rather than in the styleguide
   because nothing else paints with them, and adding near-duplicates of `violet-25` to the
   shared palette would only make the next person guess which one they want.
@@ -92,15 +92,19 @@ styles specific to the NotFoundScreen component
   align-items: center;
   width: 100%;
 
-  /* Wide enough that the longer of the two sentences below still holds one line. */
+  /* Wide enough that a sentence of the explanation still holds one line. */
   max-width: 40rem;
   text-align: center;
 }
 
+/*
+Sized by height, not width: the artwork differs from screen to screen and only a shared
+height makes two of them look like the same set. The files carry a little padding, so the
+drawing inside lands at around 131px tall.
+*/
 .illustration {
-  /* Sized so the drawing inside — the file carries a little padding — lands at 175px wide. */
-  width: 11.375rem;
-  height: auto;
+  width: auto;
+  height: 8.75rem;
 }
 
 .code {
@@ -116,20 +120,24 @@ styles specific to the NotFoundScreen component
   color: var(--color-violet-600);
 }
 
-.title {
+/*
+The heading sits close under a code, which reads as one block with it, and further under an
+illustration, which does not.
+*/
+.code + .title {
   margin-top: var(--spacing-3);
 }
 
-/*
-Each sentence is its own paragraph, so the break between them is the one the layout was drawn
-with rather than wherever the measure happens to run out. They still wrap on a narrow screen.
-*/
+.illustration + .title {
+  margin-top: var(--spacing-10);
+}
+
 .description {
   margin-top: var(--spacing-2);
   color: var(--color-gray-500);
 }
 
-.supportNote {
+.note {
   margin-top: var(--spacing-8);
   color: var(--color-gray-400);
 }
@@ -150,12 +158,12 @@ with rather than wherever the measure happens to run out. They still wrap on a n
 Both rules are scoped through `.actions` so they outrank `Button`'s own variant classes
 regardless of the order the two stylesheets happen to load in.
 */
-.actions .goBack,
+.actions .secondaryAction,
 .actions .action {
   padding: 0.625rem var(--spacing-7);
 }
 
-.actions .goBack {
+.actions .secondaryAction {
   /*
   The quieter of the two buttons, but still an app action rather than a cancel — so it keeps
   the violet the primary uses, at outline weight. The icon inherits this colour.
