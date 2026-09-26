@@ -20,7 +20,9 @@ import {
   getPaginationRowModel,
   PaginationState,
   useReactTable,
+  type Column,
 } from '@tanstack/react-table';
+import { columnAttributes } from './columnMeta';
 import Dropdown from '../Dropdown';
 import { Inbox } from 'lucide-react';
 import Pagination from '../Pagination';
@@ -38,11 +40,16 @@ const PAGE_SIZE_OPTIONS = [
 const SKELETON_ROW_COUNT = 10;
 const SKELETON_BONE_WIDTHS = ['85%', '65%', '75%', '55%', '90%', '60%'];
 
-function SkeletonRow({ columnCount, rowIndex }: { columnCount: number; rowIndex: number }) {
+/*
+Takes the columns rather than a count so each placeholder cell carries its column's
+priority and pin — otherwise the skeleton would lay out wider than the table it stands
+in for, and jump as the real rows replace it.
+*/
+function SkeletonRow<TData>({ columns, rowIndex }: { columns: Column<TData, unknown>[]; rowIndex: number }) {
   return (
     <tr>
-      {Array.from({ length: columnCount }).map((_, columnIndex) => (
-        <td key={columnIndex}>
+      {columns.map((column, columnIndex) => (
+        <td key={column.id} {...columnAttributes(column.columnDef.meta)}>
           <div
             className={styles.bone}
             style={{ width: SKELETON_BONE_WIDTHS[(rowIndex + columnIndex) % SKELETON_BONE_WIDTHS.length] }}
@@ -162,7 +169,9 @@ function DataTable<TData extends object>({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</th>
+                  <th key={header.id} {...columnAttributes(header.column.columnDef.meta)}>
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
                 ))}
               </tr>
             ))}
@@ -171,7 +180,7 @@ function DataTable<TData extends object>({
           <tbody>
             {isLoading ? (
               Array.from({ length: SKELETON_ROW_COUNT }).map((_, rowIndex) => (
-                <SkeletonRow key={rowIndex} columnCount={columns.length} rowIndex={rowIndex} />
+                <SkeletonRow key={rowIndex} columns={table.getVisibleLeafColumns()} rowIndex={rowIndex} />
               ))
             ) : totalRows === 0 ? (
               <tr>
@@ -188,7 +197,9 @@ function DataTable<TData extends object>({
               table.getRowModel().rows.map((row) => (
                 <tr key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                    <td key={cell.id} {...columnAttributes(cell.column.columnDef.meta)}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
                   ))}
                 </tr>
               ))

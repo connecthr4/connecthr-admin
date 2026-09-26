@@ -4,6 +4,8 @@ styles specific to the BasePieChart component
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 /*
   Legend under the plot is the base layout — it is what `bottom` asks for, and
   also what `right` falls back to on a card too narrow to hold a side column.
@@ -104,7 +106,7 @@ legend beside the plot — only where the card is wide enough for a side column
 ------------------------------------------------------
 **/
 
-@media (min-width: 1025px) {
+@include respond-up(md) {
   .chart[data-legend-position='right'] {
     flex-direction: row;
   }

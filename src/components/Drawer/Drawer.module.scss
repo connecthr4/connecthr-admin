@@ -8,6 +8,8 @@ animate in from, so no JavaScript timers or mount flags are needed for the motio
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 .drawer {
   --drawer-size: 26rem;
   --drawer-duration: 300ms;
@@ -166,6 +168,13 @@ animate in from, so no JavaScript timers or mount flags are needed for the motio
   transition:
     background-color 0.15s ease,
     color 0.15s ease;
+}
+
+.closeButton {
+  @include touch {
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+  }
 }
 
 .closeButton:hover {

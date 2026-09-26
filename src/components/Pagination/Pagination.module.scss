@@ -4,6 +4,8 @@ styles specific to the Pagination component
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 .container {
   display: flex;
   align-items: center;
@@ -34,6 +36,12 @@ styles specific to the Pagination component
   &:disabled {
     color: var(--color-gray-400);
     cursor: not-allowed;
+  }
+
+  /* 36px suits a mouse; a finger needs the 44px minimum. */
+  @include touch {
+    min-width: 2.75rem;
+    height: 2.75rem;
   }
 }
 

@@ -14,9 +14,11 @@ styles specific to the TableToolbar component
 
 .left {
   display: flex;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
+  min-width: 0;
 }
 
 .right {
@@ -26,7 +28,12 @@ styles specific to the TableToolbar component
   gap: 1rem;
 }
 
+/*
+Its full 330px where there is room, giving way down to 12rem before the filter wraps
+under it — a fixed width with `flex-shrink: 0` pushed the actions on the right off a
+tablet-width card instead.
+*/
 .search {
-  width: 20.625rem;
-  flex-shrink: 0;
+  flex: 0 1 20.625rem;
+  min-width: 12rem;
 }
