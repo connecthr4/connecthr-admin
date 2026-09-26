@@ -4,6 +4,7 @@
 
 import EmployeeWizard from '@/src/components/EmployeeWizard';
 import { getEmployeeDetail } from '@/src/lib/server/employees';
+import { getCurrentUser } from '@/src/lib/server/currentUser';
 
 /**
  * Depends on the caller's session cookie, so it can never be statically
@@ -29,7 +30,7 @@ interface EmployeeEditPageProps {
 export default async function EmployeeEditPage({ params }: EmployeeEditPageProps) {
   const { employeeId } = await params;
 
-  const employee = await getEmployeeDetail(employeeId);
+  const [employee, currentUser] = await Promise.all([getEmployeeDetail(employeeId), getCurrentUser()]);
 
-  return <EmployeeWizard mode="edit" employee={employee} />;
+  return <EmployeeWizard mode="edit" employee={employee} currentUser={currentUser} />;
 }

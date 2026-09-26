@@ -38,7 +38,8 @@ import type { User } from '@/src/lib/types/auth';
 interface UserMenuProps {
   /**
    * Authenticated user's information shown on the trigger.
-   * If not provided, default placeholder values are rendered.
+   * If not provided, the user in the auth store is shown, and failing that,
+   * default placeholder values.
    */
   userDetails?: User | null;
 
@@ -50,6 +51,14 @@ interface UserMenuProps {
 
 export default function UserMenu({ userDetails, className }: UserMenuProps) {
   const clearAuth = useAuthStore((state) => state.clearAuth);
+
+  /*
+  Loading skeletons render the header before their page has fetched the user, so
+  they pass nothing — fall back to the user `AuthHydrator` already put in the
+  store, rather than flashing the placeholder until the page arrives.
+  */
+  const storedUser = useAuthStore((state) => state.user);
+  const user = userDetails ?? storedUser;
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, startLogout] = useTransition();
 
@@ -83,12 +92,12 @@ export default function UserMenu({ userDetails, className }: UserMenuProps) {
           {/* A `<button>` only admits phrasing content, so the labels render as spans. */}
           <span className={styles.info}>
             <Text1 as="span" className={styles.name} truncation="ellipsis">
-              {userDetails?.name || 'User'}
+              {user?.name || 'User'}
             </Text1>
 
             {/* The API returns the role as an enum value; the chip shows its label. */}
             <Text2 as="span" className={styles.role} truncation="ellipsis">
-              {formatRole(userDetails?.role) || 'Admin'}
+              {formatRole(user?.role) || 'Admin'}
             </Text2>
           </span>
 

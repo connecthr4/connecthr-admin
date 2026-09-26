@@ -4,6 +4,7 @@
 
 import EmployeeDetails from '@/src/components/EmployeeDetails';
 import { getEmployeeDetail } from '@/src/lib/server/employees';
+import { getCurrentUser } from '@/src/lib/server/currentUser';
 
 /**
  * Depends on the caller's session cookie, so it can never be statically
@@ -28,7 +29,7 @@ interface EmployeeDetailsPageProps {
 export default async function EmployeeDetailsPage({ params }: EmployeeDetailsPageProps) {
   const { employeeId } = await params;
 
-  const employee = await getEmployeeDetail(employeeId);
+  const [employee, currentUser] = await Promise.all([getEmployeeDetail(employeeId), getCurrentUser()]);
 
-  return <EmployeeDetails employee={employee} />;
+  return <EmployeeDetails employee={employee} currentUser={currentUser} />;
 }

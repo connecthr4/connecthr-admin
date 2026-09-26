@@ -68,6 +68,7 @@ const meta = {
   argTypes: {},
   args: {
     employee,
+    currentUser: null,
   },
 } satisfies Meta<typeof EmployeeDetails>;
 

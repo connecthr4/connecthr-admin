@@ -1,0 +1,197 @@
+/**
+------------------------------------------------------
+styles specific to the StatusScreen component
+------------------------------------------------------
+**/
+
+.container {
+  /*
+  Three tints that exist only on this canvas: the faint lavender wash behind a status screen
+  and the two shades its ornaments are drawn in. Declared here rather than in the styleguide
+  because nothing else paints with them, and adding near-duplicates of `violet-25` to the
+  shared palette would only make the next person guess which one they want.
+  */
+  --canvas: #f6f6fb;
+  --ornament: #f1edfe;
+  --ornament-strong: #dbd4f6;
+
+  position: relative;
+
+  /*
+  A viewport height rather than `100%`: the body sets `min-height`, not `height`, so a
+  percentage here would resolve against nothing and collapse to the content. `flex: 1` is
+  for the other case — dropped into the app shell's column, where it takes the space left.
+  */
+  flex: 1;
+  min-height: 100dvh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-10) var(--spacing-5);
+  background-color: var(--canvas);
+
+  /* The ornaments sit near the edges; without this they would lengthen the page. */
+  overflow: hidden;
+}
+
+/* ==========================
+   Ornaments
+========================== */
+
+.ornaments span {
+  position: absolute;
+  background-color: var(--ornament);
+}
+
+.squareStart {
+  top: 6.5%;
+  left: 7.5%;
+  width: 4.6875rem;
+  height: 4.6875rem;
+  border-radius: var(--radius-xl);
+}
+
+.squareEnd {
+  right: 14%;
+  bottom: 14.5%;
+  width: 3.625rem;
+  height: 3.625rem;
+  border-radius: var(--radius-md);
+}
+
+.dotEnd {
+  top: 10.5%;
+  right: 11%;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+
+  /* The one ornament clear of the card and the copy, so it can afford to be the darker of the two. */
+  background-color: var(--ornament-strong);
+}
+
+.dotStart {
+  bottom: 10.5%;
+  left: 13.5%;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+}
+
+/* ==========================
+   Content
+========================== */
+
+.content {
+  /* Above the ornaments, which are positioned against the same container. */
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  /* Wide enough that a sentence of the explanation still holds one line. */
+  max-width: 40rem;
+  text-align: center;
+}
+
+/*
+Sized by height, not width: the artwork differs from screen to screen and only a shared
+height makes two of them look like the same set. The files carry a little padding, so the
+drawing inside lands at around 131px tall.
+*/
+.illustration {
+  width: auto;
+  height: 8.75rem;
+}
+
+.code {
+  margin-top: 1.75rem;
+
+  /*
+  Scales with the viewport rather than stepping at a breakpoint: at its full size this is the
+  widest thing on the screen, and on a phone it would otherwise crowd out everything below it.
+  */
+  font-size: clamp(4.5rem, 11vw, 6.75rem);
+  line-height: 1;
+  font-weight: 700;
+  color: var(--color-violet-600);
+}
+
+/*
+The heading sits close under a code, which reads as one block with it, and further under an
+illustration, which does not.
+*/
+.code + .title {
+  margin-top: var(--spacing-3);
+}
+
+.illustration + .title {
+  margin-top: var(--spacing-10);
+}
+
+.description {
+  margin-top: var(--spacing-2);
+  color: var(--color-gray-500);
+}
+
+.note {
+  margin-top: var(--spacing-8);
+  color: var(--color-gray-400);
+}
+
+/* ==========================
+   Actions
+========================== */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-9);
+}
+
+/*
+Both rules are scoped through `.actions` so they outrank `Button`'s own variant classes
+regardless of the order the two stylesheets happen to load in.
+*/
+.actions .secondaryAction,
+.actions .action {
+  padding: 0.625rem var(--spacing-7);
+}
+
+.actions .secondaryAction {
+  /*
+  The quieter of the two buttons, but still an app action rather than a cancel — so it keeps
+  the violet the primary uses, at outline weight. The icon inherits this colour.
+  */
+  color: var(--color-violet-600);
+  border-color: var(--color-violet-600-40);
+}
+
+/* ==========================
+   Narrow screens
+========================== */
+
+@media (max-width: 48rem) {
+  .container {
+    padding: var(--spacing-9) var(--spacing-5);
+  }
+
+  /* Nothing is lost with them gone, and at this width they would sit under the copy. */
+  .ornaments {
+    display: none;
+  }
+
+  .actions {
+    /* Full-width stacked buttons, rather than two cramped ones sharing a line. */
+    flex-direction: column;
+    width: 100%;
+
+    /* Held to a readable measure rather than running the full width of a tablet. */
+    max-width: 26.5rem;
+  }
+}

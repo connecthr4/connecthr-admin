@@ -295,6 +295,32 @@ export const STRINGS = {
    */
   APPROVED: 'Approved',
   REJECTED: 'Rejected',
+
+  /* ==========================
+     Not found (404)
+  ========================== */
+  NOT_FOUND_CODE: '404',
+  NOT_FOUND_TITLE: 'This page took an unplanned exit',
+  /* Two sentences, kept apart so each one holds its own line on a wide screen. */
+  NOT_FOUND_DESCRIPTION: "The page you're looking for doesn't exist, was moved, or the link is broken.",
+  NOT_FOUND_DESCRIPTION_HINT: 'Double-check the URL, or head back to somewhere familiar.',
+  NOT_FOUND_GO_BACK: 'Go Back',
+  NOT_FOUND_BACK_TO_DASHBOARD: 'Back to Dashboard',
+  NOT_FOUND_SUPPORT_NOTE: 'Error code: 404 · If this keeps happening, contact your HR administrator',
+
+  /* ==========================
+     Unexpected error
+  ========================== */
+  ERROR_TITLE: 'Something went wrong',
+
+  /*
+  Says what failed, that the user is not at fault, and that nothing was lost — the three
+  things someone staring at a broken screen actually wants answered.
+  */
+  ERROR_DESCRIPTION:
+    'An unexpected error stopped this page from loading. Nothing you did caused this, and no data has been lost — please try again.',
+  ERROR_RELOAD_PAGE: 'Reload Page',
+  ERROR_TRY_AGAIN: 'Try Again',
 };
 
 /**

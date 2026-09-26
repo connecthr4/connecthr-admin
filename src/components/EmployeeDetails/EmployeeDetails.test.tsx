@@ -103,13 +103,13 @@ describe('EmployeeDetails — separation section', () => {
   });
 
   it('offers the section in the sidebar for every employee', () => {
-    render(<EmployeeDetails employee={employee} />);
+    render(<EmployeeDetails employee={employee} currentUser={null} />);
 
     expect(screen.getByRole('button', { name: STRINGS.SEPARATION })).toBeInTheDocument();
   });
 
   it('reads nothing until the section is opened', () => {
-    render(<EmployeeDetails employee={employee} />);
+    render(<EmployeeDetails employee={employee} currentUser={null} />);
 
     expect(getEmployeeSeparation).not.toHaveBeenCalled();
   });
@@ -117,7 +117,7 @@ describe('EmployeeDetails — separation section', () => {
   it("asks by the employee's code, which is what the endpoint is keyed on", async () => {
     const user = userEvent.setup();
 
-    render(<EmployeeDetails employee={employee} />);
+    render(<EmployeeDetails employee={employee} currentUser={null} />);
     await openSeparation(user);
 
     await waitFor(() => expect(getEmployeeSeparation).toHaveBeenCalledWith('EMP1042'));
@@ -126,7 +126,7 @@ describe('EmployeeDetails — separation section', () => {
   it('shows the filed separation once the read lands', async () => {
     const user = userEvent.setup();
 
-    render(<EmployeeDetails employee={employee} />);
+    render(<EmployeeDetails employee={employee} currentUser={null} />);
     await openSeparation(user);
 
     expect(await screen.findByText('Relocating to another city.')).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe('EmployeeDetails — separation section', () => {
   it('reads once however often the section is left and reopened', async () => {
     const user = userEvent.setup();
 
-    render(<EmployeeDetails employee={employee} />);
+    render(<EmployeeDetails employee={employee} currentUser={null} />);
     await openSeparation(user);
     await screen.findByText('Relocating to another city.');
 
@@ -152,7 +152,7 @@ describe('EmployeeDetails — separation section', () => {
     const user = userEvent.setup();
     vi.mocked(getEmployeeSeparation).mockResolvedValue({ success: true, data: null });
 
-    render(<EmployeeDetails employee={employee} />);
+    render(<EmployeeDetails employee={employee} currentUser={null} />);
     await openSeparation(user);
 
     expect(await screen.findByText(STRINGS.NO_SEPARATION_FILED)).toBeInTheDocument();
@@ -165,7 +165,7 @@ describe('EmployeeDetails — separation section', () => {
     const user = userEvent.setup();
     vi.mocked(getEmployeeSeparation).mockResolvedValue({ success: false, message: 'Service unavailable.' });
 
-    render(<EmployeeDetails employee={employee} />);
+    render(<EmployeeDetails employee={employee} currentUser={null} />);
     await openSeparation(user);
 
     expect(await screen.findByText('Service unavailable.')).toBeInTheDocument();
@@ -180,7 +180,7 @@ describe('EmployeeDetails — separation section', () => {
   it('leaves the profile and attendance sections alone', async () => {
     const user = userEvent.setup();
 
-    render(<EmployeeDetails employee={employee} />);
+    render(<EmployeeDetails employee={employee} currentUser={null} />);
     await openSeparation(user);
     await screen.findByText('Relocating to another city.');
 
