@@ -4,6 +4,8 @@ styles specific to the AttendanceListDashboard component
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 .container {
   display: flex;
   flex-direction: column;
@@ -87,14 +89,14 @@ The panel loses its own gutters as the sidebar does, and the cards drop to two
 across — four in a row leaves each one too narrow to hold a label like "Total
 Employees" on a single line.
 */
-@media (max-width: 1280px) {
+@include respond(lg) {
   .content {
     gap: var(--spacing-5);
     padding: var(--spacing-5);
   }
 }
 
-@media (max-width: 1024px) {
+@include respond(md) {
   .field {
     max-width: none;
   }

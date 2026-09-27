@@ -4,6 +4,8 @@ styles specific to the StatusScreen component
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 .container {
   /*
   Three tints that exist only on this canvas: the faint lavender wash behind a status screen
@@ -176,7 +178,7 @@ regardless of the order the two stylesheets happen to load in.
    Narrow screens
 ========================== */
 
-@media (max-width: 48rem) {
+@include respond(sm) {
   .container {
     padding: var(--spacing-9) var(--spacing-5);
   }

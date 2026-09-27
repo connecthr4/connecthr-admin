@@ -4,20 +4,51 @@ styles specific to the LeftNavBar component
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 /*
-Width comes from the grid column in `BaseLayout`, which narrows at the laptop
-breakpoints; declaring one here as well is how the two drifted 30px apart.
+Width and height both come from the grid cell in `BaseLayout`, which narrows at the
+laptop breakpoints and stretches its one row to the viewport; declaring either here
+as well is how the two drifted apart (30px wide, and a height that had to be
+re-derived from the layout's padding at every tier).
+
+Hidden at tablet widths, where the same nav is shown in the drawer instead.
 */
 .sidebar {
   width: 100%;
-  height: calc(100vh - 3rem);
-  position: sticky;
+  min-height: 0;
   padding: var(--spacing-8);
   background: var(--color-gray-50);
   display: flex;
   flex-direction: column;
   border-radius: var(--radius-xl);
   overflow-y: auto;
+
+  @include respond(md) {
+    display: none;
+  }
+}
+
+/*
+The tablet drawer. Shares the sidebar's surface, and scrolls as one body so the
+logo moves with the list rather than eating into it on a short landscape screen.
+The drawer's own header, which holds only the close button, sits on the same fill.
+Qualified by element so it outranks the Drawer's own white surface, whichever of the
+two stylesheets happens to load last.
+*/
+dialog.drawer {
+  background: var(--color-gray-50);
+}
+
+.drawer > * > header {
+  border-bottom: none;
+  padding-block-end: 0;
+}
+
+.drawerBody {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-5) var(--spacing-5);
 }
 
 .logoSection {
@@ -144,17 +175,12 @@ own. Stripped back to the anchor's own appearance so `.navItem` styles both.
 }
 
 /*
-The `height` in each tier tracks `BaseLayout`'s vertical padding (2 × 1.5rem, then
-2 × 1rem, then 2 × 0.75rem) — the sidebar is sized against the viewport rather than
-its grid area, so it has to be told when those gutters change or it overflows.
-
-The padding comes down with the column: at a 240px column the original 24px sidebar
-padding plus 24px item indent left too little for a label like "Employees" and the
-text wrapped.
+The compact tier covers the smaller docked column and the tablet drawer alike — both
+are ~240–280px wide, where the original 24px sidebar padding plus 24px item indent
+left too little for a label like "Employees" and the text wrapped.
 */
-@media (max-width: 1280px) {
+@include respond(lg) {
   .sidebar {
-    height: calc(100vh - 2rem);
     padding: var(--spacing-5);
   }
 
@@ -174,20 +200,5 @@ text wrapped.
 
   .submenuItem {
     padding: var(--spacing-2) var(--spacing-3);
-  }
-}
-
-@media (max-width: 1024px) {
-  .sidebar {
-    height: calc(100vh - 1.5rem);
-    padding: var(--spacing-3);
-  }
-
-  .navItem {
-    padding: var(--spacing-3);
-  }
-
-  .submenu {
-    padding-left: 2rem;
   }
 }
