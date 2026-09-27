@@ -1,0 +1,83 @@
+name: E2E Tests (connecthr-test)
+
+# For every develop -> main PR, runs the full Robot API suite plus the UI
+# smoke tests in connecthr4/connecthr-test (both minus known `defect` cases),
+# and passes/fails with them so it can gate the merge. ~8 min end to end.
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: e2e-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  TEST_REPO: connecthr4/connecthr-test
+
+jobs:
+  e2e:
+    if: github.event.pull_request.head.ref == 'develop'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Trigger test suites
+        env:
+          # Fine-grained PAT with access to connecthr-test:
+          # Contents: read & write (needed for dispatches), Actions: read.
+          GH_TOKEN: ${{ secrets.CONNECTHR_TEST_TOKEN }}
+          ADMIN_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+          # Optional repo variable, e.g. the develop deployment URL.
+          AUT_BASE_URL: ${{ vars.E2E_AUT_BASE_URL }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Missing secret CONNECTHR_TEST_TOKEN"
+            exit 1
+          fi
+          gh api "repos/$TEST_REPO/dispatches" \
+            -f event_type=admin-ci \
+            -f "client_payload[admin_run_id]=$ADMIN_RUN_ID" \
+            -f "client_payload[aut_base_url]=$AUT_BASE_URL" \
+            -f "client_payload[pr_number]=${{ github.event.pull_request.number }}" \
+            -f "client_payload[sha]=${{ github.event.pull_request.head.sha }}"
+          echo "Dispatched admin-ci $ADMIN_RUN_ID to $TEST_REPO"
+
+      - name: Wait for UI + API runs
+        env:
+          GH_TOKEN: ${{ secrets.CONNECTHR_TEST_TOKEN }}
+          ADMIN_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          # Test workflows name dispatched runs "... admin-ci <ADMIN_RUN_ID>".
+          RUNS=()
+          for _ in $(seq 1 30); do
+            mapfile -t RUNS < <(gh run list -R "$TEST_REPO" \
+              --event repository_dispatch --limit 50 \
+              --json databaseId,displayTitle \
+              --jq ".[] | select(.displayTitle | endswith(\"admin-ci $ADMIN_RUN_ID\")) | .databaseId")
+            [ "${#RUNS[@]}" -ge 2 ] && break
+            sleep 10
+          done
+          if [ "${#RUNS[@]}" -lt 2 ]; then
+            echo "::error::Expected 2 runs in $TEST_REPO for admin-ci $ADMIN_RUN_ID, found ${#RUNS[@]}"
+            exit 1
+          fi
+
+          FAILED=0
+          echo "### connecthr-test results" >> "$GITHUB_STEP_SUMMARY"
+          for id in "${RUNS[@]}"; do
+            url="https://github.com/$TEST_REPO/actions/runs/$id"
+            echo "Watching $url"
+            if gh run watch "$id" -R "$TEST_REPO" --exit-status --interval 30 > /dev/null; then
+              result="✅ passed"
+            else
+              result="❌ failed"
+              FAILED=1
+            fi
+            title=$(gh run view "$id" -R "$TEST_REPO" --json displayTitle --jq .displayTitle)
+            echo "- $result — [$title]($url)" >> "$GITHUB_STEP_SUMMARY"
+            echo "$title: $result"
+          done
+          exit "$FAILED"
