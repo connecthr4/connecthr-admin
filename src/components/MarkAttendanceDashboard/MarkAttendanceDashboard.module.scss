@@ -4,6 +4,8 @@ styles specific to the MarkAttendanceDashboard component
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 .container {
   display: flex;
   flex-direction: column;
@@ -56,14 +58,14 @@ them on the fields' bottom edge rather than centred against the labels above.
 
 /* Stands in for the employee table, so it fills the panel the table will. */
 /* The panel loses its own gutters as the sidebar does. */
-@media (max-width: 1280px) {
+@include respond(lg) {
   .content {
     gap: var(--spacing-5);
     padding: var(--spacing-5);
   }
 }
 
-@media (max-width: 1024px) {
+@include respond(md) {
   .filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

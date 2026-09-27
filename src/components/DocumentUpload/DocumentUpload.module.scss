@@ -4,6 +4,8 @@ styles specific to the DocumentUpload component
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 .form {
   display: flex;
   flex-direction: column;
@@ -24,7 +26,7 @@ name is ellipsised inside its column instead of stretching it.
 }
 
 /* One column from the tablet breakpoint down, where two dropzones cannot both stay legible. */
-@media (max-width: 1024px) {
+@include respond(md) {
   .content {
     grid-template-columns: minmax(0, 1fr);
   }

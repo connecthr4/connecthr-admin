@@ -4,6 +4,8 @@ styles specific to the Stepper component
 ------------------------------------------------------
 **/
 
+@use '../../styles/mixins' as *;
+
 .container {
   display: flex;
   align-items: center;
@@ -35,7 +37,7 @@ styles specific to the Stepper component
   color: var(--color-violet-600);
 }
 
-@media (max-width: 1024px) {
+@include respond(md) {
   .container {
     overflow-x: auto;
     gap: 24px;

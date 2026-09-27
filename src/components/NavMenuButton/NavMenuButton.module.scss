@@ -1,0 +1,42 @@
+/**
+------------------------------------------------------
+styles specific to the NavMenuButton component
+------------------------------------------------------
+**/
+
+@use '../../styles/mixins' as *;
+
+/*
+44px square — the touch-target minimum — since this only ever shows on tablets.
+Only rendered below `md`, the complement of where `LeftNavBar` docks.
+*/
+.button {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-gray-900);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  @include respond(md) {
+    display: inline-flex;
+  }
+}
+
+@media (hover: hover) {
+  .button:hover {
+    background: var(--color-gray-50);
+  }
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-violet-600);
+  outline-offset: 2px;
+}

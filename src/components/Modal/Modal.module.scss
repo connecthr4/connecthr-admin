@@ -46,7 +46,9 @@ styles specific to the Modal component
 }
 
 .body {
+  /* `dvh` so the body fits the visible area while a tablet's browser toolbar is showing. */
   max-height: 80vh;
+  max-height: 80dvh;
   overflow-y: auto;
 }
 

@@ -1,30 +1,78 @@
-/* -----------------------------
-  Breakpoints
------------------------------ */
-$breakpoint-sm: 768px; // Tablet
-$breakpoint-md: 1024px; // Laptop
-$breakpoint-lg: 1280px; // Desktop
-$breakpoint-xl: 1440px; // Large Desktop
+@use 'sass:map';
 
 /* -----------------------------
-  Responsive Mixin
+  Breakpoints
+
+  The one scale every stylesheet sizes against. The supported range runs from a
+  portrait tablet (768px) up; below that is out of scope for an admin tool.
+
+  Each value is the *top* of its tier and is inclusive: `respond(lg)` covers
+  1280px itself, which matters because a Windows laptop at the default 150%
+  display scale reports exactly 1280px and belongs with the smaller laptops.
+
+  `md` is the line where the sidebar stops docking and becomes a drawer. The
+  same number lives in `src/constants/breakpoints.ts` for the one place script
+  needs it — change both together.
 ----------------------------- */
-@mixin respond($breakpoint) {
-  @if $breakpoint == sm {
-    @media (max-width: #{$breakpoint-sm}) {
-      @content;
-    }
-  } @else if $breakpoint == md {
-    @media (max-width: #{$breakpoint-md}) {
-      @content;
-    }
-  } @else if $breakpoint == lg {
-    @media (max-width: #{$breakpoint-lg}) {
-      @content;
-    }
-  } @else if $breakpoint == xl {
-    @media (max-width: #{$breakpoint-xl}) {
-      @content;
-    }
+$breakpoints: (
+  /* Portrait tablet */ sm: 768px,
+  /* Landscape tablet — the sidebar becomes a drawer at and below this */ md: 1024px,
+  /* Small laptop, incl. Windows at 150% scaling */ lg: 1280px,
+  /* Laptop / small desktop */ xl: 1440px
+);
+
+@function breakpoint($name) {
+  @if not map.has-key($breakpoints, $name) {
+    @error 'Unknown breakpoint `#{$name}`. Expected one of: #{map.keys($breakpoints)}.';
   }
+
+  @return map.get($breakpoints, $name);
+}
+
+/* -----------------------------
+  Viewport queries
+
+  `respond` is desktop-first — the base styles are the wide layout and each tier
+  narrows it — which matches how the app is used. `respond-up` is the exact
+  complement, for the rare rule that only applies above a tier. Range syntax
+  rather than `min-`/`max-width` so the two meet without a gap at fractional
+  widths (browser zoom produces those).
+----------------------------- */
+@mixin respond($name) {
+  @media (width <= #{breakpoint($name)}) {
+    @content;
+  }
+}
+
+@mixin respond-up($name) {
+  @media (width > #{breakpoint($name)}) {
+    @content;
+  }
+}
+
+/*
+Coarse pointers — touchscreens — get larger hit areas. Keyed on the input
+device rather than the screen size, because a touchscreen laptop needs them
+and a small desktop window does not.
+*/
+@mixin touch {
+  @media (pointer: coarse) {
+    @content;
+  }
+}
+
+/* -----------------------------
+  Layout helpers
+----------------------------- */
+
+/*
+A grid that fits as many `$min`-wide columns as the space allows and wraps the
+rest, so a card row or a form reflows by its own width rather than per
+breakpoint. `min(…, 100%)` keeps a single column from overflowing a container
+narrower than `$min`.
+*/
+@mixin auto-grid($min, $gap: var(--spacing-7)) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(#{$min}, 100%), 1fr));
+  gap: $gap;
 }

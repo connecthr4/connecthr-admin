@@ -15,6 +15,7 @@ import type { ReactNode } from 'react';
 import type { User } from '@/src/lib/types/auth';
 import Breadcrumbs from '../Breadcrumbs';
 import UserMenu from '../UserMenu';
+import NavMenuButton from '../NavMenuButton';
 import { Bell } from 'lucide-react';
 import { Heading3, Text1 } from '../Typography';
 import styles from './AppHeader.module.scss';
@@ -60,10 +61,14 @@ interface AppHeaderProps {
 export default function AppHeader({ title, subtitle, userDetails, breadcrumbs }: AppHeaderProps) {
   return (
     <header className={styles.header}>
-      <div className={styles.leftSection}>
-        <Heading3>{title}</Heading3>
-        {breadcrumbs?.length && <Breadcrumbs items={breadcrumbs} />}
-        {subtitle && <Text1 className={styles.subtitle}>{subtitle}</Text1>}
+      <div className={styles.titleGroup}>
+        <NavMenuButton />
+
+        <div className={styles.leftSection}>
+          <Heading3>{title}</Heading3>
+          {breadcrumbs?.length && <Breadcrumbs items={breadcrumbs} />}
+          {subtitle && <Text1 className={styles.subtitle}>{subtitle}</Text1>}
+        </div>
       </div>
 
       <div className={styles.rightSection}>
