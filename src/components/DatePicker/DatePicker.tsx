@@ -12,13 +12,21 @@
  */
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import TextInput from '@/src/components/TextInput';
 import { DayPicker, DateRange, Matcher } from '@daypicker/react';
 import '@daypicker/react/style.css';
 import { formatDisplayDate, formatLongDateValue, parseLocalDate } from '@/src/utils/date';
+import MonthYearPanel, { CalendarView, CaptionClickContext, CaptionLabel } from './MonthYearPanel';
 import styles from './DatePicker.module.scss';
+
+/* Stable reference, so DayPicker does not see new components on every render. */
+const DAY_PICKER_COMPONENTS = { CaptionLabel };
+
+/* Navigation bounds used by single and range mode when no minDate/maxDate is given. */
+const DEFAULT_START_MONTH = new Date(2024, 0);
+const DEFAULT_END_MONTH = new Date(2035, 11);
 
 type DatePickerValue = Date | Date[] | DateRange | string | undefined;
 
@@ -167,6 +175,21 @@ export default function DatePicker({
 
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(currentSelectedDate);
+  const [view, setView] = useState<CalendarView>('days');
+
+  /* Multiple mode has never been bounded, so only single and range get the defaults. */
+  const startMonth = mode === 'multiple' ? undefined : minDate || DEFAULT_START_MONTH;
+  const endMonth = mode === 'multiple' ? undefined : maxDate || DEFAULT_END_MONTH;
+
+  const openMonthGrid = useCallback(() => setView('months'), []);
+
+  const toggleOpen = () => {
+    if (disabled) return;
+
+    // Every open starts on the day calendar, whatever grid it was closed on.
+    setView('days');
+    setOpen((prev) => !prev);
+  };
 
   /*
     minDate/maxDate only feed startMonth/endMonth, which caps how far the calendar can be
@@ -240,8 +263,37 @@ export default function DatePicker({
     return '';
   }, [value, currentSelectedDate]);
 
+  /*
+  The month the grids open on. Before any navigation `month` is unset and DayPicker
+  shows today, pulled inside the bounds, so the same is worked out here.
+  */
+  const getVisibleMonth = () => {
+    if (month) return month;
+
+    const today = new Date();
+
+    if (startMonth && today < startMonth) return startMonth;
+
+    if (endMonth && today > endMonth) return endMonth;
+
+    return today;
+  };
+
   // Helper to render DayPicker for all modes
   const renderPicker = () => {
+    if (view !== 'days') {
+      return (
+        <MonthYearPanel
+          view={view}
+          month={getVisibleMonth()}
+          startMonth={startMonth}
+          endMonth={endMonth}
+          onViewChange={setView}
+          onMonthChange={setMonth}
+        />
+      );
+    }
+
     const props = {
       month,
       onMonthChange: setMonth,
@@ -252,41 +304,20 @@ export default function DatePicker({
       disabled: disabledDates,
       className: styles.dayPicker,
       onSelect: handleSelect,
+      components: DAY_PICKER_COMPONENTS,
+      startMonth,
+      endMonth,
     };
 
     if (mode === 'single') {
-      return (
-        <DayPicker
-          {...props}
-          mode="single"
-          captionLayout="dropdown"
-          reverseYears
-          reverseMonths
-          startMonth={minDate || new Date(2024, 0)}
-          endMonth={maxDate || new Date(2035, 11)}
-          selected={currentSelectedDate}
-        />
-      );
+      return <DayPicker {...props} mode="single" selected={currentSelectedDate} />;
     }
 
     if (mode === 'multiple') {
       return <DayPicker {...props} mode="multiple" selected={selectedMultiple} />;
     }
 
-    return (
-      <DayPicker
-        {...props}
-        mode="range"
-        selected={range}
-        min={min}
-        max={max}
-        captionLayout="dropdown"
-        reverseYears
-        reverseMonths
-        startMonth={minDate || new Date(2024, 0)}
-        endMonth={maxDate || new Date(2035, 11)}
-      />
-    );
+    return <DayPicker {...props} mode="range" selected={range} min={min} max={max} />;
   };
 
   return (
@@ -297,24 +328,26 @@ export default function DatePicker({
         value={formattedValue}
         required={required}
         error={error}
-        onClick={() => !disabled && setOpen((prev) => !prev)}
+        onClick={toggleOpen}
         className={inputClassName}
         readOnly
         rightIcon={<Calendar size={24} className={styles.calendarIcon} />}
       />
 
       {open && (
-        <div className={styles.datePickerWrapper}>
-          {displayMode === 'inline' ? (
-            <div className={styles.inlineContainer}>{renderPicker()}</div>
-          ) : (
-            <div className={styles.modalOverlay} onClick={() => setOpen(false)}>
-              <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
-                {renderPicker()}
+        <CaptionClickContext value={disableNavigation ? undefined : openMonthGrid}>
+          <div className={styles.datePickerWrapper}>
+            {displayMode === 'inline' ? (
+              <div className={styles.inlineContainer}>{renderPicker()}</div>
+            ) : (
+              <div className={styles.modalOverlay} onClick={() => setOpen(false)}>
+                <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
+                  {renderPicker()}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </CaptionClickContext>
       )}
     </div>
   );
