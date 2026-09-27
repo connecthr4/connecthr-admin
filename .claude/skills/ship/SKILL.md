@@ -12,7 +12,7 @@ Takes local work to an open pull request, following this repo's flow:
 Nothing is pushed to `develop` or `main` directly. Ask the user once, before anything goes outside this
 machine: step 5 collects every decision in a single prompt.
 
-`$ARGUMENTS`, if given, describes the change. Use it for the branch name, the ticket search and the PR title.
+`$ARGUMENTS`, if given, describes the change. Use it for the branch name, the ticket search and the ticket title (which the PR title copies).
 
 ## Fixed facts about this repo
 
@@ -64,7 +64,7 @@ Look in this order and stop at the first hit:
    3 matches, judged by title.
 
 If nothing credible turns up, plan a new ticket. Drafting it follows the user's `/ticket` command:
-- **Title:** a short, clear imperative summary.
+- **Title:** `UI - ` followed by a short, clear imperative summary (e.g. `UI - Add month and year grid navigation to date picker`).
 - **List:** HRMS - UI.
 - **Assignee:** the user (resolve "me" with `clickup_resolve_assignees`).
 - **Priority:** `normal`.
@@ -77,7 +77,9 @@ Load ClickUp tools with ToolSearch if they are deferred.
 - **Branch name** (only if a new branch is needed): `feature/…` or `bugfix/…`, based on what the diff does.
 - **Commit message** (only if there are uncommitted changes): match the repo's short lower-case style
   (`git log --oneline -10`), and end with the attribution lines the session asks for.
-- **PR title:** a sentence-case summary, under 70 characters.
+- **PR title:** exactly the ClickUp ticket's title, whether it's an existing match or the new draft
+  (e.g. `UI - Add month and year grid navigation to date picker`). If the user edits the ticket title in step 5,
+  the PR title follows it.
 
 ### 5. Confirm once
 
